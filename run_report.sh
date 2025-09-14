@@ -113,7 +113,8 @@ python3 quality_report_generator.py \
   --abs-file abs.txt \
   --security-file security.txt \
   --git-repo-path /Users/rchowdhuri/SDB \
-  --report-type comprehensive
+  --report-type comprehensive \
+  --skip-confirmation
 
 if [ $? -eq 0 ]; then
     echo ""

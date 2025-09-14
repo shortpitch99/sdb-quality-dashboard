@@ -1,0 +1,23 @@
+[
+  {
+    "component": "Authentication Module",
+    "line_coverage": 85.2,
+    "branch_coverage": 78.5,
+    "function_coverage": 92.1,
+    "test_count": 156
+  },
+  {
+    "component": "Payment Processing",
+    "line_coverage": 91.3,
+    "branch_coverage": 87.2,
+    "function_coverage": 95.8,
+    "test_count": 203
+  },
+  {
+    "component": "UI Components",
+    "line_coverage": 73.1,
+    "branch_coverage": 65.8,
+    "function_coverage": 81.2,
+    "test_count": 89
+  }
+]

@@ -1481,7 +1481,7 @@ IMPORTANT: Use these specific dates in your report header:
 - Reporting Period: {dates['period_full']}
 - Do NOT include "Prepared by: Quality Engineering Team" or similar attribution lines
 
-CRITICAL: Start the report with a "Data Preparation Prerequisites" section that explains how users should populate the required data files before running this report generator.
+CRITICAL: Start the report with a brief "Data Sources" section listing what data was used for this report (e.g., "Generated from 9 data sources: risk tracking, PRBs, production bugs, deployment records, coverage metrics, CI/security issues, and git analysis").
 
 RISK DATA:
 {json.dumps(data.get('risks', []), indent=2)}
@@ -1730,6 +1730,7 @@ def main():
     parser.add_argument('--prb-augmentation', help='PRB manual augmentation file (legacy)')
     parser.add_argument('--output-dir', default='./reports', help='Output directory')
     parser.add_argument('--report-type', default='comprehensive', choices=['comprehensive', 'compact'], help='Report type')
+    parser.add_argument('--skip-confirmation', action='store_true', help='Skip data readiness confirmation prompt')
     
     args = parser.parse_args()
     
@@ -1784,8 +1785,33 @@ def main():
     archive_file = os.path.join(args.output_dir, f"quality_data_archive_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
     collector.save_archive_data(archive_file)
     
+    # Confirm data readiness
+    if not args.skip_confirmation:
+        print("\n" + "="*60)
+        print("📋 DATA PREPARATION CHECKLIST")
+        print("="*60)
+        print("Before generating the report, confirm you have:")
+        print("✓ Updated risks.txt with current feature status")
+        print("✓ Exported latest PRB data to prb.txt")
+        print("✓ Pulled current production bugs to bugs.txt")  
+        print("✓ Generated fresh deployment.csv from SuperSet")
+        print("✓ Extracted coverage.txt from SonarQube")
+        print("✓ Exported CI/security issues to respective files")
+        print("✓ Refreshed SDB git repository")
+        print("")
+        
+        while True:
+            response = input("📊 All data sources are current and ready? (y/N): ").strip().lower()
+            if response in ['y', 'yes']:
+                break
+            elif response in ['n', 'no', '']:
+                print("📋 Please update your data sources first. See INSTRUCTIONS.md for details.")
+                return 0
+            else:
+                print("Please enter 'y' for yes or 'n' for no.")
+
     # Generate report
-    print("Generating quality report...")
+    print("\n🤖 Generating quality report...")
     report_generator = QualityReportGenerator(collector.config.get('llm_api_key', ''))
     try:
         report_content = report_generator.generate_report(collector.data, args.report_type)
