@@ -1,0 +1,18 @@
+09/12 - Weekly Deployment Rollouts Update:
+Cells at High Risk during Upgrade
+ita2s  - 258.7.8 (SB12 Week1) Deployment Paused until the fix is in place to mitigate the risk . Also, Data Encryption (TLE) not enabled
+This week updates
+Below releases planned for this week
+260.2.2  SB0  -  Shared Services and Cells :done-3:
+258.11.14 SB12 Week2  Shared Services and Cells  Completed :done-3:
+258.11.15  R* Cells Week1 :done-3:
+258.15.7 Cloudstore and Store ERR   - In Progress
+GIA2H Snapline shared services upgrade to 258.11.14  :done-3:
+SDB-DB Node Right-Sizing  (Phase4 - ~57% Cells (24/42) Completed  
+Plan for next week
+260.3.2 SB0  -  Shared Services and Cells
+258.11.15  R* Cells Week2
+258.15.8    R* Cells  Week1 
+258.15.7 Cloudstore and Store ERR
+SDB-DB Node Right-Sizing  (Phase4 - 18 Cells remaining)
+Challenges   Faced during last week - Nil

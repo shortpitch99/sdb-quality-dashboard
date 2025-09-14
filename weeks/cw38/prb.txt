@@ -1,0 +1,76 @@
+Created Date Time Select all rows for Drill Down.
+Created Date Time
+Sorted by Created Date Time, oldest-to-newestAscending
+Problem Priority
+Sorted by Problem Priority, ascending picklist orderAscending
+Problem Number
+Sorted by Problem Number, A-to-ZAscending
+Select row for Drill Down.
+9/14/2025 - 9/20/2025(1)
+P2(1)
+PRB-0028761(1)
+Created Date Time
+Sorted by Created Date Time, oldest-to-newestAscending
+Problem Priority
+Sorted by Problem Priority, ascending picklist orderAscending
+Problem Number
+Sorted by Problem Number, A-to-ZAscending
+Team: Team Name
+Cloud
+Problem State
+Customer Impact
+External RCA Requested
+Problem Description
+Repeat Incident
+Created Date
+Initial Work Issue: Work ID
+Customer Experience
+What Happened?
+Proximate Cause (Why did it happen)?
+How did we find out about the issue?
+How was it Resolved?
+Root Cause
+Next Steps
+Retro Summary
+Owner: Full Name
+9/14/2025 - 9/20/2025(1)
+P2(1)
+PRB-0028761(1)
+SDB Archival
+SDB
+Analysis Complete
+Feature degradation / disruption (internal service impact)
+feature not included
+PRB Retrospective | SEV-2 | 09/16/2025 | SDB Clusters in Hyperforce are not backing up causing capacity constraints
+
+[THIS PRB IS MANAGED BY QUIP2GUS]
+feature not included
+9/16/2025
+W-19654054
+User Experience: There was no customer impact due to this. | Impact Quantification: Q: What #/% of users/customers/requests got impacted (aggregated across all infra units)?. A: .
+[THIS PRB IS MANAGED BY QUIP2GUS]
+Any updates made in GUS will be overwritten! Update Quip doc: https://salesforce.quip.com/PDaWAt3Bl3qE
+​
+SDB Archival is not running for sdb in the following FIs: aws-prod3-eucentral1-core1-sam-r
+ERR release caused version mismatch between archival and store service
+https://salesforce-internal.slack.com/archives/CDQ3U66E5/p1758040952998679
+Archival worker release was rolled back and archivalworker pods were restarted
+​
+Q: Explain in detail the Time to Fix (i.e key events from detection to resolution)
+A: 
+​
+Q: Was a known mitigation for this incident? If yes, please describe
+1)  The 258.15 bkproxy client in archival worker is incompatible with the 258.11 store server, as ASYNC_JOURNAL is ALLOWED starting from 258.15.8. Two ERRs (. ERR-30812. and . ERR-30802. ) on 9/15 PST both caused clusters in SB week 2 stagger to enter a
+1) W-19678943. Create availability alert for archivalworker bkproxy sidecar.
+2) W-19678956. Add store version compatibility check in archival worker deployment pipeline.
+3) W-19669982. : Update to shared service staggering sequence.
+Proximate Cause: ERR release caused version mismatch between archival and store service
+​
+Key Questions for Retro (enter as Problem Statements below): 
+​
+Q: RCA to be determined 
+A: 
+​
+Q: If caught by Alert but missed TTD goal, does
+Sanjukta Chatterjee
+

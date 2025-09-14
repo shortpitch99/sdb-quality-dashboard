@@ -32,36 +32,45 @@ echo "🔍 Checking required data files..."
 
 missing_files=()
 
-if [ ! -f "risks.txt" ]; then
+# Determine data directory based on week parameter
+if [ "$1" ]; then
+    data_dir="weeks/$1"
+    echo "📂 Looking for data files in: $data_dir/"
+else
+    data_dir="."
+    echo "📂 Looking for data files in current directory"
+fi
+
+if [ ! -f "$data_dir/risks.txt" ]; then
     missing_files+=("risks.txt")
 fi
 
-if [ ! -f "prb.txt" ]; then
+if [ ! -f "$data_dir/prb.txt" ]; then
     missing_files+=("prb.txt")
 fi
 
-if [ ! -f "bugs.txt" ]; then
+if [ ! -f "$data_dir/bugs.txt" ]; then
     missing_files+=("bugs.txt")
 fi
 
-if [ ! -f "deployment.csv" ]; then
+if [ ! -f "$data_dir/deployment.csv" ]; then
     missing_files+=("deployment.csv")
 fi
 
-if [ ! -f "coverage.txt" ]; then
+if [ ! -f "$data_dir/coverage.txt" ]; then
     missing_files+=("coverage.txt")
 fi
 
-if [ ! -f "ci.txt" ]; then
+if [ ! -f "$data_dir/ci.txt" ]; then
     missing_files+=("ci.txt")
 fi
 
-if [ ! -f "leftshift.txt" ]; then
+if [ ! -f "$data_dir/leftshift.txt" ]; then
     missing_files+=("leftshift.txt")
 fi
 
-if [ ! -f "security.txt" ]; then
-    missing_files+=("security.txt")
+if [ ! -f "$data_dir/ss.txt" ]; then
+    missing_files+=("ss.txt")
 fi
 
 # Check if git repository exists
@@ -70,12 +79,17 @@ if [ ! -d "/Users/rchowdhuri/SDB/.git" ]; then
 fi
 
 if [ ${#missing_files[@]} -ne 0 ]; then
-    echo "❌ Missing required data files:"
+    echo "❌ Missing required data files in $data_dir/:"
     for file in "${missing_files[@]}"; do
         echo "   - $file"
     done
     echo ""
-    echo "📋 Please follow the data preparation instructions in the generated report."
+    if [ "$1" ]; then
+        echo "📋 Please ensure all data files are present in the $data_dir/ directory."
+        echo "   You can copy files from another week or prepare new data files."
+    else
+        echo "📋 Please follow the data preparation instructions in the generated report."
+    fi
     echo "   Run this script again after preparing all data files."
     exit 1
 fi
@@ -95,26 +109,36 @@ cd - > /dev/null
 
 echo "✅ Git repository updated!"
 
-# Clean previous reports
-echo "🗑️  Cleaning previous reports..."
-rm -f reports/*.md reports/*.json
+# Archive previous reports (do not clean - reports are meant to be archived)
+echo "📁 Archiving functionality enabled - previous reports preserved"
 
 # Generate the quality report
 echo "📊 Generating comprehensive quality report..."
-python3 quality_report_generator.py \
-  --risk-file risks.txt \
-  --prb-file prb.txt \
-  --bugs-file bugs.txt \
-  --deployment-csv deployments.csv \
-  --stagger-deployment-csv deployment.csv \
-  --coverage-txt coverage.txt \
-  --ci-file ci.txt \
-  --leftshift-file leftshift.txt \
-  --abs-file abs.txt \
-  --security-file security.txt \
-  --git-repo-path /Users/rchowdhuri/SDB \
-  --report-type comprehensive \
-  --skip-confirmation
+
+# Check if week argument is provided
+if [ "$1" ]; then
+    echo "📅 Using calendar week: $1"
+    python3 quality_report_generator.py \
+      --week $1 \
+      --git-repo-path /Users/rchowdhuri/SDB \
+      --report-type comprehensive \
+      --skip-confirmation
+else
+    # Default behavior - use current directory files
+    python3 quality_report_generator.py \
+      --risk-file risks.txt \
+      --prb-file prb.txt \
+      --bugs-file bugs.txt \
+      --deployment-csv deployment.csv \
+      --coverage-txt coverage.txt \
+      --ci-file ci.txt \
+      --leftshift-file leftshift.txt \
+      --abs-file abs.txt \
+      --security-file security.txt \
+      --git-repo-path /Users/rchowdhuri/SDB \
+      --report-type comprehensive \
+      --skip-confirmation
+fi
 
 if [ $? -eq 0 ]; then
     echo ""

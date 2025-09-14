@@ -1,6 +1,18 @@
 Scrum Team Name Select all rows for Drill Down.
 Scrum Team Name
 Sorted by Scrum Team Name, A-to-ZAscending
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Work: Work ID
+Found in Build
+Assigned To
+Status
+Subject
+Scrum Team Name Select all rows for Drill Down.
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Priority
+Sorted by Priority, ascending picklist orderAscending
 Work: Work ID
 Found in Build
 Assigned To
@@ -8,6 +20,7 @@ Status
 Subject
 Select row for Drill Down.
 Sayonara Data Management(13)
+P4(13)
 W-14324477
 sdb.248.25
 Anup Ghatage
@@ -74,13 +87,16 @@ Thomas Fanghaenel
 New
 OVERRUN - /src/backend/utils/adt/correlationid.c (1 issues)
 Subtotal
+Subtotal
 Select row for Drill Down.
 Sayonara TxP(1)
+P4(1)
 W-13140867
 sdb.246.9
 Kaushal Mittal
 New
 OVERRUN - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/src/backend/replication/pg_workflow_extra.c (1 issues)
+Subtotal
 Subtotal
 Total(14)
 

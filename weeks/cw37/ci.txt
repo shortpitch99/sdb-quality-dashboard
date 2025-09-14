@@ -24,8 +24,8 @@ Sorted by Scrum Team Name, A-to-ZAscending
 Priority
 Sorted by Priority, ascending picklist orderAscending
 Select row for Drill Down.
-Sayonara Data Management(6)
-P2(6)
+Sayonara Data Management(7)
+P2(7)
 Subtotal
 Subtotal
 Select row for Drill Down.
@@ -34,8 +34,8 @@ P2(2)
 Subtotal
 Subtotal
 Select row for Drill Down.
-Sayonara TxP(10)
-P2(10)
+Sayonara TxP(9)
+P2(9)
 Subtotal
 Subtotal
 Select row for Drill Down.
@@ -75,8 +75,30 @@ Found in Build
 Scheduled Build
 Customer
 Work: Created By
-Sayonara Data Management(6)
-P2(6)
+Sayonara Data Management(7)
+P2(7)
+W-19638203
+SDB-JUnitStress-LD-sharded-FC-Debug-cross-cell-RHEL9.cross-cell: PSQLException: ERROR: cannot update tenant state for te
+New
+SDB Data Management Work Queue
+9/15/2025
+-
+Bug
+sdb.260.7
+-
+-
+SFCI API USER
+W-19630992
+InterruptedFlushLocationCacheTest.flushTerminateFullInvalTest_withSuccessfulMiniFlushInBetweenTest: AssertionFailedError: expected:<3> but was:<4>
+New
+Audrey Fang
+9/13/2025
+-
+Bug
+sdb.260.7
+-
+-
+SFCI API USER
 W-19630909
 SDB-JUnitStress-LD-sharded-FC-cross-cell-RHEL9.cross-cell: PSQLException: ERROR: deadlock detected
 New
@@ -88,21 +110,10 @@ sdb.260.7
 -
 -
 SFCI API USER
-W-19626626
-SDB-JUnitStress-sandbox-stress-encryption-kms-RHEL9.sandbox-stress-encryption-kms: PSQLException: ERROR: FAILED: get_current_active_server
-New
-SDB Data Management Work Queue
-9/12/2025
--
-Bug
-sdb.260.7
--
--
-SFCI API USER
 W-19624375
 SDB-JUnitStress-sandbox-stress-RHEL9.sandbox-stress: AssertionError: Index inconsistency found for relation:
 New
-SDB Data Management Work Queue
+Theo Vanderkooy
 9/12/2025
 -
 Bug
@@ -171,19 +182,8 @@ sdb.260
 SFCI API USER
 Subtotal
 Subtotal
-Sayonara TxP(10)
-P2(10)
-W-19630992
-InterruptedFlushLocationCacheTest.flushTerminateFullInvalTest_withSuccessfulMiniFlushInBetweenTest: AssertionFailedError: expected:<3> but was:<4>
-New
-SDB TxP Work Queue
-9/13/2025
--
-Bug
-sdb.260.7
--
--
-SFCI API USER
+Sayonara TxP(9)
+P2(9)
 W-19629559
 test.skip_test:TestStartStopKeyForward: Ctest failure: TEST 506/587 skip_test:TestStartStopKeyF
 New
@@ -357,3 +357,4 @@ Dipesh Pandit
 Subtotal
 Subtotal
 Total(23)
+

@@ -1,0 +1,146 @@
+Priority Select all rows for Drill Down.
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Created Date
+Sorted by Created Date, oldest-to-newestAscending
+Select row for Drill Down.
+P2(7)
+Sayonara Data Management(1)
+9/17/2025(1)
+Subtotal
+Subtotal
+Sayonara Foundation Services(2)
+8/12/2025(1)
+Subtotal
+8/25/2025(1)
+Subtotal
+Subtotal
+Sayonara TxP(1)
+8/27/2025(1)
+Subtotal
+Subtotal
+SDB Engine Health and Diagnostics(1)
+9/19/2025(1)
+Subtotal
+Subtotal
+SDB Query Proc Optimizer(1)
+7/15/2025(1)
+Subtotal
+Subtotal
+SDBStore(1)
+8/20/2025(1)
+Subtotal
+Subtotal
+Subtotal
+Total(7)
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Created Date
+Sorted by Created Date, oldest-to-newestAscending
+Work ID
+Subject
+Readme Notes
+Assigned To: Full Name
+Status
+Customer
+Found In Build Name
+Sprint: Name
+P2(7)
+Sayonara Data Management(1)
+9/17/2025(1)
+W-19661638
+[EA][PROD][PROD_ERROR][usa32s] Scan processing for tenant "00DEm00000JSt0E" and object with phyId 21...
+-
+Christopher Drexelius
+Triaged
+SDBFalcon usa32s
+sdb.258.11
+-
+Subtotal
+Subtotal
+Sayonara Foundation Services(2)
+8/12/2025(1)
+W-19317263
+[EA][PROD][INTERNAL_ERROR][usa376] We need an in-progress transaction to read the catalogs
+09/23 - Code is in Review stage.
+
+09/09 - Jacob has already fixed this as part of Sequences V2. Once he is back from PTO (9b), he willl cherry-pick the fix into Sequences V1.
+
+08/14/2025 Couple of follow-ups have been identified which will be fixed as pa...
+Jacob Park
+Ready for Review
+SDBFalcon usa376
+sdb.258.1
+2025.09b-Sayonara Foundation Services
+Subtotal
+8/25/2025(1)
+W-19419309
+[EA][PROD][INTERNAL_ERROR][usa804s] Record lineage mismatch error
+9/23 - The team is adding additional diagnostics which will be checked into master and tested on left-shift. Actual ERR and deployment will wait until after the Dreamforce moratorium.
+
+9/9 - Multiple theories were pursued but we don't have a smoking gun ...
+Michael Abebe
+In Progress
+SDBFalcon usa804s
+sdb.258.7
+2025.09b-Sayonara Foundation Services
+Subtotal
+Subtotal
+Sayonara TxP(1)
+8/27/2025(1)
+W-19440829
+[EA][PROD][INTERNAL_ERROR][ind132] Cannot allocate FragmentStaetQueue slot after 649 attempts over 120 seconds, error=1,
+9/22: Sprinted to fix in 9b
+9/11: Suhas identified a potential DL in the fsq daemon with timestamp logging.
+Suhas Dantkale
+New
+SDBFalcon ind132
+sdb.258.3
+2025.09b Sayonara TxP
+Subtotal
+Subtotal
+SDB Engine Health and Diagnostics(1)
+9/19/2025(1)
+W-19692318
+[EA][PROD][INTERNAL_ERROR][usa740] could not read statistics message: Success
+9/22: multi-occurrences, did we deliver the diagnostic code as discussed in W-18995582?
+Ankur Singh Chauhan
+New
+SDBFalcon usa740
+sdb.258.11
+-
+Subtotal
+Subtotal
+SDB Query Proc Optimizer(1)
+7/15/2025(1)
+W-19056851
+Hash semijoin hint is not honored in query with two hinted hash semijoins and a skinny table.
+9/22: Problem was reproduced locally. Tried a couple of fixes. What's the ETA for the final fix?
+9/9: Trying to reproduce the problem to ensure the theory is correct. The potential fix for the theory is ready.
+Sanjib Mishra
+In Progress
+SDBFalcon usa224s
+256
+-
+Subtotal
+Subtotal
+SDBStore(1)
+8/20/2025(1)
+W-19391926
+[EA][PROD][PROD_ERROR][usa936s] Could not commit transaction before the transaction commit threshold...
+9/22: Any updates?
+9/10: Swapnil will check if the problem was caused by OS patching
+Swapnil Warke
+In Progress
+SDBFalcon usa936s
+sdb.258.11
+2025.09b-SDBStore
+Subtotal
+Subtotal
+Subtotal
+Total(7)
+

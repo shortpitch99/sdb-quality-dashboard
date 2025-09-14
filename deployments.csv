@@ -1,4 +1,0 @@
-version,date,environment,status,features,issues
-v2.3.1,2024-01-15,production,deployed,auth-improvements;ui-updates,
-v2.3.0,2024-01-10,production,deployed,payment-gateway;mobile-fixes,minor-ui-glitch
-v2.2.9,2024-01-05,staging,testing,data-export;performance-opt,load-test-pending

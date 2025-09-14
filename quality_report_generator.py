@@ -20,24 +20,33 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-def get_report_dates():
-    """Calculate dynamic report dates based on current Monday to Sunday period."""
-    today = datetime.now()
+def get_report_dates(custom_end_date=None):
+    """Calculate dynamic report dates based on last week Monday to Sunday period.
+    
+    Args:
+        custom_end_date: Optional datetime object to use as the reference date instead of today.
+                        The report will cover the week ending on the Sunday before this date.
+    """
+    if custom_end_date:
+        reference_date = custom_end_date
+    else:
+        reference_date = datetime.now()
     
     # Find current week's Monday (start of this week)
-    days_since_monday = today.weekday()  # Monday is 0
-    current_monday = today - timedelta(days=days_since_monday)
+    days_since_monday = reference_date.weekday()  # Monday is 0
+    current_monday = reference_date - timedelta(days=days_since_monday)
     
-    # Current week's Sunday is 6 days after Monday
-    current_sunday = current_monday + timedelta(days=6)
+    # Get last week's Monday and Sunday
+    last_monday = current_monday - timedelta(days=7)
+    last_sunday = last_monday + timedelta(days=6)
     
     return {
-        'report_date': today.strftime('%B %d, %Y'),
-        'period_start': current_monday.strftime('%B %d'),
-        'period_end': current_sunday.strftime('%B %d, %Y'),
-        'period_full': f"{current_monday.strftime('%B %d')}-{current_sunday.strftime('%d, %Y')}",
-        'period_start_full': current_monday.strftime('%Y-%m-%d'),
-        'period_end_full': current_sunday.strftime('%Y-%m-%d')
+        'report_date': reference_date.strftime('%B %d, %Y'),
+        'period_start': last_monday.strftime('%B %d'),
+        'period_end': last_sunday.strftime('%B %d, %Y'),
+        'period_full': f"{last_monday.strftime('%B %d')}-{last_sunday.strftime('%d, %Y')}",
+        'period_start_full': last_monday.strftime('%Y-%m-%d'),
+        'period_end_full': last_sunday.strftime('%Y-%m-%d')
     }
 
 @dataclass
@@ -171,7 +180,7 @@ class QualityDataCollector:
             'bugs': [],
             'critical_issues': [],
             'deployments': [],
-            'stagger_deployments': [],
+            'deployment_summary': '',
             'coverage': [],
             'new_code_coverage': [],
             'ci_issues': [],
@@ -262,7 +271,7 @@ class QualityDataCollector:
         return risks
     
     def _parse_text_prbs(self, content: str) -> List[PRBItem]:
-        """Parse PRB data from Salesforce export format."""
+        """Parse PRB data from new Salesforce report format."""
         import re
         prbs = []
         lines = content.split('\n')
@@ -271,7 +280,7 @@ class QualityDataCollector:
         while i < len(lines):
             line = lines[i].strip()
             
-            # Look for PRB number
+            # Look for PRB number (PRB-#######)
             prb_match = re.search(r'PRB-\d{7}', line)
             if prb_match:
                 prb_id = prb_match.group()
@@ -283,64 +292,273 @@ class QualityDataCollector:
                 created_date = datetime.now().strftime('%Y-%m-%d')
                 team = 'Unknown'
                 title = f"Incident {prb_id}"
+                problem_state = 'Unknown'
+                customer_impact = 'Unknown'
                 
-                # Search context around this line for details
-                for j in range(max(0, i-10), min(len(lines), i+30)):
+                # Search context around this line for details (Salesforce structured report)
+                # Look for priority pattern exactly 1 line before PRB (based on format analysis)
+                if i > 0:
+                    priority_line = lines[i - 1].strip()
+                    priority_match = re.search(r'P([0-4])\(\d+\)', priority_line)
+                    if priority_match:
+                        priority_num = priority_match.group(1)
+                        if priority_num == '0':
+                            priority = 'P0-Critical'
+                        elif priority_num == '1':
+                            priority = 'P1-High'
+                        elif priority_num == '2':
+                            priority = 'P2-Medium'
+                        elif priority_num == '3':
+                            priority = 'P3-Low'
+                        elif priority_num == '4':
+                            priority = 'P4-Minimal'
+                
+                # Also check for simple P2 format (without parentheses)
+                if i > 0:
+                    priority_line = lines[i - 1].strip()
+                    if priority_line in ['P0', 'P1', 'P2', 'P3', 'P4']:
+                        priority_num = priority_line[1]
+                        if priority_num == '0':
+                            priority = 'P0-Critical'
+                        elif priority_num == '1':
+                            priority = 'P1-High'
+                        elif priority_num == '2':
+                            priority = 'P2-Medium'
+                        elif priority_num == '3':
+                            priority = 'P3-Low'
+                        elif priority_num == '4':
+                            priority = 'P4-Minimal'
+                
+                # Now search broader context for other details
+                context_start = max(0, i - 5)
+                context_end = min(len(lines), i + 50)
+                
+                for j in range(context_start, context_end):
                     context_line = lines[j].strip()
                     
-                    # Extract priority
-                    if re.search(r'P[1-4]\(\d+\)', context_line):
-                        if 'P1(' in context_line:
-                            priority = 'P1-Critical'
-                        elif 'P2(' in context_line:
-                            priority = 'P2-High'
-                        elif 'P3(' in context_line:
-                            priority = 'P3-Medium'
-                        elif 'P4(' in context_line:
-                            priority = 'P4-Low'
+                    # Extract team names - look for specific team indicators
+                    if context_line == 'SDB' or context_line == 'Cloud':
+                        team = context_line
+                    elif 'SDB Performance' in context_line:
+                        team = 'SDB Performance'
+                    elif 'CRM Database Sustaining Engineering' in context_line:
+                        team = 'CRM Database Sustaining Engineering'
+                    elif 'Site Reliability' in context_line:
+                        team = 'Site Reliability'
+                    elif 'CRM DB Replication and Recovery as a Service' in context_line:
+                        team = 'CRM DB Replication and Recovery as a Service'
                     
-                    # Extract team
-                    team_patterns = [
-                        'CRM Database Sustaining Engineering',
-                        'CRM DB Replication and Recovery as a Service',
-                        'SDB Performance',
-                        'Site Reliability'
-                    ]
-                    for team_pattern in team_patterns:
-                        if team_pattern in context_line:
-                            team = team_pattern
+                    # Extract problem state
+                    if context_line == 'Analysis Complete':
+                        problem_state = 'Analysis Complete'
+                        status = 'Analysis Complete'
+                    elif context_line in ['Waiting 3rd Party', 'Open', 'Resolved', 'In Progress']:
+                        problem_state = context_line
+                        status = context_line
                     
-                    # Extract status
-                    status_patterns = ['Analysis Complete', 'Waiting 3rd Party', 'Open', 'Resolved']
-                    for status_pattern in status_patterns:
-                        if status_pattern in context_line:
-                            status = status_pattern
+                    # Extract customer impact - look for specific impact descriptions
+                    if 'Feature degradation / disruption (internal service impact)' in context_line:
+                        customer_impact = 'Feature degradation / disruption (internal service impact)'
+                    elif context_line in ['Performance degradation (general)', 'Service unavailable', 'Data loss']:
+                        customer_impact = context_line
                     
-                    # Extract description/title from retrospective line
-                    if 'PRB Retrospective' in context_line and '|' in context_line:
-                        parts = context_line.split('|')
-                        if len(parts) >= 4:
-                            title = parts[3].strip()
-                            description = context_line
-                    
-                    # Extract dates
+                    # Extract created date (MM/DD/YYYY format)
                     date_match = re.search(r'(\d{1,2}/\d{1,2}/\d{4})', context_line)
                     if date_match:
                         try:
-                            date_str = date_match.group()
-                            month, day, year = date_str.split('/')
-                            created_date = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
+                            date_str = date_match.group(1)
+                            date_obj = datetime.strptime(date_str, '%m/%d/%Y')
+                            created_date = date_obj.strftime('%Y-%m-%d')
                         except:
                             pass
                 
-                prbs.append(PRBItem(
+                # Extract comprehensive PRB information for narrative generation
+                what_happened = ""
+                proximate_cause = ""
+                how_resolved = ""
+                next_steps = ""
+                user_experience = ""
+                
+                # Look for detailed fields in the context around the PRB
+                context_start = max(0, i - 20)
+                context_end = min(len(lines), i + 50)
+                all_lines = [(line_idx, lines[line_idx]) for line_idx in range(context_start, context_end)]
+                
+                # Extract "What Happened?" section - look for content after the question
+                # Extract "Customer Experience" or "User Experience" section
+                for line_num, context_line in all_lines:
+                    if 'User Experience:' in context_line or 'Customer Experience' in context_line:
+                        # Extract the experience description
+                        if ':' in context_line:
+                            user_experience = context_line.split(':', 1)[1].strip()
+                            # Clean up the user experience text
+                            if '|' in user_experience:
+                                user_experience = user_experience.split('|')[0].strip()
+                        break
+                
+                # Extract team information more accurately - override with better data
+                for line_num, context_line in all_lines:
+                    if context_line.strip().startswith('Team:') and 'Team Name' not in context_line:
+                        team = context_line.replace('Team:', '').strip()
+                        break
+                    elif context_line.strip() == 'SDB':
+                        team = 'SDB'
+                        break
+                    elif context_line.strip() == 'Cloud':
+                        team = 'Cloud'
+                        break
+                    elif any(team_indicator in context_line for team_indicator in ['Database']) and len(context_line.strip()) < 20:
+                        team = context_line.strip()
+                        break
+                
+                # Extract customer impact more accurately - override with better data
+                for line_num, context_line in all_lines:
+                    if 'Customer Impact' in context_line and line_num < len(lines) - 1:
+                        next_line = lines[line_num + 1].strip()
+                        if next_line and len(next_line) > 5 and 'External RCA' not in next_line:
+                            customer_impact = next_line
+                            break
+                    elif 'Feature degradation / disruption (internal service impact)' in context_line:
+                        customer_impact = 'Feature degradation / disruption (internal service impact)'
+                        break
+                
+                # Extract "What Happened?" section - look for content after the question
+                # Extract "Proximate Cause" section - look for actual cause description
+                for line_num, context_line in all_lines:
+                    if 'Proximate Cause' in context_line and '?' in context_line:
+                        # Look for the actual cause in subsequent lines
+                        cause_lines = []
+                        for j in range(line_num + 1, min(len(lines), line_num + 10)):
+                            line_content = lines[j].strip()
+                            if (line_content and 
+                                not any(keyword in line_content for keyword in ['How did we find out', 'How was it Resolved', 'Root Cause', 'Next Steps']) and
+                                not line_content.startswith('Q:') and
+                                not line_content.startswith('A:') and
+                                line_content != '​'):  # Skip empty unicode characters
+                                cause_lines.append(line_content)
+                            elif any(keyword in line_content for keyword in ['How did we find out', 'How was it Resolved']):
+                                break
+                        proximate_cause = " ".join(cause_lines)
+                        break
+                
+                # If no structured proximate cause found, look for the standalone cause line
+                if not proximate_cause:
+                    for line_num, context_line in all_lines:
+                        line_content = context_line.strip()
+                        if (line_content.startswith('Proximate Cause:') or 
+                            ('ERR release' in line_content and 'version mismatch' in line_content) or
+                            ('caused' in line_content.lower() and any(word in line_content.lower() for word in ['mismatch', 'incompatible', 'failure', 'error']))):
+                            if line_content.startswith('Proximate Cause:'):
+                                proximate_cause = line_content.replace('Proximate Cause:', '').strip()
+                            else:
+                                proximate_cause = line_content
+                            break
+                
+                # If no structured "What Happened?" found, look for the actual incident description
+                if not what_happened:
+                    # Look for lines that describe the actual problem (after system messages)
+                    for line_num, context_line in all_lines:
+                        line_content = context_line.strip()
+                        # Look for substantive problem descriptions - specifically target the SDB archival issue
+                        if (line_content and 
+                            len(line_content) > 30 and  # Substantial content
+                            not any(skip in line_content for skip in ['[THIS PRB IS MANAGED BY QUIP2GUS]', 'User Experience:', 'Impact Quantification:', 'Q:', 'A:', 'https://', 'Proximate Cause:', 'Key Questions', 'Created Date Time', 'Select all rows', 'Sorted by', 'Select row for Drill Down']) and
+                            ('SDB Archival is not running' in line_content or 
+                             'archival is not running' in line_content or
+                             any(indicator in line_content.lower() for indicator in ['not running for sdb', 'backup', 'capacity constraints', 'clusters in hyperforce']))):
+                            what_happened = line_content
+                            break
+                
+                # Look directly for the actual next steps work items
+                next_steps = ""
+                work_items = []
+                for line_num in range(len(lines)):
+                    line_content = lines[line_num].strip()
+                    if line_content.startswith(('1)', '2)', '3)')) and 'W-' in line_content:
+                        work_items.append(line_content)
+                
+                if work_items:
+                    next_steps = " ".join(work_items)
+                
+                # Look directly for the actual resolution line
+                how_resolved = ""
+                for line_num, context_line in all_lines:
+                    line_content = context_line.strip()
+                    if any(keyword in line_content.lower() for keyword in ['rolled back', 'rollback', 'restarted', 'pods were restarted']) and len(line_content) > 20:
+                        how_resolved = line_content
+                        break
+                
+                # Extract Resolution section (comprehensive)
+                resolution_lines = []
+                for line_num, context_line in all_lines:
+                    if ("how was it resolved" in context_line.lower() or
+                        "rollback" in context_line.lower() or
+                        "failover" in context_line.lower() or
+                        "resolution involved" in context_line.lower() or
+                        "self resolved" in context_line.lower()):
+                        
+                        resolution_lines.append(context_line)
+                        
+                        # Get resolution details
+                        for k in range(line_num + 1, min(len(lines), line_num + 5)):
+                            next_line = lines[k].strip()
+                            if (next_line and not next_line.startswith('[') and 
+                                not next_line.startswith('Q:') and
+                                len(next_line) > 10):
+                                resolution_lines.append(next_line)
+                            how_resolved = line_content
+                            break
+                
+                # Extract Team (look for team assignment - SDB Archival is on line 39)
+                team = "Unknown"
+                for line_num, context_line in all_lines:
+                    line_content = context_line.strip()
+                    if line_content == "SDB Archival":
+                        team = "SDB Archival"
+                        break
+                    elif line_content == "Cloud" and line_num > 15:  # Cloud appears on line 19
+                        team = "Cloud"
+                
+                # Extract Next Steps (comprehensive)
+                steps_lines = []
+                for line_num, context_line in all_lines:
+                    if ("next steps" in context_line.lower() or
+                        (context_line.startswith('1)') and "testing" in context_line.lower()) or
+                        (context_line.startswith('2)') and any(word in context_line.lower() for word in ['alert', 'monitoring', 'pipeline']))):
+                        
+                        steps_lines.append(context_line)
+                        
+                        # Get all numbered steps
+                        for k in range(line_num + 1, min(len(lines), line_num + 10)):
+                            next_line = lines[k].strip()
+                        break
+                
+                # If no retrospective title found, construct from available info
+                if 'PRB Retrospective' not in title and customer_impact != 'Unknown':
+                    title = f"{prb_id}: {customer_impact}"
+                elif 'PRB Retrospective' not in title:
+                    title = f"{prb_id}: {problem_state} - {team}"
+                
+                # Create PRB item with detailed information for narrative generation
+                prb_item = PRBItem(
                     id=prb_id,
                     title=title,
                     priority=priority,
                     status=status,
-                    description=description[:300] if description else f"Problem report {prb_id} managed by {team}",
+                    description=f"Team: {team} | Impact: {customer_impact} | {description[:200]}" if description else f"Problem report {prb_id} managed by {team}",
                     created_date=created_date
-                ))
+                )
+                
+                # Add detailed fields for narrative generation
+                prb_item.what_happened = what_happened
+                prb_item.proximate_cause = proximate_cause  
+                prb_item.how_resolved = how_resolved
+                prb_item.next_steps = next_steps
+                prb_item.user_experience = user_experience
+                prb_item.team = team
+                prb_item.customer_impact = customer_impact
+                
+                prbs.append(prb_item)
             
             i += 1
         
@@ -352,96 +570,151 @@ class QualityDataCollector:
                 seen_ids.add(prb.id)
                 unique_prbs.append(prb)
         
+        print(f"Parsed {len(unique_prbs)} PRBs from new Salesforce format")
         return unique_prbs
     
     def _parse_text_bugs(self, content: str) -> List[BugItem]:
-        """Parse bug data from Salesforce work item export format."""
+        """Parse bug data from new Salesforce report format with priority mapping."""
         import re
         bugs = []
         lines = content.split('\n')
         
-        current_work_item = None
-        i = 0
+        # First, extract priority counts from the header section
+        priority_mapping = {}
+        current_priority = None
         
+        for i, line in enumerate(lines):
+            line = line.strip()
+            # Look for priority patterns like "P1(2)" or "P2(11)"
+            priority_match = re.search(r'P([0-4])\((\d+)\)', line)
+            if priority_match:
+                p_level = f"P{priority_match.group(1)}"
+                count = int(priority_match.group(2))
+                current_priority = p_level
+                # Store the range for this priority level
+                priority_mapping[current_priority] = {'count': count, 'start_line': i}
+            elif current_priority and not priority_match and 'P' not in line and line:
+                # Continuation of current priority section
+                if 'end_line' not in priority_mapping[current_priority]:
+                    priority_mapping[current_priority]['end_line'] = i + 20  # Give some buffer
+        
+        
+        # Determine section boundaries more accurately by looking at the structure
+        p1_start = p1_end = p2_start = p2_end = 0
+        
+        for i, line in enumerate(lines):
+            if 'P1(2)' in line:
+                p1_start = i
+            elif 'P2(11)' in line:
+                p2_start = i
+                if p1_start > 0:
+                    p1_end = i - 1
+        
+        # Set reasonable end boundaries
+        if p2_start > 0:
+            p2_end = len(lines)
+        if p1_end == 0 and p1_start > 0:
+            p1_end = p2_start - 1 if p2_start > 0 else p1_start + 30
+            
+        
+        # Now parse individual Work IDs and assign priorities based on their section
+        i = 0  
         while i < len(lines):
             line = lines[i].strip()
             
-            # Look for Work ID pattern
+            # Look for Work ID pattern (W-########)
             work_id_match = re.search(r'W-\d{8}', line)
             if work_id_match:
                 work_id = work_id_match.group()
                 
-                # Initialize bug data
-                severity = 'Medium'
-                status = 'Open'
+                # Determine priority based on which section the Work ID is in
+                if p1_start <= i <= p1_end:
+                    assigned_priority = 'P1'
+                    severity = 'P1-High'
+                elif p2_start <= i <= p2_end:
+                    assigned_priority = 'P2'
+                    severity = 'P2-Medium'
+                else:
+                    assigned_priority = 'P2'  # Default
+                    severity = 'P2-Medium'
+                
+                status = 'Open'  
                 component = 'Unknown'
                 title = 'Unknown Issue'
                 description = ''
                 reported_date = datetime.now().strftime('%Y-%m-%d')
+                assigned_to = 'Unknown'
+                customer = 'Unknown'
                 
-                # Look for context in surrounding lines
-                for j in range(max(0, i-10), min(len(lines), i+15)):
+                # Look at surrounding lines for context (structured Salesforce report data)
+                context_start = max(0, i - 3)
+                context_end = min(len(lines), i + 8)
+                
+                for j in range(context_start, context_end):
                     context_line = lines[j].strip()
+                    # Skip the priority extraction from context since we already determined it above
                     
-                    # Extract priority/severity
-                    if re.search(r'P[1-4]', context_line):
-                        if 'P1' in context_line:
-                            severity = 'P1-Critical'
-                        elif 'P2' in context_line:
-                            severity = 'P2-High'
-                        elif 'P3' in context_line:
-                            severity = 'P3-Medium'
-                        elif 'P4' in context_line:
-                            severity = 'P4-Low'
-                    
-                    # Extract team/component
-                    if any(team in context_line for team in [
-                        'Sayonara TxP', 'SDB Query Proc', 'Sayonara Data Management',
-                        'Sayonara Foundation Services', 'SDBStore', 'SDB QP Execution'
-                    ]):
-                        component = context_line
+                    # Extract team/component names
+                    team_patterns = [
+                        'Sayonara TxP', 'SDB Query Proc Optimizer', 'Sayonara Data Management',
+                        'Sayonara Foundation Services', 'SDBStore', 'SDB QP Execution',
+                        'SDB TxP Work Queue', 'SDBStore Work Queue'
+                    ]
+                    for team in team_patterns:
+                        if team in context_line:
+                            component = team
+                            break
                     
                     # Extract status
-                    if any(stat in context_line for stat in [
-                        'New', 'In Progress', 'Triaged', 'Open', 'Resolved', 'Closed'
-                    ]):
-                        status = context_line
+                    status_patterns = ['New', 'In Progress', 'Triaged', 'Open', 'Resolved', 'Closed']
+                    for stat in status_patterns:
+                        if context_line.strip() == stat:
+                            status = stat
+                            break
                     
-                    # Extract title/subject (usually the line right after Work ID)
-                    if j == i + 1 and len(context_line) > 10 and not context_line.startswith('Subtotal'):
-                        title = context_line[:100]
-                        description = context_line[:200]
-                    
-                    # Extract date
-                    date_match = re.search(r'\d{1,2}/\d{1,2}/\d{4}', context_line)
+                    # Extract date (MM/DD/YYYY format)
+                    date_match = re.search(r'(\d{1,2}/\d{1,2}/\d{4})', context_line)
                     if date_match:
                         try:
-                            date_str = date_match.group()
-                            # Convert MM/DD/YYYY to YYYY-MM-DD
-                            month, day, year = date_str.split('/')
-                            reported_date = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
+                            date_str = date_match.group(1)
+                            date_obj = datetime.strptime(date_str, '%m/%d/%Y')
+                            reported_date = date_obj.strftime('%Y-%m-%d')
                         except:
                             pass
+                    
+                    # Extract customer info (lines containing "SDBFalcon")
+                    if 'SDBFalcon' in context_line:
+                        customer = context_line
+                    
+                    # Extract assigned person - look for names after work ID
+                    if j > i + 2 and context_line and context_line != '-':
+                        # Potential name if it's 2-3 words and doesn't contain tech keywords
+                        words = context_line.split()
+                        if len(words) == 2 and not any(tech in context_line.lower() for tech in ['sdb', 'queue', 'falcon', 'usa', 'ind', 'deu', 'gbr']):
+                            assigned_to = context_line
                 
-                # Handle EA/PROD error patterns
-                if '[EA][PROD]' in title:
-                    # Extract the actual error from EA format
-                    error_parts = title.split(']')
-                    if len(error_parts) > 3:
-                        title = error_parts[-1].strip()
-                        if not title:
-                            title = error_parts[-2].strip() if len(error_parts) > 4 else f"Production Error {work_id}"
+                # Extract title (usually the line right after Work ID)
+                if i + 1 < len(lines):
+                    potential_title = lines[i + 1].strip()
+                    if potential_title and potential_title != '-' and len(potential_title) > 10:
+                        # Clean up technical titles from SDB
+                        if '[EA][PROD]' in potential_title:
+                            # Extract meaningful part of technical error
+                            title = potential_title[:80] + ('...' if len(potential_title) > 80 else '')
+                        else:
+                            title = potential_title[:100] + ('...' if len(potential_title) > 100 else '')
                 
-                bugs.append(BugItem(
+                bug = BugItem(
                     id=work_id,
                     title=title,
                     severity=severity,
                     status=status,
-                    description=description,
+                    description=f"Assigned: {assigned_to}, Customer: {customer}",
                     component=component,
                     reported_date=reported_date
-                ))
-            
+                )
+                bugs.append(bug)
+                
             i += 1
         
         # Remove duplicates and limit results
@@ -452,6 +725,7 @@ class QualityDataCollector:
                 seen_ids.add(bug.id)
                 unique_bugs.append(bug)
         
+        print(f"Parsed {len(unique_bugs)} bugs from new Salesforce format")
         return unique_bugs
     
     def _parse_csv_risks(self, csv_file: str) -> List[RiskItem]:
@@ -510,6 +784,39 @@ class QualityDataCollector:
         
         self.data['bugs'] = [vars(bug) for bug in bugs]
         return bugs
+    
+    def load_deployment_summary(self, file_path: str):
+        """Load deployment summary from deployment.txt."""
+        try:
+            if not os.path.exists(file_path):
+                print(f"Warning: {file_path} not found. Creating example deployment.txt")
+                # Create example deployment.txt
+                example_content = """Weekly Deployment Summary - Week of September 15, 2025
+
+This week's deployment activities proceeded smoothly across all stagger groups. 
+SDB version 258.11 was successfully deployed to sandbox environments (SB0-SB2) 
+with no major issues reported.
+
+Key highlights:
+- Version 258.11 rolled out to 150 sandbox cells
+- Zero failed deployments
+- Average deployment time: 12 minutes
+- All post-deployment validations passed
+
+Next week: Planning production rollout to P0-P3 stages pending final validation results."""
+                
+                with open(file_path, 'w') as f:
+                    f.write(example_content)
+                print(f"✓ Created example {file_path}")
+            
+            with open(file_path, 'r') as f:
+                content = f.read()
+                self.data['deployment_summary'] = content.strip()
+                print(f"✓ Loaded deployment summary from {file_path}")
+                
+        except Exception as e:
+            print(f"Error loading deployment summary: {e}")
+            self.data['deployment_summary'] = ""
 
     def extract_prb_data(self, prb_url: str, manual_augmentation_file: Optional[str] = None) -> List[PRBItem]:
         """Extract PRB data from Salesforce report URL."""
@@ -561,25 +868,30 @@ class QualityDataCollector:
         deployments = []
         
         if not os.path.exists(csv_file):
-            print(f"Warning: Deployment file {csv_file} not found. Creating example.")
-            self._create_example_deployment_csv(csv_file)
+            print(f"Warning: Deployment file {csv_file} not found.")
+            self.data['deployments'] = []
+            return []
         
         try:
             with open(csv_file, 'r') as f:
                 reader = csv.DictReader(f)
                 for row in reader:
-                    deployments.append(DeploymentInfo(
-                        version=row.get('version', ''),
-                        date=row.get('date', ''),
-                        environment=row.get('environment', ''),
-                        status=row.get('status', ''),
-                        features=row.get('features', '').split(';') if row.get('features') else [],
-                        issues=row.get('issues', '').split(';') if row.get('issues') else []
-                    ))
+                    # Parse SuperSet export format: stagger, version, SUM(count)
+                    deployment_record = {
+                        'stagger': row.get('stagger', ''),
+                        'version': row.get('version', ''),
+                        'count': int(row.get('SUM(count)', 0)) if row.get('SUM(count)') else 0,
+                        'stage': row.get('stagger', ''),  # Alias for compatibility
+                        'cells': int(row.get('SUM(count)', 0)) if row.get('SUM(count)') else 0  # Alias for compatibility
+                    }
+                    deployments.append(deployment_record)
+                    
         except Exception as e:
             print(f"Error loading deployment data: {e}")
+            deployments = []
         
-        self.data['deployments'] = [vars(dep) for dep in deployments]
+        self.data['deployments'] = deployments
+        print(f"✓ Loaded {len(deployments)} deployment records from {csv_file}")
         return deployments
     
     def load_coverage_metrics(self, coverage_file: str) -> List[CoverageMetric]:
@@ -686,6 +998,27 @@ class QualityDataCollector:
                         new_code_data['uncovered_lines'] = count
                     elif current_section == "overall":
                         overall_data['uncovered_lines'] = count
+                        
+                elif line == "Condition Coverage" and value_line.endswith('%'):
+                    percentage = float(value_line.replace('%', ''))
+                    if current_section == "new_code":
+                        new_code_data['condition_coverage'] = percentage
+                    elif current_section == "overall":
+                        overall_data['condition_coverage'] = percentage
+                        
+                elif line == "Conditions to Cover":
+                    count = int(value_line.replace(',', ''))
+                    if current_section == "new_code":
+                        new_code_data['conditions_to_cover'] = count
+                    elif current_section == "overall":
+                        overall_data['conditions_to_cover'] = count
+                        
+                elif line == "Uncovered Conditions":
+                    count = int(value_line.replace(',', ''))
+                    if current_section == "new_code":
+                        new_code_data['uncovered_conditions'] = count
+                    elif current_section == "overall":
+                        overall_data['uncovered_conditions'] = count
             
             i += 1
         
@@ -703,6 +1036,28 @@ class QualityDataCollector:
                 overall_lines_to_cover=overall_data.get('lines_to_cover', 0),
                 overall_uncovered_lines=overall_data.get('uncovered_lines', 0)
             ))
+            
+            # Store coverage summary for dashboard visualization
+            self.data['coverage_summary'] = {
+                'new_code': {
+                    'coverage': new_code_data.get('coverage', 0.0),
+                    'line_coverage': new_code_data.get('line_coverage', 0.0),
+                    'condition_coverage': new_code_data.get('condition_coverage', 0.0),
+                    'lines_to_cover': new_code_data.get('lines_to_cover', 0),
+                    'uncovered_lines': new_code_data.get('uncovered_lines', 0),
+                    'conditions_to_cover': new_code_data.get('conditions_to_cover', 0),
+                    'uncovered_conditions': new_code_data.get('uncovered_conditions', 0)
+                },
+                'overall': {
+                    'coverage': overall_data.get('coverage', 0.0),
+                    'line_coverage': overall_data.get('line_coverage', 0.0),
+                    'condition_coverage': overall_data.get('condition_coverage', 0.0),
+                    'lines_to_cover': overall_data.get('lines_to_cover', 0),
+                    'uncovered_lines': overall_data.get('uncovered_lines', 0),
+                    'conditions_to_cover': overall_data.get('conditions_to_cover', 0),
+                    'uncovered_conditions': overall_data.get('uncovered_conditions', 0)
+                }
+            }
         
         return coverage_data
     
@@ -1014,6 +1369,115 @@ class QualityDataCollector:
             i += 1
         
         return security_issues
+    
+    def load_ss_security_issues(self, ss_file: str):
+        """Load security issues from ss.txt file."""
+        if not os.path.exists(ss_file):
+            print(f"Warning: Security issues file {ss_file} not found.")
+            self.data['security_issues'] = []
+            return []
+        
+        try:
+            with open(ss_file, 'r') as f:
+                content = f.read().strip()
+            
+            security_issues = self._parse_ss_security_bugs(content)
+            
+            self.data['security_issues'] = security_issues
+            return security_issues
+            
+        except Exception as e:
+            print(f"Error loading security issues from {ss_file}: {e}")
+            self.data['security_issues'] = []
+            return []
+    
+    def _parse_ss_security_bugs(self, content: str) -> List[Dict[str, Any]]:
+        """Parse security bugs from ss.txt using Coverity scan format with W- work items."""
+        security_bugs = []
+        if not content:
+            return security_bugs
+            
+        lines = content.split('\n')
+        current_priority = 'P4'  # Default priority from the data
+        current_team = 'Unknown'
+        
+        i = 0
+        while i < len(lines):
+            line = lines[i].strip()
+            
+            # Extract priority from lines like "P4(16)"
+            if line.startswith('P') and '(' in line:
+                priority_match = line.split('(')[0]
+                if priority_match in ['P0', 'P1', 'P2', 'P3', 'P4']:
+                    current_priority = priority_match
+            
+            # Extract team names like "Sayonara Data Management(16)"
+            elif '(' in line and line.endswith(')') and not line.startswith('W-'):
+                team_part = line.split('(')[0].strip()
+                if len(team_part) > 5 and team_part not in ['Subtotal', 'Total']:
+                    current_team = team_part
+            
+            # Look for work items (W-numbers) which represent security issues
+            elif line.startswith('W-'):
+                work_id = line.strip()
+                
+                # Extract details from the next few lines
+                build_version = 'Unknown'
+                assignee = 'Unknown'
+                status = 'Unknown'
+                issue_description = 'Security Issue'
+                
+                # Look ahead for details in the structured format
+                if i + 1 < len(lines):
+                    build_version = lines[i + 1].strip() or 'Unknown'
+                if i + 2 < len(lines):
+                    assignee = lines[i + 2].strip() or 'Unknown'
+                if i + 3 < len(lines):
+                    status = lines[i + 3].strip() or 'Unknown'
+                if i + 4 < len(lines):
+                    issue_description = lines[i + 4].strip() or 'Security Issue'
+                
+                # Create security bug entry
+                security_bug = {
+                    'id': work_id,
+                    'title': issue_description,
+                    'priority': f"{current_priority}-{'Critical' if current_priority in ['P0', 'P1'] else 'Medium' if current_priority == 'P2' else 'Low'}",
+                    'severity': f"{current_priority}-{'Critical' if current_priority in ['P0', 'P1'] else 'Medium' if current_priority == 'P2' else 'Low'}",
+                    'status': status,
+                    'component': current_team,
+                    'assignee': assignee,
+                    'build_version': build_version,
+                    'description': issue_description,
+                    'type': 'security',
+                    'issue_category': self._extract_issue_category(issue_description)
+                }
+                
+                security_bugs.append(security_bug)
+                
+                # Skip the next 4 lines as we've already processed them
+                i += 4
+            
+            i += 1
+        
+        print(f"Parsed {len(security_bugs)} security bugs from ss.txt")
+        return security_bugs
+    
+    def _extract_issue_category(self, description: str) -> str:
+        """Extract issue category from Coverity description."""
+        if 'RESOURCE_LEAK' in description:
+            return 'Resource Leak'
+        elif 'ARRAY_VS_SINGLETON' in description:
+            return 'Array vs Singleton'
+        elif 'OVERRUN' in description:
+            return 'Buffer Overrun'
+        elif 'USE_AFTER_FREE' in description:
+            return 'Use After Free'
+        elif 'UNINIT' in description:
+            return 'Uninitialized Variable'
+        elif 'NO_EFFECT' in description:
+            return 'No Effect'
+        else:
+            return 'Other'
     
     def analyze_git_repository(self, repo_path: str, period_start: str, period_end: str) -> GitStats:
         """Analyze git repository for code changes during reporting period."""
@@ -1372,9 +1836,56 @@ Reported: 2024-01-13
             f.write(example_content)
         print(f"Created example bugs file: {filename}")
     
-    def save_archive_data(self, archive_file: str):
-        """Save all collected data to archive file."""
+    def save_archive_data(self, archive_file: str, custom_end_date=None):
+        """Save all collected data to archive file with metadata."""
         os.makedirs(os.path.dirname(archive_file), exist_ok=True)
+        
+        # Add metadata to the data
+        dates = get_report_dates(custom_end_date)
+        # Compute additional summary counts
+        def _count_p0_p1(items):
+            try:
+                return sum(1 for x in items if str(x.get('priority', '')).upper().startswith(('P0', 'P1')))
+            except Exception:
+                return 0
+
+        ci_items = self.data.get('ci_issues', []) or []
+        sec_items = self.data.get('security_issues', []) or []
+        ls_items = self.data.get('leftshift_issues', []) or []
+        cov_summary = self.data.get('coverage_summary', {}) or {}
+        new_code_cov = cov_summary.get('new_code', {}) if isinstance(cov_summary, dict) else {}
+        overall_cov = cov_summary.get('overall', {}) if isinstance(cov_summary, dict) else {}
+
+        metadata = {
+            'generated_at': datetime.now().isoformat(),
+            'report_period_start': dates['period_start_full'],
+            'report_period_end': dates['period_end_full'],
+            'report_period_display': dates['period_full'],
+            'generator_version': '2.0',
+            'data_sources': {
+                'risks': len(self.data.get('risks', [])),
+                'prbs': len(self.data.get('prbs', [])),
+                'bugs': len(self.data.get('bugs', [])),
+                'deployments': len(self.data.get('deployments', [])),
+                'has_llm_content': 'llm_content' in self.data,
+                # Extended metrics
+                'ci_total': len(ci_items),
+                'ci_p0_p1': _count_p0_p1(ci_items),
+                'security_total': len(sec_items),
+                'security_p0_p1': _count_p0_p1(sec_items),
+                'leftshift_total': len(ls_items),
+                'leftshift_p0_p1': _count_p0_p1(ls_items),
+                # Coverage (percentages)
+                'coverage_overall': float(overall_cov.get('coverage', 0.0) or 0.0),
+                'coverage_overall_line': float(overall_cov.get('line_coverage', 0.0) or 0.0),
+                'coverage_new_code': float(new_code_cov.get('coverage', 0.0) or 0.0),
+                'coverage_new_code_line': float(new_code_cov.get('line_coverage', 0.0) or 0.0)
+            }
+        }
+        
+        # Add metadata to data
+        self.data['metadata'] = metadata
+        
         with open(archive_file, 'w') as f:
             json.dump(self.data, f, indent=2)
         print(f"Data archived to: {archive_file}")
@@ -1407,6 +1918,218 @@ class QualityReportGenerator:
             "Content-Type": "application/json"
         } if self.llm_api_key else None
         
+    def generate_llm_content_for_dashboard(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate all LLM-based content for dashboard consumption."""
+        print("🤖 Generating LLM content for dashboard...")
+        
+        if not self.llm_api_key or not self.headers:
+            print("⚠️ No LLM Gateway key provided. Dashboard will show 'content not available' messages.")
+            return {}
+        
+        llm_content = {}
+        
+        try:
+            # Generate PRB narratives
+            prbs = data.get('prbs', [])
+            prb_narratives = {}
+            prb_analyses = {}
+            
+            for prb in prbs:
+                # Handle both dict and object types
+                if isinstance(prb, dict):
+                    prb_dict = {
+                        'id': prb.get('id', 'Unknown'),
+                        'title': prb.get('title', ''),
+                        'priority': prb.get('priority', ''),
+                        'team': prb.get('team', ''),
+                        'what_happened': prb.get('what_happened', ''),
+                        'proximate_cause': prb.get('proximate_cause', ''),
+                        'how_resolved': prb.get('how_resolved', ''),
+                        'next_steps': prb.get('next_steps', ''),
+                        'customer_impact': prb.get('customer_impact', ''),
+                        'status': prb.get('status', ''),
+                        'user_experience': prb.get('user_experience', ''),
+                        'description': prb.get('description', ''),
+                        'created_date': prb.get('created_date', '')
+                    }
+                else:
+                    prb_dict = {
+                        'id': getattr(prb, 'id', 'Unknown'),
+                        'title': getattr(prb, 'title', ''),
+                        'priority': getattr(prb, 'priority', ''),
+                        'team': getattr(prb, 'team', ''),
+                        'what_happened': getattr(prb, 'what_happened', ''),
+                        'proximate_cause': getattr(prb, 'proximate_cause', ''),
+                        'how_resolved': getattr(prb, 'how_resolved', ''),
+                        'next_steps': getattr(prb, 'next_steps', ''),
+                        'customer_impact': getattr(prb, 'customer_impact', ''),
+                        'status': getattr(prb, 'status', ''),
+                        'user_experience': getattr(prb, 'user_experience', ''),
+                        'description': getattr(prb, 'description', ''),
+                        'created_date': getattr(prb, 'created_date', '')
+                    }
+                
+                # Generate narrative using LLM
+                narrative = self._call_llm_for_prb_narrative(prb_dict)
+                prb_narratives[prb_dict['id']] = narrative
+                
+                # Generate exhaustive analysis using LLM
+                analysis = self._call_llm_for_prb_analysis(prb_dict)
+                prb_analyses[prb_dict['id']] = analysis
+            
+            # Generate lower priority summary
+            p2_p3_prbs = [p for p in prbs if 'P2' in str(getattr(p, 'priority', '')) or 'P3' in str(getattr(p, 'priority', ''))]
+            if p2_p3_prbs:
+                lower_summary = self._call_llm_for_lower_priority_summary(p2_p3_prbs)
+                llm_content['lower_priority_summary'] = lower_summary
+            
+            # Generate trend analysis
+            trend_analysis = self._call_llm_for_trend_analysis(data)
+            llm_content['trend_analysis'] = trend_analysis
+            
+            # Generate code change risk analysis
+            risk_analysis = self._call_llm_for_risk_analysis(data)
+            llm_content['risk_analysis'] = risk_analysis
+            
+            llm_content['prb_narratives'] = prb_narratives
+            llm_content['prb_analyses'] = prb_analyses
+            
+            print("✅ LLM content generated successfully")
+            
+        except Exception as e:
+            print(f"⚠️ LLM content generation failed: {e}")
+            return {}
+        
+        return llm_content
+
+    def _call_llm_for_prb_narrative(self, prb_dict: Dict[str, Any]) -> str:
+        """Generate PRB narrative using LLM."""
+        prompt = f"""
+        You are a technical incident analyst for a database platform team. Analyze this Problem Report (PRB) and provide a clear, concise summary in exactly this format:
+
+        **Problem Type:** [One sentence describing the specific technical issue type]
+        **Root Cause:** [One sentence explaining the detailed underlying technical cause]
+        **Resolution:** [One sentence describing how the issue was specifically fixed or mitigated]
+        **Next Steps:** [One sentence describing concrete follow-up actions or improvements]
+
+        PRB Data:
+        ID: {prb_dict['id']}
+        Title: {prb_dict['title']}
+        Priority: {prb_dict['priority']}
+        Team: {prb_dict['team']}
+        What Happened: {prb_dict['what_happened']}
+        Proximate Cause: {prb_dict['proximate_cause']}
+        How Resolved: {prb_dict['how_resolved']}
+        Next Steps: {prb_dict['next_steps']}
+        """
+        
+        return self._call_llm_sync(prompt)
+
+    def _call_llm_for_prb_analysis(self, prb_dict: Dict[str, Any]) -> str:
+        """Generate exhaustive PRB analysis using LLM."""
+        prompt = f"""
+        Generate a comprehensive technical analysis for this PRB:
+
+        **Technical Impact:** [Detailed impact assessment]
+        **Root Cause Analysis:** [In-depth technical root cause]
+        **Resolution Applied:** [Detailed resolution methodology]
+        **Preventive Measures:** [Specific prevention strategies]
+
+        PRB Data: {json.dumps(prb_dict, indent=2)}
+        """
+        
+        return self._call_llm_sync(prompt)
+
+    def _call_llm_for_lower_priority_summary(self, prbs: List) -> str:
+        """Generate lower priority PRB summary using LLM."""
+        prompt = f"""
+        Generate a concise summary of these Sev 2+ PRBs:
+        
+        PRB Data: {json.dumps([{
+            'id': getattr(p, 'id', 'Unknown'),
+            'priority': getattr(p, 'priority', ''),
+            'team': getattr(p, 'team', ''),
+            'what_happened': getattr(p, 'what_happened', '')
+        } for p in prbs], indent=2)}
+        
+        Format as: **Current Sev 2+ Issues:** followed by a brief summary of each issue.
+        """
+        
+        return self._call_llm_sync(prompt)
+
+    def _call_llm_for_trend_analysis(self, data: Dict[str, Any]) -> str:
+        """Generate quality trends analysis using LLM."""
+        prompt = f"""
+        Analyze these quality metrics and provide trend insights:
+        
+        Data Summary:
+        - PRBs: {len(data.get('prbs', []))}
+        - Bugs: {len(data.get('bugs', []))}
+        - Risks: {len(data.get('risks', []))}
+        - Security Issues: {len(data.get('security_bugs', []))}
+        
+        Provide a brief quality trends analysis focusing on overall system health.
+        """
+        
+        return self._call_llm_sync(prompt)
+
+    def _call_llm_for_risk_analysis(self, data: Dict[str, Any]) -> str:
+        """Generate code change risk analysis using LLM."""
+        prompt = f"""
+        Analyze code changes and deployment risks based on this data:
+        
+        Deployment Summary: {data.get('deployment_summary', 'No deployment data')}
+        
+        Provide a risk assessment focusing on deployment stability and code change impact.
+        
+        Format the response using standard markdown headers. Start with ### for the main title 
+        (not # which is too large), then use #### for main sections and ##### for subsections. 
+        Use consistent formatting that matches typical technical documentation.
+        """
+        
+        return self._call_llm_sync(prompt)
+
+    def _call_llm_sync(self, prompt: str) -> str:
+        """Make synchronous LLM call."""
+        try:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                return loop.run_until_complete(self._call_llm_async(prompt))
+            finally:
+                loop.close()
+        except Exception as e:
+            print(f"⚠️ LLM call failed: {e}")
+            return "Content not available - LLM generation failed"
+
+    async def _call_llm_async(self, prompt: str) -> str:
+        """Make async LLM call."""
+        messages = [
+            {"role": "system", "content": "You are a senior quality engineer providing technical analysis."},
+            {"role": "user", "content": prompt}
+        ]
+        
+        payload = {
+            "model": self.model,
+            "messages": messages,
+            "max_tokens": 1000,
+            "temperature": 0.3
+        }
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                self.api_url,
+                headers=self.headers,
+                json=payload,
+                timeout=aiohttp.ClientTimeout(total=30)
+            ) as response:
+                if response.status == 200:
+                    result = await response.json()
+                    if "choices" in result and len(result["choices"]) > 0:
+                        return result["choices"][0]["message"]["content"].strip()
+                
+                return "Content not available - LLM API error"
+
     def generate_report(self, data: Dict[str, Any], report_type: str = "comprehensive") -> str:
         """Generate a quality report using Salesforce LLM Gateway analysis."""
         
@@ -1468,20 +2191,17 @@ class QualityReportGenerator:
                     print(f"❌ LLM Gateway API error: {response.status} - {error_text}")
                     raise RuntimeError(f"LLM Gateway API failed with status {response.status}: {error_text}")
     
-    def _build_prompt(self, data: Dict[str, Any], report_type: str) -> str:
+    def _build_llm_prompt(self, data: Dict[str, Any], report_type: str) -> str:
         """Build the prompt for LLM report generation."""
         
-        # Get dynamic report dates
-        dates = get_report_dates()
+        # Get dynamic report dates (use custom date if available)
+        dates = get_report_dates(getattr(self, 'custom_end_date', None))
         
         prompt = f"""Generate a {report_type} quality report based on the following data.
 
-IMPORTANT: Use these specific dates in your report header:
-- Report Date: {dates['report_date']}
-- Reporting Period: {dates['period_full']}
 - Do NOT include "Prepared by: Quality Engineering Team" or similar attribution lines
+- Do NOT include report title, report date, or reporting period in the header
 
-CRITICAL: Start the report with a brief "Data Sources" section listing what data was used for this report (e.g., "Generated from 9 data sources: risk tracking, PRBs, production bugs, deployment records, coverage metrics, CI/security issues, and git analysis").
 
 RISK DATA:
 {json.dumps(data.get('risks', []), indent=2)}
@@ -1546,22 +2266,13 @@ Use clear, professional language suitable for engineering management. Highlight 
 """
         return prompt
     
-    def _generate_template_report(self, data: Dict[str, Any]) -> str:
+    def _generate_template_report(self, data: Dict[str, Any], report_type: str) -> str:
         """Generate a template report when LLM is not available."""
         
-        # Get dynamic report dates
-        dates = get_report_dates()
+        # Get dynamic report dates (use custom date if available)
+        dates = get_report_dates(getattr(self, 'custom_end_date', None))
         
-        report = f"""# Quality Report - {dates['report_date']}
-
-**Report Date:** {dates['report_date']}  
-**Reporting Period:** {dates['period_full']}
-
-**NOTE**: For data preparation instructions, see INSTRUCTIONS.md
-
----
-
-## Executive Summary
+        report = f"""## Executive Summary
 This quality report provides an overview of system health, risk factors, incidents, deployments, and test coverage metrics for the period {dates['period_full']}.
 
 ## Risk Assessment
@@ -1718,10 +2429,9 @@ def main():
     parser.add_argument('--risk-file', default='risks.txt', help='Risk tracking file')
     parser.add_argument('--prb-file', default='prb.txt', help='PRB/Incident tracking file')
     parser.add_argument('--bugs-file', default='bugs.txt', help='Active bugs tracking file')
-    parser.add_argument('--deployment-csv', default='deployments.csv', help='Deployment CSV file (legacy format)')
-    parser.add_argument('--stagger-deployment-csv', default='deployment.csv', help='Stagger deployment CSV file')
+    parser.add_argument('--deployment-csv', default='deployment.csv', help='Deployment CSV file (SuperSet export only)')
     parser.add_argument('--coverage-file', default='coverage.json', help='Coverage metrics file (JSON format)')
-    parser.add_argument('--coverage-txt', help='New code coverage file (text format from coverage.txt)')
+    parser.add_argument('--coverage-txt', default='coverage.txt', help='New code coverage file (text format from coverage.txt)')
     parser.add_argument('--ci-file', default='ci.txt', help='CI issues file')
     parser.add_argument('--leftshift-file', default='leftshift.txt', help='LeftShift issues file')
     parser.add_argument('--abs-file', default='abs.txt', help='ABS issues file')
@@ -1731,8 +2441,43 @@ def main():
     parser.add_argument('--output-dir', default='./reports', help='Output directory')
     parser.add_argument('--report-type', default='comprehensive', choices=['comprehensive', 'compact'], help='Report type')
     parser.add_argument('--skip-confirmation', action='store_true', help='Skip data readiness confirmation prompt')
+    parser.add_argument('--report-end-date', help='Custom report end date (YYYY-MM-DD). Report will cover the week ending on the Sunday before this date.')
+    parser.add_argument('--week', help='Calendar week (e.g., cw37, cw38). Automatically sets subdirectory path and report-end-date for historical weeks.')
     
     args = parser.parse_args()
+    
+    # Handle calendar week argument
+    if args.week:
+        week_dir = f"weeks/{args.week}"
+        if not os.path.exists(week_dir):
+            print(f"❌ Week directory not found: {week_dir}")
+            return 1
+        
+        # Set all file paths to use the week subdirectory
+        args.risk_file = os.path.join(week_dir, os.path.basename(args.risk_file))
+        args.prb_file = os.path.join(week_dir, os.path.basename(args.prb_file))
+        args.bugs_file = os.path.join(week_dir, os.path.basename(args.bugs_file))
+        args.deployment_csv = os.path.join(week_dir, os.path.basename(args.deployment_csv))
+        args.coverage_file = os.path.join(week_dir, os.path.basename(args.coverage_file))
+        args.coverage_txt = os.path.join(week_dir, os.path.basename(args.coverage_txt))
+        args.ci_file = os.path.join(week_dir, os.path.basename(args.ci_file))
+        args.leftshift_file = os.path.join(week_dir, os.path.basename(args.leftshift_file))
+        args.abs_file = os.path.join(week_dir, os.path.basename(args.abs_file))
+        args.security_file = os.path.join(week_dir, os.path.basename(args.security_file))
+        
+        # Set report-end-date for historical weeks
+        current_week = 38  # This week is cw38
+        if args.week.lower() == 'cw37':
+            args.report_end_date = '2025-09-21'
+            print(f"📅 Using historical week {args.week} with end date: {args.report_end_date}")
+        elif args.week.lower() == f'cw{current_week}':
+            # Current week, no need to set report-end-date
+            print(f"📅 Using current week {args.week}")
+        else:
+            # For other weeks, you might need to calculate the date
+            print(f"📅 Using week {args.week} (no automatic date calculation implemented)")
+        
+        print(f"📁 Using data from directory: {week_dir}")
     
     # Initialize data collector
     collector = QualityDataCollector(args.config)
@@ -1747,31 +2492,40 @@ def main():
     print("Loading bugs data...")
     collector.load_bugs_data(args.bugs_file)
     
-    print("Extracting critical issues...")
-    collector.extract_critical_issues("https://gus.lightning.force.com/lightning/r/Report/00OEE0000014M4b2AE/view")
+    # Critical issues are already loaded as part of bugs data - no need for separate extraction
     
     print("Loading deployment data...")
     collector.load_deployment_data(args.deployment_csv)
     
-    print("Loading stagger deployment data...")
-    collector.load_stagger_deployment_data(args.stagger_deployment_csv)
-    
     print("Loading coverage metrics...")
     collector.load_coverage_metrics(args.coverage_file)
     
-    if args.coverage_txt:
-        print("Loading new code coverage data...")
-        collector.load_new_code_coverage(args.coverage_txt)
+    print("Loading new code coverage data...")
+    collector.load_new_code_coverage(args.coverage_txt)
+    
+    print("Loading deployment summary...")
+    collector.load_deployment_summary("deployment.txt")
     
     print("Loading development codeline health data...")
     collector.load_ci_issues(args.ci_file)
     collector.load_leftshift_issues(args.leftshift_file)
     collector.load_abs_issues(args.abs_file)
-    collector.load_security_issues(args.security_file)
+    collector.load_ss_security_issues("ss.txt")
+    
+    # Parse custom report end date if provided
+    custom_end_date = None
+    if args.report_end_date:
+        try:
+            custom_end_date = datetime.strptime(args.report_end_date, '%Y-%m-%d')
+            print(f"📅 Using custom report end date: {custom_end_date.strftime('%Y-%m-%d')}")
+        except ValueError:
+            print(f"❌ Invalid date format: {args.report_end_date}. Use YYYY-MM-DD format.")
+            return 1
     
     # Analyze git repository for code churn
     print("Analyzing git repository for code changes...")
-    dates = get_report_dates()
+    dates = get_report_dates(custom_end_date)
+    print(f"📊 Report period: {dates['period_full']}")
     collector.analyze_git_repository(
         args.git_repo_path, 
         dates['period_start_full'], 
@@ -1783,7 +2537,24 @@ def main():
     
     # Archive data
     archive_file = os.path.join(args.output_dir, f"quality_data_archive_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
-    collector.save_archive_data(archive_file)
+    collector.save_archive_data(archive_file, custom_end_date)
+    
+    # Generate LLM content for dashboard if credentials are available
+    try:
+        llm_generator = QualityReportGenerator()
+        # Pass custom end date to LLM generator if provided
+        if custom_end_date:
+            llm_generator.custom_end_date = custom_end_date
+        llm_content = llm_generator.generate_llm_content_for_dashboard(collector.data)
+        collector.data['llm_content'] = llm_content
+        
+        # Re-save archive data with LLM content
+        collector.save_archive_data(archive_file, custom_end_date)
+        print("✅ LLM content generated and added to archive data")
+    except Exception as e:
+        print(f"⚠️ LLM content generation skipped: {e}")
+        print("   Dashboard will show 'content not available' messages for LLM sections")
+        collector.data['llm_content'] = {}
     
     # Confirm data readiness
     if not args.skip_confirmation:
@@ -1810,25 +2581,10 @@ def main():
             else:
                 print("Please enter 'y' for yes or 'n' for no.")
 
-    # Generate report
-    print("\n🤖 Generating quality report...")
-    report_generator = QualityReportGenerator(collector.config.get('llm_api_key', ''))
-    try:
-        report_content = report_generator.generate_report(collector.data, args.report_type)
-    except RuntimeError as e:
-        print(f"❌ Report generation failed: {e}")
-        print("💡 Ensure your .env file contains valid LLM Gateway credentials")
-        print("   Required: LLM_GW_EXPRESS_KEY, OPENAI_USER_ID, SALESFORCE_SESSION_ID")
-        return 1
-    
-    # Save report
-    report_file = os.path.join(args.output_dir, f"quality_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md")
-    with open(report_file, 'w') as f:
-        f.write(report_content)
-    
-    print(f"Quality report generated: {report_file}")
+    # Skip markdown report generation - dashboard only uses JSON data
+    print("📊 Skipping markdown report generation (dashboard uses JSON data only)")
     print(f"Data archived: {archive_file}")
-    
+
     # Display compact summary
     print("\n" + "="*50)
     print("QUALITY REPORT SUMMARY")

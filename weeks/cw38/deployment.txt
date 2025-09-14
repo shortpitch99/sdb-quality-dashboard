@@ -1,0 +1,20 @@
+09/19 - Weekly Deployment Rollouts Update:
+Cells at High Risk during Upgrade
+ita2s  - 258.7.8 (SB12 Week1) Deployment Paused until the fix is in place to mitigate the risk . Also, Data Encryption (TLE) not enabled
+This week updates
+Below releases planned for this week
+258.11.15  R* Cells Week2 completed except ita14 (High Risk Cell , 100% busy always)  and che16  (due to active Incident Lock, No ETA  - #icc-80333111)
+258.15.7 Cloudstore and Store ERR   :white_check_mark:
+258.15.7 SB12 Week2 Shared Services and Cell  -  Paused :pause2:  due to an Archival  issue related to mix version of sdbstore
+260.2.3   SB0 Shared Services -  Archival ERR     -  Paused :pause2:  due to an Archival  issue related to mix version of sdbstore
+GIA2H Snapline shared services upgrade to 258.15.7  :white_check_mark:
+SDB-DB Node Right-Sizing  (Phase4 - ~98% Cells (41/42) Completed  (ita14 - Skipped - High Risk Cell , 100% busy always)
+Plan for next week
+260.3.2  SB0  -  Shared Services
+260.4.1 SB0  -  Shared Services and Cells
+258.15.8    R* Cells  Week1
+Challenges   Faced during last week -
+Post deployment of 258.15.7 Archival ERR, all archival worker pods in crashloopbackoff state due to mismatch of versioning between archival, cloudstore and store
+In Impacted cluster ,  cloudstore/ store are on lower version and Archival are on higher version. To Resolve, rolled back archival version to 258.11.8 on all affected clusters
+Intermittently Macha Services's Error impacting Releases Executed in MR . It failed to trigger few Deployments. So, manually recreate the execution of failed Pods. 
+Need to clean up the 13K old open cases for restore is causing MR performance issues and slowing down SDB rollout.

@@ -1,0 +1,109 @@
+Created Date Time Select all rows for Drill Down.
+Created Date Time
+Sorted by Created Date Time, oldest-to-newestAscending
+Problem Priority
+Sorted by Problem Priority, ascending picklist orderAscending
+Problem Number
+Sorted by Problem Number, A-to-ZAscending
+Select row for Drill Down.
+8/24/2025 - 8/30/2025(1)
+P1(1)
+PRB-0028619(1)
+Select row for Drill Down.
+8/31/2025 - 9/6/2025(1)
+P2(1)
+PRB-0028630(1)
+Created Date Time
+Sorted by Created Date Time, oldest-to-newestAscending
+Problem Priority
+Sorted by Problem Priority, ascending picklist orderAscending
+Problem Number
+Sorted by Problem Number, A-to-ZAscending
+Team: Team Name
+Cloud
+Problem State
+Customer Impact
+External RCA Requested
+Problem Description
+Repeat Incident
+Created Date
+Initial Work Issue: Work ID
+Customer Experience
+What Happened?
+Proximate Cause (Why did it happen)?
+How did we find out about the issue?
+How was it Resolved?
+Root Cause
+Next Steps
+Retro Summary
+Owner: Full Name
+8/24/2025 - 8/30/2025(1)
+P1(1)
+PRB-0028619(1)
+SDB Performance
+SDB
+Analysis Complete
+Performance degradation (general)
+feature not included
+PRB Retrospective | SEV-1 | 08/27/2025 | USA728 - APTs and Connpools
+
+[THIS PRB IS MANAGED BY QUIP2GUS]
+feature not included
+8/28/2025
+W-19436758
+User Experience: The customer experience during the incident was one of performance degradation and intermittent service issues. Users encountered: High APTs (Average Page Times): Webpages and application functions were slow to load. Connection Pool Exh...
+[THIS PRB IS MANAGED BY QUIP2GUS]
+Any updates made in GUS will be overwritten! Update Quip doc: https://salesforce.quip.com/jykNAJH679ky
+​
+An ongoing cyclical incident is causing high APTs and login failures across the fleet, spec
+The proximate cause of this incident was a regression in the OS patch that was applied to the SDB pods on August 13, 2025.
+The regression was the underlying issue, this was compounded by application the performance degradation where application level ac...
+https://salesforce.pagerduty.com/incidents/Q2ELZEQPMU6EU6
+In the case of USA728, it self resolved during the incident as impact was cyclical in nature. The incident resolution involved implementing a rollback of the OS patch suspected to be causing the issue. Additional guardrails of applying CTC locks were pl
+1) A kernel change introduced by AWS into the EKS AL2 AMI that is consumed by Salesforce which resulted in increased DB connection and connection tear down times thus impacting core app and SDB performance..
+2) SF is the only organization impacted. A
+1) Forge to Develop process of testing with SDB requirements as part of their release.
+ 1) W-19619898. Create a new workload in PerfCI HF to run during core app B/G (gus-write-app-upgrade).
+ 2) W-19627797. Define Regression Indicators for gus-write-app-upgrade workload.
+ 3) W-19619908. Calibrate gus-write-app-upgrade workload.
+Proximate Cause: The proximate cause of this incident was a regression in the OS patch that was applied to the SDB pods on August 13, 2025. The regression was the underlying issue, this was compounded by application the performance degradation where appl
+Maeve Coleman
+8/31/2025 - 9/6/2025(1)
+P2(1)
+PRB-0028630(1)
+CRM Database Sustaining Engineering
+SDB
+Analysis Complete
+Performance degradation (general)
+feature not included
+PRB Retrospective | SEV-2 | 08/31/2025 | USA556 - Rowlocks and misc DB issues
+
+[THIS PRB IS MANAGED BY QUIP2GUS]
+feature not included
+8/31/2025
+W-19466903
+User Experience: Customers were seeing latency and rowlocks.. | Impact Quantification: Q: What #/% of users/customers/requests got impacted (aggregated across all infra units)?. A: .
+[THIS PRB IS MANAGED BY QUIP2GUS]
+Any updates made in GUS will be overwritten! Update Quip doc: https://salesforce.quip.com/0te5ASpEq1Su
+​
+Multiple customers on USA556 were seeing rowlocks and latency. DB team saw RPC latency as o
+The primary DB node was in the AZ that the prior apps were in before the deploy. This was causing RPC latency and some row locking.
+https://salesforce-internal.slack.com/archives/CDQ3U66E5/p1756667266371899
+CDSE failed the primary DB node over to the correct AZ
+​
+Q: Explain in detail the Time to Fix (i.e key events from detection to resolution)
+A: 
+​
+Q: Was a known mitigation for this incident? If yes, please describe it and can it be automat
+1)  On August 31st, a log owner node, . sdb-b-43-2. , in USA556 became a "sick node" with intermittent spikes in CPU, APT, and database metrics, leading to an AZ failover that resolved the immediate impact. This issue was not attributed to cust
+1)  . Alert for Frequent standby Lag on Specific Standby Node.
+2) SDB Node disable feature from Podtap.
+3) Add pipeline support for killing a specific node in WS cluster.
+4) Spike on moving app traffic when we have a Sick Node.
+Proximate Cause: The primary DB node was in the AZ that the prior apps were in before the deploy. This was causing RPC latency and some row locking.
+​
+Key Questions for Retro (enter as Problem Statements below): 
+​
+Q: - Why did the primary DB
+Site Reliability
+
