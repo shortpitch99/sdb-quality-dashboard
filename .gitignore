@@ -1,0 +1,68 @@
+# Environment files
+.env
+env.example
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# Reports and generated files
+reports/
+*.log
+quality_data_archive_*.json
+quality_report_*.md
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Backup files
+*~
+*.bak
+*.backup
+*_backup.*
+*_broken.*
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Data files (should be provided fresh each time)
+# Uncomment if you want to ignore data files:
+# *.txt
+# *.csv

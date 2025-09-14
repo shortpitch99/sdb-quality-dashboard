@@ -1,0 +1,25 @@
+{
+  "llm_api_key": "",
+  "openai_user_id": "",
+  "salesforce_session_id": "",
+  "salesforce_instance": "gus.lightning.force.com",
+  "output_dir": "./reports",
+  "archive_dir": "./archive",
+  "report_templates": {
+    "comprehensive": {
+      "include_detailed_data": true,
+      "include_recommendations": true,
+      "max_tokens": 2000
+    },
+    "compact": {
+      "include_detailed_data": false,
+      "include_recommendations": true,
+      "max_tokens": 1000
+    }
+  },
+  "thresholds": {
+    "critical_coverage_threshold": 80.0,
+    "high_priority_prb_limit": 5,
+    "critical_issue_sla_hours": 4
+  }
+}

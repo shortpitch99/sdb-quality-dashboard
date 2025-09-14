@@ -1,0 +1,41 @@
+iCreated Date Select all rows for Drill Down.
+Created Date
+Sorted by Created Date, oldest-to-newestAscending
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Select row for Drill Down.
+August 2025(1)
+SDB Production Readiness(1)
+P2(1)
+Subtotal
+Subtotal
+Subtotal
+Total(1)
+Created Date
+Sorted by Created Date, oldest-to-newestAscending
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Work ID
+Subject
+Status
+Customer
+Found In Build Name
+Assigned To: Full Name
+August 2025(1)
+SDB Production Readiness(1)
+P2(1)
+W-19399167
+SDBFalcon - core/sdb33s - dbschema 258/postscripts failed after running for 20 hours
+New
+SDBFalcon core3/sdb33s LeftShift
+sdb.260
+Tim Eads
+Subtotal
+Subtotal
+Subtotal
+Total(1)
+

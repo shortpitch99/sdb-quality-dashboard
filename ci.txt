@@ -1,0 +1,359 @@
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Work: Work ID
+Subject
+Status
+Assigned To
+Work: Created Date
+Sorted by Work: Created Date, newest-to-oldestDescending
+Sprint
+Type
+Found in Build
+Scheduled Build
+Customer
+Work: Created By
+Scrum Team Name Select all rows for Drill Down.
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Select row for Drill Down.
+Sayonara Data Management(6)
+P2(6)
+Subtotal
+Subtotal
+Select row for Drill Down.
+Sayonara Foundation Services(2)
+P2(2)
+Subtotal
+Subtotal
+Select row for Drill Down.
+Sayonara TxP(10)
+P2(10)
+Subtotal
+Subtotal
+Select row for Drill Down.
+SDB Catalog Services(1)
+P2(1)
+Subtotal
+Subtotal
+Select row for Drill Down.
+SDB Engine Health and Diagnostics(1)
+P2(1)
+Subtotal
+Subtotal
+Select row for Drill Down.
+SDB Query Proc Execution(2)
+P2(2)
+Subtotal
+Subtotal
+Select row for Drill Down.
+SDBStore(1)
+P2(1)
+Subtotal
+Subtotal
+Total(23)
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Work: Work ID
+Subject
+Status
+Assigned To
+Work: Created Date
+Sorted by Work: Created Date, newest-to-oldestDescending
+Sprint
+Type
+Found in Build
+Scheduled Build
+Customer
+Work: Created By
+Sayonara Data Management(6)
+P2(6)
+W-19630909
+SDB-JUnitStress-LD-sharded-FC-cross-cell-RHEL9.cross-cell: PSQLException: ERROR: deadlock detected
+New
+SDB Data Management Work Queue
+9/13/2025
+-
+Bug
+sdb.260.7
+-
+-
+SFCI API USER
+W-19626626
+SDB-JUnitStress-sandbox-stress-encryption-kms-RHEL9.sandbox-stress-encryption-kms: PSQLException: ERROR: FAILED: get_current_active_server
+New
+SDB Data Management Work Queue
+9/12/2025
+-
+Bug
+sdb.260.7
+-
+-
+SFCI API USER
+W-19624375
+SDB-JUnitStress-sandbox-stress-RHEL9.sandbox-stress: AssertionError: Index inconsistency found for relation:
+New
+SDB Data Management Work Queue
+9/12/2025
+-
+Bug
+sdb.260.7
+-
+-
+SFCI API USER
+W-19545169
+test.lsmkey_encode:oidvectorcorrupt: Ctest failure: [2025-09-03 23:35:25] TEST 35/46 lsmkey_
+Triaged
+Terry Chong
+9/4/2025
+2025.09b-Sayonara Data Management
+Bug
+sdb.260.5
+-
+-
+SFCI API USER
+W-19518012
+ExtentIndexRefQueueTest.testPushingOlderEIDoesNotReleaseERS: StepFailureException: Worker at step 2 threw exception: expect
+Ready for Review
+Theo Vanderkooy
+9/3/2025
+-
+Bug
+sdb.260.5
+-
+-
+SFCI API USER
+W-19414948
+InterruptedFlushLocationCacheTest.flushCancelFullInvalTest_withPromotedMiniFlushTest: TestTimedOutException: test timed out after 900 seconds
+Triaged
+Shalini Shukla
+8/24/2025
+-
+Bug
+sdb.260
+-
+-
+SFCI API USER
+Subtotal
+Subtotal
+Sayonara Foundation Services(2)
+P2(2)
+W-19385172
+SDB-JUnitStress-LD-WS-dml-check-standby-partitioned-1-RHEL9.dml-check: RuntimeException: gave up waiting for cluster change, expe
+Triaged
+Jacob Park
+8/20/2025
+-
+Bug
+sdb.260
+-
+-
+SFCI API USER
+W-19318356
+SDB-JUnitStress-LD-sharded-FC-cross-cell-RHEL9.cross-cell: AssertionError: Expected total of 2 SDB nodes running, b
+In Progress
+Sagar Ranadive
+8/12/2025
+2025.09a-Sayonara Foundation Services
+Bug
+sdb.260
+-
+-
+SFCI API USER
+Subtotal
+Subtotal
+Sayonara TxP(10)
+P2(10)
+W-19630992
+InterruptedFlushLocationCacheTest.flushTerminateFullInvalTest_withSuccessfulMiniFlushInBetweenTest: AssertionFailedError: expected:<3> but was:<4>
+New
+SDB TxP Work Queue
+9/13/2025
+-
+Bug
+sdb.260.7
+-
+-
+SFCI API USER
+W-19629559
+test.skip_test:TestStartStopKeyForward: Ctest failure: TEST 506/587 skip_test:TestStartStopKeyF
+New
+SDB TxP Work Queue
+9/12/2025
+-
+Bug
+sdb.260.7
+-
+-
+SFCI API USER
+W-19625900
+SDB-JUnitStress-RSWS-fast-ingest-RHEL9.fastingest: ExecutionException: java.lang.AssertionError
+New
+SDB TxP Work Queue
+9/12/2025
+-
+Bug
+sdb.260.7
+-
+-
+SFCI API USER
+W-19597285
+FlushOnStoreFailuresWithSFTest.testFlushOnStoreFailures02: TestTimedOutException: test timed out after 1800 seconds
+New
+SDB TxP Work Queue
+9/9/2025
+-
+Bug
+sdb.260.6
+-
+-
+SFCI API USER
+W-19562705
+FlushErrorLocationCacheWithSFTest.sayonaradb.test.server.flush.FlushErrorLocationCacheWithSFTest: TestTimedOutException: test timed out after 3600 seconds
+New
+Kaushal Mittal
+9/5/2025
+-
+Bug
+sdb.260.5
+-
+-
+SFCI API USER
+W-19479658
+Downgrade tests are failing because BKPROXY is unable to start during the downgrade process.
+New
+Kaushal Mittal
+9/2/2025
+2025.09a-SDB Catalog Services
+Bug
+sdb.260.5
+-
+-
+Sanjib Ghosh
+W-19465357
+FSQDaemonTest.test_with_paused_fsq_daemon: TestTimedOutException: test timed out after 900 seconds
+New
+Kaushal Mittal
+8/30/2025
+-
+Bug
+sdb.260.5
+-
+-
+SFCI API USER
+W-19409996
+MemstoreDumpTest.sayonaradb.test.server.memstore.MemstoreDumpTest: ExecutionException: sayonaradb.test.util.SysCmdException: Co
+New
+Jonathan Hu
+8/22/2025
+-
+Bug
+sdb.260
+-
+-
+SFCI API USER
+W-19398827
+SDB-JUnitStress-dml-uptime-standby-arb-RHEL9.dml-uptime-standby-arb: PSQLException: An I/O error occurred while sending to t
+New
+Jonathan Hu
+8/21/2025
+-
+Bug
+sdb.260
+-
+-
+SFCI API USER
+W-19307267
+SDB-JUnitStress-RSWS-seq-stress-dbFaults-RHEL9.seq-stress: found trap on node[name=0, expectedState=RUNNING]: Last Error: dbsay`20250811162049.483639`
+New
+Dipesh Pandit
+8/11/2025
+-
+Bug
+sdb.260
+-
+-
+SFCI API USER
+Subtotal
+Subtotal
+SDB Catalog Services(1)
+P2(1)
+W-19364382
+SDB-JUnitStress-WS-schemaupgrade-stress-RHEL9.schemaupgrade-stress: Exception: error executing teardown sayonaradb.test
+Waiting
+Mikhail Lychagin
+8/18/2025
+-
+Bug
+sdb.260
+-
+-
+SFCI API USER
+Subtotal
+Subtotal
+SDB Engine Health and Diagnostics(1)
+P2(1)
+W-19466621
+LockWaitTraceAndLogLineTest.testSdbTimeoutTraceForDeadlockLoglineLockTimeout: NullPointerException: Cannot invoke "org.json.JSONObject.getJS
+New
+Sai Prasad Mysary
+8/31/2025
+-
+Bug
+sdb.260.5
+-
+-
+SFCI API USER
+Subtotal
+Subtotal
+SDB Query Proc Execution(2)
+P2(2)
+W-19628071
+AuditFileCreationTest.SecurityMetricsTest: AssertionFailedError: expected:<0> but was:<1>
+New
+Sanoop Nambiar
+9/12/2025
+-
+Bug
+sdb.260.6
+-
+-
+SFCI API USER
+W-19565729
+TxnProcOomKillerTest.ProactiveOomKillerTest: StepFailureException: Worker at step 6 threw exception: expect
+New
+Suresh Kumar Jami
+9/5/2025
+-
+Bug
+sdb.260.6
+-
+-
+SFCI API USER
+Subtotal
+Subtotal
+SDBStore(1)
+P2(1)
+W-19402274
+SFStore-Build-RHEL9.org.apache.bookkeeper.bookie.BookieCacheRehydrationFaultInjectionTest.testNoSpaceInGCRehydration
+New
+Swapnil Warke
+8/21/2025
+2025.09a-SDBStore
+Bug
+sdb.260
+-
+-
+Dipesh Pandit
+Subtotal
+Subtotal
+Total(23)
