@@ -37,8 +37,10 @@ class QualityReportDashboard:
     """Streamlit dashboard for quality reports."""
     
     def __init__(self):
-        self.reports_dir = "./reports"
-        self.archive_dir = "./archive"
+        # Get the directory where this script is located
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        self.reports_dir = os.path.join(script_dir, "reports")
+        self.archive_dir = os.path.join(script_dir, "archive")
         
         # Ensure directories exist
         os.makedirs(self.reports_dir, exist_ok=True)
@@ -3368,6 +3370,44 @@ def main():
     
     elif not reports:
         st.warning("📭 No reports found.")
+        
+        # Debug information
+        with st.expander("🔍 Debug Information"):
+            st.write("**Current working directory:**", os.getcwd())
+            st.write("**Script directory:**", os.path.dirname(os.path.abspath(__file__)))
+            st.write("**Reports directory:**", dashboard.reports_dir)
+            st.write("**Archive directory:**", dashboard.archive_dir)
+            
+            st.write("**Reports directory exists:**", os.path.exists(dashboard.reports_dir))
+            st.write("**Archive directory exists:**", os.path.exists(dashboard.archive_dir))
+            
+            if os.path.exists(dashboard.reports_dir):
+                st.write("**Files in reports directory:**")
+                try:
+                    files = os.listdir(dashboard.reports_dir)
+                    for f in files:
+                        st.write(f"  • {f}")
+                except Exception as e:
+                    st.write(f"Error listing files: {e}")
+            
+            if os.path.exists(dashboard.archive_dir):
+                st.write("**Files in archive directory:**")
+                try:
+                    files = os.listdir(dashboard.archive_dir)
+                    for f in files:
+                        st.write(f"  • {f}")
+                except Exception as e:
+                    st.write(f"Error listing files: {e}")
+            
+            # Check for JSON files specifically
+            st.write("**Looking for pattern:** quality_data_archive_*.json")
+            for search_dir in [dashboard.reports_dir, dashboard.archive_dir]:
+                if os.path.exists(search_dir):
+                    pattern = os.path.join(search_dir, "quality_data_archive_*.json")
+                    files = glob.glob(pattern)
+                    st.write(f"**Found {len(files)} files in {search_dir}:**")
+                    for f in files:
+                        st.write(f"  • {os.path.basename(f)}")
     
     # Footer
     st.markdown("---")
