@@ -1305,7 +1305,7 @@ class QualityReportDashboard:
             )
         )
         
-        st.plotly_chart(fig, width="stretch", key="deployment_stacked_bar")
+        st.plotly_chart(fig, use_container_width=True, key="deployment_stacked_bar")
     
     def create_version_pie_chart(self, data: Dict[str, Any]):
         """Create pie chart of SDB versions from deployment.csv data."""
@@ -1347,7 +1347,7 @@ class QualityReportDashboard:
             )
             
             fig.update_layout(showlegend=True, height=400)
-            st.plotly_chart(fig, width="stretch", key="version_pie_chart")
+            st.plotly_chart(fig, use_container_width=True, key="version_pie_chart")
         else:
             st.warning(f"📊 No valid version data for pie chart (found {total_cells} total cells)")
     
@@ -1577,7 +1577,7 @@ class QualityReportDashboard:
                 )
             )
             
-            st.plotly_chart(fig, width="stretch", key=f"risk_distribution_chart{key_suffix}")
+            st.plotly_chart(fig, use_container_width=True, key=f"risk_distribution_chart{key_suffix}")
         
         with col2:
             # Count risks by priority
@@ -1639,7 +1639,7 @@ class QualityReportDashboard:
                 )
             )
             
-            st.plotly_chart(fig2, width="stretch", key=f"risk_priority_chart{key_suffix}")
+            st.plotly_chart(fig2, use_container_width=True, key=f"risk_priority_chart{key_suffix}")
     
     def create_coverage_chart(self, data: Dict[str, Any], key_suffix: str = ""):
         """Create coverage visualization."""
@@ -1690,7 +1690,7 @@ class QualityReportDashboard:
             barmode='group'
         )
         
-        st.plotly_chart(fig, width="stretch", key=f"coverage_chart{key_suffix}")
+        st.plotly_chart(fig, use_container_width=True, key=f"coverage_chart{key_suffix}")
     
     def create_coverage_comparison_chart(self, data: Dict[str, Any], key_suffix: str = ""):
         """Create coverage comparison chart showing New Code vs Overall Coverage from coverage.txt."""
@@ -1760,7 +1760,7 @@ class QualityReportDashboard:
             yaxis=dict(range=[0, 100])
         )
         
-        st.plotly_chart(fig, width="stretch", key=f"coverage_comparison_chart{key_suffix}")
+        st.plotly_chart(fig, use_container_width=True, key=f"coverage_comparison_chart{key_suffix}")
     
     def create_prb_analysis(self, data: Dict[str, Any], key_suffix: str = ""):
         """Create PRB analysis visualization by priority levels."""
@@ -1828,7 +1828,7 @@ class QualityReportDashboard:
             height=300
         )
         
-        st.plotly_chart(fig, width="stretch", key=f"prb_analysis_chart{key_suffix}")
+        st.plotly_chart(fig, use_container_width=True, key=f"prb_analysis_chart{key_suffix}")
     
     def create_deployment_timeline(self, data: Dict[str, Any]):
         """Create deployment visualization."""
@@ -1869,7 +1869,7 @@ class QualityReportDashboard:
                 }
             )
             fig.update_layout(xaxis_tickangle=45)
-            st.plotly_chart(fig, width="stretch", key="deployment_timeline_chart")
+            st.plotly_chart(fig, use_container_width=True, key="deployment_timeline_chart")
     
     def create_bug_severity_chart(self, data: Dict[str, Any]):
         """Create production bug priority breakdown chart with scoring visualization."""
@@ -1923,7 +1923,7 @@ class QualityReportDashboard:
             ]
         )
         
-        st.plotly_chart(fig, width="stretch", key="bug_severity_chart")
+        st.plotly_chart(fig, use_container_width=True, key="bug_severity_chart")
     
     def create_ci_issues_chart(self, data: Dict[str, Any]):
         """Create CI issues stacked bar chart by team and priority."""
@@ -1983,7 +1983,7 @@ class QualityReportDashboard:
             legend_title="Priority"
         )
         
-        st.plotly_chart(fig, width="stretch", key="ci_issues_chart")
+        st.plotly_chart(fig, use_container_width=True, key="ci_issues_chart")
     
     def create_security_bugs_chart(self, data: Dict[str, Any]):
         """Create security bugs stacked bar chart by team and priority."""
@@ -2043,7 +2043,7 @@ class QualityReportDashboard:
             legend_title="Priority"
         )
         
-        st.plotly_chart(fig, width="stretch", key="security_bugs_chart")
+        st.plotly_chart(fig, use_container_width=True, key="security_bugs_chart")
     
     def create_leftshift_bugs_chart(self, data: Dict[str, Any]):
         """Create left shift bugs stacked bar chart by team and priority."""
@@ -2101,7 +2101,7 @@ class QualityReportDashboard:
             legend_title="Priority"
         )
         
-        st.plotly_chart(fig, width="stretch", key="leftshift_bugs_chart")
+        st.plotly_chart(fig, use_container_width=True, key="leftshift_bugs_chart")
     
     def create_trend_analysis(self, data: Dict[str, Any]):
         """Get pre-generated trend analysis from LLM content or show unavailable message."""
