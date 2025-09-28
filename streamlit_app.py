@@ -948,13 +948,42 @@ class QualityReportDashboard:
                                 })
                 
                 return changes_by_path, file_changes_for_llm
-            except:
+            except Exception as e:
+                print(f"Error in get_git_changes_by_path: {e}")
                 return {}, []
         
-        # Get changes for current reporting period
-        current_week_start = dates['period_start_full']
-        current_week_end = dates['period_end_full']
-        changes_data, file_changes_for_llm = get_git_changes_by_path(current_week_start, current_week_end)
+        # Try to get git stats from archived data first
+        git_stats = data.get('git_stats', {})
+        if git_stats:
+            # Use pre-computed git stats from the archive
+            st.markdown("#### 📊 Code Changes Summary")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric("Total Commits", git_stats.get('total_commits', 0))
+                st.metric("Lines Added", git_stats.get('lines_added', 0))
+                st.metric("Lines Deleted", git_stats.get('lines_deleted', 0))
+            with col2:
+                st.metric("Files Changed", git_stats.get('files_changed', 0))
+                st.metric("Authors", len(git_stats.get('authors', [])))
+                st.metric("Code Churn Risk", git_stats.get('code_churn_risk', 'Unknown'))
+            
+            # Show most changed files if available
+            most_changed = git_stats.get('most_changed_files', [])
+            if most_changed:
+                st.markdown("#### 📁 Most Changed Files")
+                for i, file_info in enumerate(most_changed[:5]):
+                    st.write(f"{i+1}. **{file_info.get('file', 'Unknown')}** - {file_info.get('total_changes', 0)} changes")
+            return
+        
+        # Fallback: Try to get changes from git (won't work on Streamlit Cloud)
+        try:
+            current_week_start = dates['period_start_full']
+            current_week_end = dates['period_end_full']
+            changes_data, file_changes_for_llm = get_git_changes_by_path(current_week_start, current_week_end)
+        except Exception as e:
+            st.info("📊 Code changes analysis not available (git repository not accessible)")
+            st.info("💡 This feature works when running locally with access to the SDB repository")
+            return
         
         if not changes_data:
             st.info("📊 No code changes data available for the reporting period")
@@ -1927,7 +1956,7 @@ class QualityReportDashboard:
     
     def create_ci_issues_chart(self, data: Dict[str, Any]):
         """Create CI issues stacked bar chart by team and priority."""
-        ci_data = data.get('ci', [])
+        ci_data = data.get('ci_issues', [])
         
         if not ci_data:
             st.info("🔧 No CI issues data available")
@@ -1987,7 +2016,7 @@ class QualityReportDashboard:
     
     def create_security_bugs_chart(self, data: Dict[str, Any]):
         """Create security bugs stacked bar chart by team and priority."""
-        security_data = data.get('security', [])
+        security_data = data.get('security_issues', [])
         
         if not security_data:
             st.info("🔒 No security bugs data available")
@@ -2047,7 +2076,7 @@ class QualityReportDashboard:
     
     def create_leftshift_bugs_chart(self, data: Dict[str, Any]):
         """Create left shift bugs stacked bar chart by team and priority."""
-        leftshift_data = data.get('leftshift', [])
+        leftshift_data = data.get('leftshift_issues', [])
         
         if not leftshift_data:
             st.info("⬅️ No left shift bugs data available")
@@ -3244,7 +3273,7 @@ def main():
                     dashboard.create_ci_issues_chart(archive_data)
                 with col2:
                     st.markdown("#### 📊 CI Issues Insights")
-                    ci_data = archive_data.get('ci', [])
+                    ci_data = archive_data.get('ci_issues', [])
                     if ci_data:
                         total_ci_issues = len(ci_data)
                         # Calculate priority breakdown
