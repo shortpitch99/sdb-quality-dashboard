@@ -2510,7 +2510,12 @@ def main():
     collector.load_ci_issues(args.ci_file)
     collector.load_leftshift_issues(args.leftshift_file)
     collector.load_abs_issues(args.abs_file)
-    collector.load_ss_security_issues("ss.txt")
+    # Load security issues from ss.txt (use proper path when week is specified)
+    ss_file = "ss.txt"
+    if args.week:
+        week_dir = f"weeks/{args.week}"
+        ss_file = os.path.join(week_dir, "ss.txt")
+    collector.load_ss_security_issues(ss_file)
     
     # Parse custom report end date if provided
     custom_end_date = None
