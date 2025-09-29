@@ -27,7 +27,7 @@ from quality_report_generator import QualityDataCollector, QualityReportGenerato
 
 # Configure Streamlit page
 st.set_page_config(
-    page_title="Quality Reports Dashboard",
+    page_title="SDB Service Quality Dashboard",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -3044,7 +3044,7 @@ def main():
         # Add title overlay
         st.markdown("""
         <div class="video-title-overlay">
-            <h1 class="video-title-text">SDB Engine Quality Dashboard</h1>
+            <h1 class="video-title-text">SDB Service Quality Dashboard</h1>
         </div>
         """, unsafe_allow_html=True)
         
@@ -3187,8 +3187,102 @@ def main():
             
             # Show visual dashboard if archive data is available
             if archive_data:
-                st.markdown("### 📊 Key Metrics")
-                dashboard.create_metrics_dashboard(archive_data)
+                # Component Tabs
+                st.markdown("### 🏗️ SDB Service Components")
+                tab1, tab2, tab3, tab4 = st.tabs(["🔧 Engine", "📊 SDD", "🔄 mSDB", "⚡ Core App Efficiency"])
+                
+                with tab1:  # Engine Tab (Current Dashboard)
+                    st.markdown("#### 📊 Engine Quality Metrics")
+                    dashboard.create_metrics_dashboard(archive_data)
+                    
+                    # Engine-specific Development Metrics
+                    st.markdown("---")
+                    st.markdown("#### 💻 Engine Development Metrics")
+                    
+                    # Extract Engine-specific data (for now, use all data as Engine)
+                    engine_data = archive_data
+                    
+                    # Development KPIs for Engine
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        # Code Coverage
+                        coverage_data = engine_data.get('coverage_summary', {}).get('overall', {})
+                        line_coverage = coverage_data.get('line_coverage', 0)
+                        coverage_color = "🟢" if line_coverage >= 80 else ("🟡" if line_coverage >= 70 else "🔴")
+                        st.metric(
+                            label=f"{coverage_color} Code Coverage",
+                            value=f"{line_coverage:.1f}%",
+                            delta=f"Target: 80%"
+                        )
+                    
+                    with col2:
+                        # P0/P1 CI Issues
+                        ci_issues = engine_data.get('ci_issues', [])
+                        p0_p1_ci = len([issue for issue in ci_issues if issue.get('priority', '').startswith(('P0', 'P1'))])
+                        total_ci = len(ci_issues)
+                        ci_color = "🟢" if p0_p1_ci <= 5 else ("🟡" if p0_p1_ci <= 10 else "🔴")
+                        st.metric(
+                            label=f"{ci_color} P0/P1 CI Issues",
+                            value=f"{p0_p1_ci}",
+                            delta=f"of {total_ci} total"
+                        )
+                    
+                    with col3:
+                        # Code Changes
+                        git_stats = engine_data.get('git_stats', {})
+                        lines_changed = git_stats.get('lines_changed', 0)
+                        commits = git_stats.get('total_commits', 0)
+                        change_color = "🟢" if commits < 10 and lines_changed < 3000 else ("🟡" if commits < 25 and lines_changed < 8000 else "🔴")
+                        st.metric(
+                            label=f"{change_color} Code Changes",
+                            value=f"{lines_changed:,} lines",
+                            delta=f"{commits} commits"
+                        )
+                
+                with tab2:  # SDD Tab
+                    st.markdown("#### 📊 SDD Quality Metrics")
+                    st.info("🚧 SDD component metrics coming soon...")
+                    
+                    # Placeholder for SDD-specific metrics
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("🟡 Code Coverage", "Coming Soon", "SDD specific")
+                    with col2:
+                        st.metric("🟡 P0/P1 CI Issues", "Coming Soon", "SDD specific")
+                    with col3:
+                        st.metric("🟡 Code Changes", "Coming Soon", "SDD specific")
+                
+                with tab3:  # mSDB Tab
+                    st.markdown("#### 📊 mSDB Quality Metrics")
+                    st.info("🚧 mSDB component metrics coming soon...")
+                    
+                    # Placeholder for mSDB-specific metrics
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("🟡 Code Coverage", "Coming Soon", "mSDB specific")
+                    with col2:
+                        st.metric("🟡 P0/P1 CI Issues", "Coming Soon", "mSDB specific")
+                    with col3:
+                        st.metric("🟡 Code Changes", "Coming Soon", "mSDB specific")
+                
+                with tab4:  # Core App Efficiency Tab
+                    st.markdown("#### 📊 Core App Efficiency Quality Metrics")
+                    st.info("🚧 Core App Efficiency component metrics coming soon...")
+                    
+                    # Placeholder for Core App-specific metrics
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("🟡 Code Coverage", "Coming Soon", "Core App specific")
+                    with col2:
+                        st.metric("🟡 P0/P1 CI Issues", "Coming Soon", "Core App specific")
+                    with col3:
+                        st.metric("🟡 Code Changes", "Coming Soon", "Core App specific")
+                
+                # Common Production Metrics (Outside tabs - applies to all components)
+                st.markdown("---")
+                st.markdown("### 📊 Common Production Metrics")
+                st.info("ℹ️ These metrics apply across all SDB service components")
                 
                 # Week-over-Week Trends across past reports
                 dashboard.create_weekly_trends(reports)
