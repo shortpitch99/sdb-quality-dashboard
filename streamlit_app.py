@@ -3295,7 +3295,7 @@ def main():
                         priority_breakdown = ", ".join([f"{p}:{count}" for p, count in sorted(priority_counts.items())])
                         st.metric("Total Security Bugs", f"{total_security_bugs} ({priority_breakdown})")
                         
-                        teams = list(set(bug.get('team', 'Unknown') for bug in security_data))
+                        teams = list(set(bug.get('team', bug.get('component', 'Unknown')) for bug in security_data))
                         st.metric("Teams Affected", len(teams))
                         st.markdown("**Security Bug Types:**")
                         bug_types = {}
@@ -3321,7 +3321,7 @@ def main():
                     dashboard.create_leftshift_bugs_chart(archive_data)
                 with col2:
                     st.markdown("#### 📈 Left Shift Insights")
-                    leftshift_data = archive_data.get('leftshift', [])
+                    leftshift_data = archive_data.get('leftshift_issues', [])
                     if leftshift_data:
                         total_leftshift_bugs = len(leftshift_data)
                         # Calculate priority breakdown
