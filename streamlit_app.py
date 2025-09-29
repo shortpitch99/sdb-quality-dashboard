@@ -727,67 +727,43 @@ class QualityReportDashboard:
             """, unsafe_allow_html=True)
             
         with col9:
-            # Calculate code changes metrics using actual git analysis
-            from quality_report_generator import get_report_dates
-            import subprocess
-            import os
+            # Calculate code changes metrics using archived git stats
+            git_stats = data.get('git_stats', {})
             
-            dates = get_report_dates()
-            
-            # Calculate actual git line changes for current and previous weeks
-            def get_git_line_changes(start_date, end_date):
-                """Get actual line changes from git for a date range."""
-                try:
-                    # Path to SDB repository
-                    sdb_path = "/Users/rchowdhuri/SDB"
-                    if not os.path.exists(sdb_path):
-                        return 0
-                    
-                    # Git command to get line changes (additions + deletions)
-                    cmd = f'cd {sdb_path} && git log --since="{start_date}" --until="{end_date}" --numstat --pretty=format:"" | awk \'{{added+=$1; deleted+=$2}} END {{print added+deleted}}\''
-                    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-                    
-                    if result.returncode == 0 and result.stdout.strip():
-                        return int(result.stdout.strip())
-                    return 0
-                except:
-                    return 0
-            
-            # Get current week (last Monday to Sunday) and previous week dates
-            current_week_start = dates['period_start_full']
-            current_week_end = dates['period_end_full']
-            
-            # Calculate previous week dates
-            from datetime import datetime, timedelta
-            start_date = datetime.strptime(dates['period_start_full'], '%Y-%m-%d')
-            end_date = datetime.strptime(dates['period_end_full'], '%Y-%m-%d')
-            
-            prev_week_start = (start_date - timedelta(days=7)).strftime('%Y-%m-%d')
-            prev_week_end = (end_date - timedelta(days=7)).strftime('%Y-%m-%d')
-            
-            # Get actual line changes
-            current_week_changes = get_git_line_changes(current_week_start, current_week_end)
-            previous_week_changes = get_git_line_changes(prev_week_start, prev_week_end)
-            
-            # Calculate percentage change
-            if previous_week_changes > 0:
-                percentage_change = ((current_week_changes - previous_week_changes) / previous_week_changes) * 100
+            if git_stats:
+                # Use pre-computed git stats from archive
+                current_week_changes = git_stats.get('lines_changed', 0)
+                total_commits = git_stats.get('total_commits', 0)
+                
+                # Calculate a simple activity metric based on commits and changes
+                # For demo purposes, we'll use a baseline comparison
+                baseline_changes = 5000  # Typical week baseline
+                
+                if baseline_changes > 0:
+                    percentage_change = ((current_week_changes - baseline_changes) / baseline_changes) * 100
+                else:
+                    percentage_change = 100 if current_week_changes > 0 else 0
+                
+                # Determine status color based on percentage change and commit activity
+                if total_commits < 10 and current_week_changes < 3000:
+                    change_status = "GREEN"
+                    change_delta_class = "metric-delta-green"
+                elif total_commits < 25 and current_week_changes < 8000:
+                    change_status = "YELLOW" 
+                    change_delta_class = "metric-delta-yellow"
+                else:
+                    change_status = "RED"
+                    change_delta_class = "metric-delta-red"
+                
+                # Format percentage with + or - sign
+                change_sign = "+" if percentage_change >= 0 else ""
             else:
-                percentage_change = 100 if current_week_changes > 0 else 0
-            
-            # Determine status color based on percentage change
-            if percentage_change < 25:
-                change_status = "GREEN"
-                change_delta_class = "metric-delta-green"
-            elif percentage_change <= 70:
-                change_status = "YELLOW" 
-                change_delta_class = "metric-delta-yellow"
-            else:
-                change_status = "RED"
-                change_delta_class = "metric-delta-red"
-            
-            # Format percentage with + or - sign
-            change_sign = "+" if percentage_change >= 0 else ""
+                # Fallback when no git stats available
+                current_week_changes = 0
+                percentage_change = 0
+                change_status = "UNKNOWN"
+                change_delta_class = "metric-delta-gray"
+                change_sign = ""
             
             st.markdown(f"""
             <div class="metric-card">
