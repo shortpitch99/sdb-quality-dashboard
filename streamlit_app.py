@@ -631,7 +631,7 @@ class QualityReportDashboard:
             prod_delta_class = "metric-delta-green" if prod_bug_status == "GREEN" else ("metric-delta-yellow" if prod_bug_status == "YELLOW" else "metric-delta-red")
             st.markdown(f"""
             <div class="metric-card">
-                <div class="metric-label">🐛 P0/P1 Production Bugs</div>
+                <div class="metric-label">🐛 P0/P1 Prod Bugs</div>
                 <div class="metric-value">{critical_prod_bugs}</div>
                 <div class="metric-total">of {total_bugs} total</div>
                 <div class="metric-delta {prod_delta_class}">
@@ -644,7 +644,7 @@ class QualityReportDashboard:
             second_line = f"2nd: {second_version} ({second_percentage:.1f}%)" if second_version != "N/A" else ""
             st.markdown(f"""
             <div class="metric-card">
-                <div class="metric-label">🚀 Production Deployment</div>
+                <div class="metric-label">🚀 Prod Deployment</div>
                 <div class="metric-value">{dominant_version}</div>
                 <div class="metric-total">Dominant in fleet ({dominant_percentage:.1f}%)</div>
                 <div class="metric-delta">
@@ -3414,6 +3414,42 @@ def main():
                     for f in files:
                         st.write(f"  • {os.path.basename(f)}")
     
+    # KPI Legend Section
+    st.markdown("---")
+    st.markdown("### 📊 KPI Color Definitions")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        #### 🐛 **Bug Metrics (Production, CI, Security, Left Shift)**
+        - **🟢 GREEN**: Low risk - minimal critical issues
+        - **🟡 YELLOW**: Moderate risk - standard review needed  
+        - **🔴 RED**: High risk - extra scrutiny required
+        
+        **Scoring**: P0/P1 bugs = 4 points, P2+ bugs = 1 point
+        - **Production Bugs**: Green ≤16, Yellow 17-32, Red >32
+        - **CI Issues**: Green ≤25, Yellow 26-50, Red >50
+        - **Security Issues**: Green ≤16, Yellow 17-32, Red >32
+        - **Left Shift**: Green ≤25, Yellow 26-50, Red >50
+        """)
+    
+    with col2:
+        st.markdown("""
+        #### 🚨 **PRB Metrics**
+        - **🟢 GREEN**: ≤2 critical PRBs
+        - **🟡 ELEVATED**: 3-4 critical PRBs
+        - **🔴 HIGH RISK**: >4 critical PRBs or any P0 PRBs
+        
+        #### 📈 **Code Changes**
+        - **🟢 GREEN**: <10 commits & <3,000 lines (Stable)
+        - **🟡 YELLOW**: <25 commits & <8,000 lines (Moderate)
+        - **🔴 RED**: ≥25 commits or ≥8,000 lines (High Activity)
+        
+        #### 🎯 **Feature Rollout Risk**
+        - Count of features with Red/At Risk/Critical status
+        """)
+
     # Footer
     st.markdown("---")
     st.markdown(
