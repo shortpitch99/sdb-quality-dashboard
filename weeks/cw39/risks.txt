@@ -1,0 +1,26 @@
+# Risk and Feature Tracking
+# Format: Each feature block should contain Feature, Status, Priority, Description, Updated
+
+Feature: Database Encryption
+Status: Green
+Priority: High
+Description: Database Encryption enabled in the sandbox cells in the production fleet.The enablement of TLE for Open Beta cells is a crucial step towards its general availability, requiring a scalable and efficient approach to handle hundreds of cells. The current process, heavily reliant on Structured Config (SC) overrides, is being revamped due to its manual nature and high latency. We created new, Sandbox-Only Stagger Groups to run the TLE pipeline on a per-cell basis for 266 sandbox cells based on reputation scores. This allows for the pipeline to be executed on groups of cells simultaneously, starting with less critical ones and progressing to more critical ones based on success. This approach avoids conflicts with existing release stagger groups, which contain a mix of sandbox and production cells and could interfere with weekly release deployments. Each stagger group execution is estimated to take about 10 minutes, with an additional 20 minutes for validation, leading to a total rollout time of approximately 7 hours for all sandboxes, assuming no failures. This comprehensive approach aims to make TLE enablement for Open Beta cells scalable, resilient, and less operationally intensive, paving the way for a smooth transition to general availability.
+Updated: 2024-01-15
+
+Feature: Read your own writes(RYOW)
+Status: Yellow
+Priority: Medium
+Description: Performance enhancement feature for Write Scaling. TLE dark launch mode has been rolled out to multiple cells. However, when rolling out the live mode, we ran into an issue on a couple of cells including the UHG sandbox cell (USA804s) where it seems to run into a possible data corruption issue. However, the guardrails that we implemented in the LSM layer helped detect and prevent those corruptions from persisting. Folowing this, we disabled the rollout of the live mode for RYOW functionality and it has been disabled since mid August when the problem was detected.
+Updated: 2024-01-15
+
+Feature: 128 bit extent id
+Status: Green
+Priority: High
+Description: 128 bit extent id has been rolled out successfully. This is needed for rolling out Fast Restore. Based on monitoring data collected from the fleet, so far the results have been positive and we've not seen any issue related to the feature rollout.
+Updated: 2024-01-15
+
+Feature: Collision Detection in Store
+Status: Green
+Priority: High
+Description: Beginning to rollout in GUS sandboxes. This is needed for rolling out Fast Restore. This is very early in the rollout process.
+Updated: 2024-01-15

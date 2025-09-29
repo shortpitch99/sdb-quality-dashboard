@@ -2279,6 +2279,7 @@ class QualityReportDashboard:
         
         fig.update_xaxes(
             title_text='<b>Week Ending</b>',
+            title_standoff=10,  # Bring X-axis title closer to chart
             showgrid=True,
             gridwidth=1,
             gridcolor='rgba(128,128,128,0.2)'
@@ -2290,23 +2291,21 @@ class QualityReportDashboard:
                 'text': '<b>Week-over-Week Quality Trends</b>',
                 'x': 0.5,
                 'xanchor': 'center',
-                'font': {'size': 18, 'color': '#2E86AB'},
-                'y': 0.95,  # Move title down to make room for legend
-                'yanchor': 'top'
+                'font': {'size': 18, 'color': '#2E86AB'}
             },
             legend=dict(
                 orientation='h', 
-                yanchor='top', 
-                y=0.98,  # Position legend at the very top
+                yanchor='bottom', 
+                y=-0.45,  # Position line legends even lower for more separation
                 xanchor='center', 
                 x=0.5,
                 bgcolor='rgba(255,255,255,0.9)',
                 bordercolor='rgba(0,0,0,0.2)',
                 borderwidth=1,
-                font=dict(size=10)  # Smaller legend font
+                font=dict(size=9)  # Smaller legend font
             ),
-            margin=dict(l=60, r=60, t=120, b=60),  # Increased top margin for legend
-            height=480,  # Slightly increased height to accommodate legend
+            margin=dict(l=60, r=60, t=80, b=200),  # Increased bottom margin for lower legend position
+            height=480,  # Keep height to accommodate legend
             hovermode='x unified',
             plot_bgcolor='rgba(248,249,250,0.8)',
             paper_bgcolor='white',
@@ -3220,7 +3219,7 @@ def main():
                 st.markdown("---")
                 
                 # Deployment Analysis Section
-                st.markdown("### 🚀 [Deployment Analysis](https://bdmpresto-superset-server.sfproxy.uip.aws-esvc1-useast2.aws.sfdc.cl/superset/dashboard/4582/?native_filters_key=yYRKF7h_Y8u9ZRnBpCak9qd8PYiswfY_s7lb6H6a9ecAR7m_-RwaQrWlBl1yUUb-)")
+                st.markdown("### 🚀 [Deployment Analysis](https://bdmpresto-superset-server.sfproxy.uip.aws-esvc1-useast2.aws.sfdc.cl/superset/sqllab?savedQueryId=25468)")
                 col1, col2 = st.columns([1, 1])
                 with col1:
                     dashboard.create_deployment_stacked_bar(archive_data)
@@ -3315,7 +3314,7 @@ def main():
                         st.info("No security bugs data available")
                 
                 # Left Shift Bugs Section
-                st.markdown("### ⬅️ [Left Shift Bugs](https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE0000014M4b2AE)")
+                st.markdown("### ⬅️ [Left Shift Bugs](https://gus.lightning.force.com/lightning/r/Report/00OEE000002Wjld2AC/view?queryScope=userFolders)")
                 col1, col2 = st.columns([1, 1])
                 with col1:
                     dashboard.create_leftshift_bugs_chart(archive_data)

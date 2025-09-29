@@ -1,0 +1,66 @@
+Created Date Time Select all rows for Drill Down.
+Created Date Time
+Sorted by Created Date Time, oldest-to-newestAscending
+Problem Priority
+Sorted by Problem Priority, ascending picklist orderAscending
+Problem Number
+Sorted by Problem Number, A-to-ZAscending
+Select row for Drill Down.
+9/21/2025 - 9/27/2025(1)
+P2(1)
+PRB-0028802(1)
+Created Date Time
+Sorted by Created Date Time, oldest-to-newestAscending
+Problem Priority
+Sorted by Problem Priority, ascending picklist orderAscending
+Problem Number
+Sorted by Problem Number, A-to-ZAscending
+Team: Team Name
+Cloud
+Problem State
+Customer Impact
+External RCA Requested
+Problem Description
+Repeat Incident
+Created Date
+Initial Work Issue: Work ID
+Customer Experience
+What Happened?
+Proximate Cause (Why did it happen)?
+How did we find out about the issue?
+How was it Resolved?
+Root Cause
+Next Steps
+Retro Summary
+Owner: Full Name
+9/21/2025 - 9/27/2025(1)
+P2(1)
+PRB-0028802(1)
+Core Database Performance
+SDB
+Under Investigation
+Performance degradation (general)
+feature not included
+PRB Retrospective | SEV-2 | 09/21/2025 | Sherlock_APT Degradation Alert for Falcon_Instance : AWS-PROD1-USEAST1, Functional_Domain: core1, Cell: usa1038, Orgs_Impacted: Single_Org_Cell
+
+[THIS PRB IS MANAGED BY QUIP2GUS]
+feature not included
+9/21/2025
+W-19697376
+User Experience: During the incident, users experienced performance degradation, characterized by slow response times and potential timeouts. Although the service remained accessible, the increased APT affected the efficiency and responsiveness of the ap...
+[THIS PRB IS MANAGED BY QUIP2GUS]
+Any updates made in GUS will be overwritten! Update Quip doc: https://salesforce.quip.com/m8AXAsxSXLBN
+​
+Sherlock detected an APT Incident for Cell: usa1038, FI: AWS-PROD1-USEAST1. Anomalies dete
+The proximate cause of the incident was an increase in database total time, which led to the breach of the APT threshold. The root cause of the increased database time is still under investigation by the Core DB Performance team.
+
+Top impacted URIs by by total runtime 196095798s /services/Soap/u/60.0 1874322s /aura/#aura.ApexAction.execute/#ApexActionController.execute:BWC_ServiceAlertsController.getServiceAlertsWithOutCont 1607301s /aura/#aura.ApexAction.execute/#ApexActionController.execute:ServiceBannerApiController.engagePostInstallSynchronous 1274407s /aura/#aura.ApexAction.execute/#ApexActionController.execute:BWC_ServiceAvailability_OffersController.getNewServiceAvailabilityCont 1241293s /aura/#aura.ApexAction.execute/#ApexActionController.execute:BWC_BalancesController.getBalancesWithoutCont Org breakdown Org ID : Contribution to high APT (%) : Excluding APT (ms) 00D6g000005jkYJ : 94.21 : 73.01 00Dfg000000XkqT : -3.43 : 1305.13
+https://salesforce.pagerduty.com/incidents/Q0AQDQGYZPWM3O
+No immediate resolution was applied as the impact self-resolved. Continuous monitoring was maintained to ensure stability, and the Core DB Performance team was engaged for further analysis.
+​
+Q: Explain in detail the Time to Fix (i.e key events fro
+-
+1) Created user story W-19769379 where we mentioned about the outbound request details.
+Proximate Cause: The proximate cause of the incident was an increase in database total time, which led to the breach of the APT threshold. The root cause of the increased database time is still under investigation by the Core DB Performance team. Top im
+Site Reliability
+

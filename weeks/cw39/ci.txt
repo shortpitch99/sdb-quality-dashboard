@@ -1,0 +1,388 @@
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Work: Work ID
+Subject
+Status
+Assigned To
+Work: Created Date
+Sorted by Work: Created Date, newest-to-oldestDescending
+Sprint
+Type
+Found in Build
+Scheduled Build
+Customer
+Work: Created By
+Scrum Team Name Select all rows for Drill Down.
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Select row for Drill Down.
+Sayonara Data Management(6)
+P2(6)
+Subtotal
+Subtotal
+Select row for Drill Down.
+Sayonara Foundation Services(6)
+P2(6)
+Subtotal
+Subtotal
+Select row for Drill Down.
+Sayonara TxP(6)
+P2(6)
+Subtotal
+Subtotal
+Select row for Drill Down.
+SDB Engine Health and Diagnostics(3)
+P2(3)
+Subtotal
+Subtotal
+Select row for Drill Down.
+SDB Query Proc Execution(2)
+P2(2)
+Subtotal
+Subtotal
+Select row for Drill Down.
+SDBStore(3)
+P1(1)
+Subtotal
+P2(2)
+Subtotal
+Subtotal
+Total(26)
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Work: Work ID
+Subject
+Status
+Assigned To
+Work: Created Date
+Sorted by Work: Created Date, newest-to-oldestDescending
+Sprint
+Type
+Found in Build
+Scheduled Build
+Customer
+Work: Created By
+Sayonara Data Management(6)
+P2(6)
+W-19763355
+PersistentKeyCachePITRTest.testPITRestoreWithTLEDDLs_noPKC: RuntimeException: java.lang.RuntimeException: org.postgres
+New
+SDB Data Management Work Queue
+9/27/2025
+-
+Bug
+sdb.260.9
+-
+-
+SFCI API USER
+W-19762894
+TruncateTableForTenantServerTest.testOnlineIndexingRangeDeleteWithoutFlush: RuntimeException: JUnit barfed with multiple errors, this
+New
+SDB Data Management Work Queue
+9/27/2025
+-
+Bug
+sdb.260.9
+-
+-
+SFCI API USER
+W-19761586
+MultiNodeLastLevelMergeTest.lastLevelStackTest1: JSONException: Unterminated string at 603 [character 0
+New
+SDB Data Management Work Queue
+9/26/2025
+-
+Bug
+sdb.260.9
+-
+-
+SFCI API USER
+W-19726659
+MergeMergeConflictTest.testTombstoneOverlapMergeConflictRatio: PSQLException: An I/O error occurred while sending to t
+Triaged
+Vaibhav Arora
+9/24/2025
+-
+Bug
+sdb.260.8
+-
+-
+SFCI API USER
+W-19624375
+SDB-JUnitStress-sandbox-stress-RHEL9.sandbox-stress: AssertionError: Index inconsistency found for relation:
+In Progress
+Theo Vanderkooy
+9/12/2025
+2025.10a-Sayonara Data Management
+Bug
+sdb.260.7
+-
+-
+SFCI API USER
+W-19414948
+InterruptedFlushLocationCacheTest.flushCancelFullInvalTest_withPromotedMiniFlushTest: TestTimedOutException: test timed out after 900 seconds
+Triaged
+Shalini Shukla
+8/24/2025
+-
+Bug
+sdb.260
+-
+-
+SFCI API USER
+Subtotal
+Subtotal
+Sayonara Foundation Services(6)
+P2(6)
+W-19766091
+SDB-JUnitStress-dml-uptime-fast-purgeflush-nightly-RHEL9.dml-uptime-fast-purgeflush: 1,[::1], port=62202, expectedState=UP]: Last Error: dbsay`20250928151601.557880`
+New
+Ankur Singh Chauhan
+9/28/2025
+-
+Bug
+sdb.260.9
+-
+-
+SFCI API USER
+W-19763960
+WSLogTailingRPCsTest.testMemstoreAvoidanceOnWSLogTailer: AssertionFailedError: expected:<0> but was:<1>
+New
+SDB Foundation Services Work Queue
+9/27/2025
+-
+Bug
+sdb.260.9
+-
+-
+SFCI API USER
+W-19763852
+XCLockBroadcastTest.sayonaradb.test.server.ws.coordinator.XCLockBroadcastTest: PSQLException: The connection attempt failed.
+New
+SDB Foundation Services Work Queue
+9/27/2025
+-
+Bug
+sdb.260.9
+-
+-
+SFCI API USER
+W-19761429
+regression.multitenancy_lifecycle: regression test failed: [2025-09-26 04:02:41] test multitenancy_
+New
+Ankit Sharma
+9/26/2025
+-
+Bug
+sdb.260.8
+-
+-
+SFCI API USER
+W-19761218
+WriteScalingSSLTests.testEpochGeneratorRetransmit: AssertionFailedError: expected:<2> but was:<1>
+New
+SDB Foundation Services Work Queue
+9/26/2025
+-
+Bug
+sdb.260.9
+-
+-
+SFCI API USER
+W-19385172
+SDB-JUnitStress-LD-WS-dml-check-standby-partitioned-1-RHEL9.dml-check: RuntimeException: gave up waiting for cluster change, expe
+Triaged
+Jacob Park
+8/20/2025
+-
+Bug
+sdb.260
+-
+-
+SFCI API USER
+Subtotal
+Subtotal
+Sayonara TxP(6)
+P2(6)
+W-19717664
+KeyOrderPurgeTest.testPurgeWaitOnWriteLatch: AssertionFailedError: junit.framework.AssertionFailedError at
+New
+Smit Raj
+9/23/2025
+-
+Bug
+sdb.260.8
+-
+-
+SFCI API USER
+W-19701447
+MemstoreReproProblematicRecordChain.case1_unCommittedUpdateFollowedByGrantedKeyShareLock: TestTimedOutException: test timed out after 900 seconds
+Triaged
+Shao-Yuan Ho
+9/22/2025
+-
+Bug
+sdb.260.8
+-
+-
+SFCI API USER
+W-19562705
+FlushErrorLocationCacheWithSFTest.sayonaradb.test.server.flush.FlushErrorLocationCacheWithSFTest: TestTimedOutException: test timed out after 3600 seconds
+New
+Kaushal Mittal
+9/5/2025
+-
+Bug
+sdb.260.5
+-
+-
+SFCI API USER
+W-19465357
+FSQDaemonTest.test_with_paused_fsq_daemon: TestTimedOutException: test timed out after 900 seconds
+New
+Kaushal Mittal
+8/30/2025
+-
+Bug
+sdb.260.5
+-
+-
+SFCI API USER
+W-19409996
+MemstoreDumpTest.sayonaradb.test.server.memstore.MemstoreDumpTest: ExecutionException: sayonaradb.test.util.SysCmdException: Co
+In Progress
+Jonathan Hu
+8/22/2025
+2025.09b Sayonara TxP
+Bug
+sdb.260
+-
+-
+SFCI API USER
+W-19307267
+SDB-JUnitStress-RSWS-seq-stress-dbFaults-RHEL9.seq-stress: found trap on node[name=0, expectedState=RUNNING]: Last Error: dbsay`20250811162049.483639`
+New
+Dipesh Pandit
+8/11/2025
+-
+Bug
+sdb.260
+-
+-
+SFCI API USER
+Subtotal
+Subtotal
+SDB Engine Health and Diagnostics(3)
+P2(3)
+W-19717671
+ActivityStatementHistoryTest.testNullNonNullValues: StepFailureException: Worker at step 2 threw exception: expect
+New
+SDB EHD Development
+9/23/2025
+-
+Bug
+sdb.260.8
+-
+-
+SFCI API USER
+W-19664218
+AvgActiveSessionTest.testAvgActiveSession: RuntimeException: JUnit barfed with multiple errors, this
+New
+Sai Prasad Mysary
+9/17/2025
+2025.10a-SDB Engine Health and Diagnostics
+Bug
+sdb.260.7
+-
+-
+SFCI API USER
+W-19466621
+LockWaitTraceAndLogLineTest.testSdbTimeoutTraceForDeadlockLoglineLockTimeout: NullPointerException: Cannot invoke "org.json.JSONObject.getJS
+Ready for Review
+Sai Prasad Mysary
+8/31/2025
+2025.09b-SDB Engine Health and Diagnostics
+Bug
+sdb.260.5
+-
+-
+SFCI API USER
+Subtotal
+Subtotal
+SDB Query Proc Execution(2)
+P2(2)
+W-19761585
+PerfProfileTest.TestAttackPerfProfileDaemon: AssertionFailedError: junit.framework.AssertionFailedError at
+New
+Rui Zhang
+9/26/2025
+-
+Bug
+sdb.260.9
+-
+-
+SFCI API USER
+W-19565729
+TxnProcOomKillerTest.ProactiveOomKillerTest: StepFailureException: Worker at step 6 threw exception: expect
+New
+Suresh Kumar Jami
+9/5/2025
+-
+Bug
+sdb.260.6
+-
+-
+SFCI API USER
+Subtotal
+Subtotal
+SDBStore(3)
+P1(1)
+W-19654204
+Bookie decomm tests running in SDBChaos are failing
+New
+SDBStore Work Queue
+9/16/2025
+-
+Bug
+sdb.260.5
+-
+-
+Jisha Paul
+Subtotal
+P2(2)
+W-19402274
+SFStore-Build-RHEL9.org.apache.bookkeeper.bookie.BookieCacheRehydrationFaultInjectionTest.testNoSpaceInGCRehydration
+New
+Senthilkumar Narayanasamy
+8/21/2025
+2025.09b-SDBStore
+Bug
+sdb.260
+-
+-
+Dipesh Pandit
+W-19364382
+SDB-JUnitStress-WS-schemaupgrade-stress-RHEL9.schemaupgrade-stress: Exception: error executing teardown sayonaradb.test
+In Progress
+Shyam Vanga
+8/18/2025
+-
+Bug
+sdb.260
+-
+-
+SFCI API USER
+Subtotal
+Subtotal
+Total(26)
+

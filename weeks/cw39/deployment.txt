@@ -1,0 +1,21 @@
+09/29 - Weekly Deployment Rollouts Update:
+Cells at High Risk during Upgrade
+ita2s  - 258.7.8 (SB12 Week1) Deployment Paused until the fix is in place to mitigate the risk . Also, Data Encryption (TLE) not enabled
+Last week updates
+258.15.9 SB12 Week2
+Shared Services and SDB Cells (GID, Ecom, GovCloud) - :white_check_mark:
+Shared Services and SDB Cells (Commercial) - In Progress, was on hold for 2 days due to activation of MR Safe Change Compliance checks that we are not ready
+260.1.6 SB12 Week1
+Shared Services and SDB Cells - In Progress, was on hold for 2 days due to activation of MR Safe Change Compliance checks that we are not ready to comply to
+260.3.2 SB0
+Shared Services and SDB Cells - :white_check_mark:, was on hold for 2 days due to activation of MR Safe Change Compliance checks that we are not ready
+Plan for this week
+260.1.6 SB12 W1 - [Continue] Shared Services and cells
+258.15.9 SB12 W2 - [Continue] Shared Services and cells
+258.15.10 RW1 - Delayed, to start only after SBW2 is completed
+Pending approval
+260.4.1 SB0 - Shared Services and Cells
+260.1.7 SBW2
+260.5.1 SB0
+Challenges   Faced during last week -
+MR Safe Change Compliance checks for Tier 0 services were enabled on 9/24 UTC (I believe noone was aware ahead of time) and we were not ready to comply to all checks, as such unable to trigger SDB deployments from MR, it was resolved on 9/26 UTC after requesting exemption from MR team.
