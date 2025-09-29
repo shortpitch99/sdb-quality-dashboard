@@ -2001,7 +2001,8 @@ class QualityReportDashboard:
         # Parse security data and group by team and priority
         team_priority_counts = {}
         for bug in security_data:
-            team = bug.get('team', 'Unknown Team')
+            # Security issues use 'component' field for team info
+            team = bug.get('team', bug.get('component', 'Unknown Team'))
             # Infer priority from subject or use default
             subject = bug.get('subject', '')
             priority = 'P2'  # Default priority based on data pattern
@@ -3242,7 +3243,7 @@ def main():
                 st.markdown("---")
                 
                 # CI Issues Section
-                st.markdown("### 🔧 [CI Issues](https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=lightningdashboard&wave__assetId=01ZEE000001BaVp2AK)")
+                st.markdown("### 🔧 [CI Issues](https://gus.lightning.force.com/lightning/r/Report/00OEE000002YbOz2AK/view?queryScope=userFolders)")
                 col1, col2 = st.columns([1, 1])
                 with col1:
                     dashboard.create_ci_issues_chart(archive_data)
@@ -3281,7 +3282,7 @@ def main():
                     dashboard.create_security_bugs_chart(archive_data)
                 with col2:
                     st.markdown("#### 🛡️ Security Analysis")
-                    security_data = archive_data.get('security', [])
+                    security_data = archive_data.get('security_issues', [])
                     if security_data:
                         total_security_bugs = len(security_data)
                         # Calculate priority breakdown

@@ -1244,11 +1244,35 @@ Next week: Planning production rollout to P0-P3 stages pending final validation 
                     team_patterns = [
                         'Sayonara Data Management', 'Sayonara Foundation Services',
                         'Sayonara TxP', 'SDB Catalog Services', 'SDB Engine Health',
-                        'SDB Query Proc', 'SDBStore', 'SDB Production Readiness'
+                        'SDB Query Proc', 'SDBStore', 'SDB Production Readiness',
+                        'SDB Data Management Work Queue', 'SDB Foundation Services Work Queue',
+                        'SDB Engine Health and Diagnostics', 'SDB Query Proc Execution'
                     ]
                     for team_pattern in team_patterns:
                         if team_pattern in context_line:
                             team = team_pattern
+                            # Normalize team names for display
+                            if 'SDB Data Management Work Queue' in team:
+                                team = 'Sayonara Data Management'
+                            elif 'SDB Foundation Services Work Queue' in team:
+                                team = 'Sayonara Foundation Services'
+                            elif 'SDB Engine Health and Diagnostics' in team:
+                                team = 'SDB Engine Health'
+                            elif 'SDB Query Proc Execution' in team:
+                                team = 'SDB Query Proc'
+                    
+                    # If no team found, try to infer from assignee names
+                    if team == "Unknown":
+                        assignee_to_team = {
+                            'Kaushal Mittal': 'Sayonara TxP',
+                            'Shao-Yuan Ho': 'Sayonara Data Management',
+                            'Anup Ghatage': 'Sayonara Data Management',
+                            'Thomas Fanghaenel': 'SDB Engine Health',
+                            'Vaibhav Arora': 'Sayonara Data Management'
+                        }
+                        for assignee, inferred_team in assignee_to_team.items():
+                            if assignee in context_line:
+                                team = inferred_team
                     
                     # Extract priority
                     if re.search(r'P[1-4]', context_line):
