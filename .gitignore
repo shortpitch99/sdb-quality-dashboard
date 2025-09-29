@@ -34,7 +34,7 @@ env/
 # Reports and generated files
 reports/
 *.log
-quality_data_archive_*.json
+#quality_data_archive_*.json
 quality_report_*.md
 
 # IDE and editor files
