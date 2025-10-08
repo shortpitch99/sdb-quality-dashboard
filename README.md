@@ -89,7 +89,6 @@ pip install -r requirements.txt
 2. **Input Files**: Prepare your data files or use the provided examples:
    - `risks.txt` - Risk/feature tracking data
    - `deployments.csv` - Release deployment information
-   - `coverage.json` - Code coverage metrics
 
 ## 📊 Dashboard Screenshots
 
@@ -141,7 +140,7 @@ v2.3.1,2024-01-15,production,deployed,auth-improvements;ui-updates,
 v2.3.0,2024-01-10,production,deployed,payment-gateway;mobile-fixes,minor-ui-glitch
 ```
 
-### Coverage Metrics (coverage.json)
+### Coverage Metrics (coverage.txt only)
 ```json
 [
   {

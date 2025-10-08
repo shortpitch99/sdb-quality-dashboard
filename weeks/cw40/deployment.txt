@@ -1,0 +1,18 @@
+10/6 - Weekly Deployment Rollouts Update:
+Cells at High Risk during Upgrade
+ita2s  - 258.7.8 (SB12 Week1) Deployment Paused until the fix is in place to mitigate the risk . Also, Data Encryption (TLE) not enabled
+Last week updates
+258.15.9 SB12 Week2
+Shared Services and SDB Cells (Commercial) - :white_check_mark:
+260.1.6 SB12 Week1
+Shared Services - :white_check_mark:
+SDB Cells - Completed all except for last stagger (bra54s) due to Dreamforce moratorium
+260.4.1 SB0
+Shared Services and Cells  - :white_check_mark:
+Plan for this week
+Pending approval to continue during Dreamforce moratorium
+260.5 SB0 - Shared Services and Cells
+260.7 SB0 - Shared Services and Cells
+Challenges   Faced during last week -
+Hit MR Safe Change Compliance checks issue for a few hours due to MR team accidentally reverting the exemption while rolling out ROSS releases. Issue lasted for ~4 hrs. We will raise a WI for their RCA on this issue.
+https://salesforce-internal.slack.com/archives/CGWP4RHNJ/p1759376436171269?thread_ts=1758762145.553169&cid=CGWP4RHNJ 

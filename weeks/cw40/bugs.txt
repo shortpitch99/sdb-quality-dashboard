@@ -1,0 +1,139 @@
+Priority Select all rows for Drill Down.
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Created Date
+Sorted by Created Date, oldest-to-newestAscending
+Select row for Drill Down.
+P2(8)
+Sayonara Data Management(1)
+9/28/2025(1)
+Subtotal
+Subtotal
+Sayonara Foundation Services(4)
+8/12/2025(1)
+Subtotal
+9/28/2025(2)
+Subtotal
+9/29/2025(1)
+Subtotal
+Subtotal
+Sayonara TxP(3)
+8/20/2025(1)
+Subtotal
+8/27/2025(1)
+Subtotal
+10/6/2025(1)
+Subtotal
+Subtotal
+Subtotal
+Total(8)
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Created Date
+Sorted by Created Date, oldest-to-newestAscending
+Work ID
+Subject
+Readme Notes
+Assigned To: Full Name
+Status
+Customer
+Found In Build Name
+Sprint: Name
+P2(8)
+Sayonara Data Management(1)
+9/28/2025(1)
+W-19766958
+[EA][PROD][PROD_ERROR][jpn182s] New Tenant ERS installation is currently not allowed as the current ...
+9/30: RCA in progress.
+Terry Chong
+New
+SDBFalcon jpn182s
+sdb.258.11
+-
+Subtotal
+Subtotal
+Sayonara Foundation Services(4)
+8/12/2025(1)
+W-19317263
+[EA][PROD][INTERNAL_ERROR][usa376] We need an in-progress transaction to read the catalogs
+09/23 - Code is in Review stage.
+
+09/09 - Jacob has already fixed this as part of Sequences V2. Once he is back from PTO (9b), he willl cherry-pick the fix into Sequences V1.
+
+08/14/2025 Couple of follow-ups have been identified which will be fixed as pa...
+Jacob Park
+Ready for Review
+SDBFalcon usa376
+sdb.258.1
+2025.09b-Sayonara Foundation Services
+Subtotal
+9/28/2025(2)
+W-19765560
+[EA][PROD][INTERNAL_ERROR][usa6s] index "ak3auth_session" has an entry with no corresponding base ro...
+9/30: Michael might have reproduced the problem. Waiting for the log extent to confirm the theory .
+Michael Abebe
+Triaged
+SDBFalcon usa6s
+sdb.260.1
+-
+W-19767303
+[EA][PROD][PROD_ERROR][usa4s] [D0dknWZOlMmfYLSbxZdmdQ:00000A7C] Req:LedgerReadStreamReq StoreId:3069...
+-
+Sagar Ranadive
+Triaged
+SDBFalcon usa4s
+sdb.260.8
+-
+Subtotal
+9/29/2025(1)
+W-19769313
+[EA][PROD][TRAP][usa6s] AllocSetAlloc,palloc_internal,Array_init,ExtentIdList_init,read_extentset
+9/30: Just transferred to Sagar
+Sagar Ranadive
+Triaged
+SDBFalcon usa6s
+sdb.260.1
+-
+Subtotal
+Subtotal
+Sayonara TxP(3)
+8/20/2025(1)
+W-19391926
+[EA][PROD][PROD_ERROR][usa936s] Could not commit transaction before the transaction commit threshold...
+9/22: Any updates?
+9/10: Swapnil will check if the problem was caused by OS patching
+Jonathan Hu
+In Progress
+SDBFalcon usa936s
+sdb.258.11
+-
+Subtotal
+8/27/2025(1)
+W-19440829
+[EA][PROD][INTERNAL_ERROR][ind132] Cannot allocate FragmentStaetQueue slot after 649 attempts over 120 seconds, error=1,
+9/22: Sprinted to fix in 9b
+9/11: Suhas identified a potential DL in the fsq daemon with timestamp logging.
+Suhas Dantkale
+Ready for Review
+SDBFalcon ind132
+sdb.258.3
+2025.10a Sayonara TxP
+Subtotal
+10/6/2025(1)
+W-19825077
+[EA][PROD][PROD_ERROR][usa16s] terminating connection due to severe memory pressure in memstore
+-
+SDB TxP Work Queue
+New
+SDBFalcon usa16s
+sdb.260.4
+-
+Subtotal
+Subtotal
+Subtotal
+Total(8)
+

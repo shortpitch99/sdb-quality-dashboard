@@ -65,6 +65,13 @@ class PRBItem:
     status: str
     description: str
     created_date: str
+    # Enhanced fields for comprehensive LLM analysis
+    what_happened: str = ""
+    customer_experience: str = ""
+    proximate_cause: str = ""
+    how_resolved: str = ""
+    team: str = "Unknown"
+    customer_impact: str = "Unknown"
 
 @dataclass
 class BugItem:
@@ -329,9 +336,43 @@ class QualityDataCollector:
                         elif priority_num == '4':
                             priority = 'P4-Minimal'
                 
-                # Now search broader context for other details
+                # NEW: Handle grouped priority format (like in cw40)
+                # Look backwards for priority group headers like "P1(3)" 
+                current_priority_group = None
+                for back_i in range(i - 1, max(0, i - 20), -1):
+                    back_line = lines[back_i].strip()
+                    group_match = re.search(r'P([0-4])\(\d+\)', back_line)
+                    if group_match:
+                        priority_num = group_match.group(1)
+                        if priority_num == '0':
+                            current_priority_group = 'P0-Critical'
+                        elif priority_num == '1':
+                            current_priority_group = 'P1-High'
+                        elif priority_num == '2':
+                            current_priority_group = 'P2-Medium'
+                        elif priority_num == '3':
+                            current_priority_group = 'P3-Low'
+                        elif priority_num == '4':
+                            current_priority_group = 'P4-Minimal'
+                        break
+                
+                # If we found a priority group and haven't set priority yet, use it
+                if current_priority_group and priority == 'Medium':
+                    priority = current_priority_group
+                
+                # Now search broader context for other details - but limit to this PRB's section
                 context_start = max(0, i - 5)
                 context_end = min(len(lines), i + 50)
+                
+                # Find the next PRB to limit our search scope
+                next_prb_line = len(lines)
+                for next_i in range(i + 1, len(lines)):
+                    if re.search(r'PRB-\d{7}', lines[next_i]):
+                        next_prb_line = next_i
+                        break
+                
+                # Limit context to not go beyond the next PRB
+                context_end = min(context_end, next_prb_line)
                 
                 for j in range(context_start, context_end):
                     context_line = lines[j].strip()
@@ -379,22 +420,30 @@ class QualityDataCollector:
                 next_steps = ""
                 user_experience = ""
                 
-                # Look for detailed fields in the context around the PRB
+                # Look for detailed fields in the context around this specific PRB
+                # Use a larger context window but prioritize matches closer to this PRB
                 context_start = max(0, i - 20)
-                context_end = min(len(lines), i + 50)
+                context_end = min(len(lines), i + 80)
                 all_lines = [(line_idx, lines[line_idx]) for line_idx in range(context_start, context_end)]
                 
-                # Extract "What Happened?" section - look for content after the question
-                # Extract "Customer Experience" or "User Experience" section
+                # Extract "Customer Experience" or "User Experience" section - find closest match
+                best_user_experience = ""
+                best_distance = float('inf')
                 for line_num, context_line in all_lines:
-                    if 'User Experience:' in context_line or 'Customer Experience' in context_line:
-                        # Extract the experience description
-                        if ':' in context_line:
-                            user_experience = context_line.split(':', 1)[1].strip()
-                            # Clean up the user experience text
-                            if '|' in user_experience:
-                                user_experience = user_experience.split('|')[0].strip()
-                        break
+                    if 'User Experience:' in context_line or 'Customer Experience:' in context_line:
+                        distance = abs(line_num - i)  # Distance from current PRB
+                        if distance < best_distance:
+                            # Extract the experience description
+                            if ':' in context_line:
+                                candidate = context_line.split(':', 1)[1].strip()
+                                # Clean up the user experience text - remove truncation markers
+                                if candidate.endswith('...'):
+                                    candidate = candidate[:-3].strip()
+                                if '|' in candidate:
+                                    candidate = candidate.split('|')[0].strip()
+                                best_user_experience = candidate
+                                best_distance = distance
+                user_experience = best_user_experience
                 
                 # Extract team information more accurately - override with better data
                 for line_num, context_line in all_lines:
@@ -423,51 +472,53 @@ class QualityDataCollector:
                         break
                 
                 # Extract "What Happened?" section - look for content after the question
-                # Extract "Proximate Cause" section - look for actual cause description
+                # Extract "Proximate Cause" - find closest match
+                best_proximate_cause = ""
+                best_distance = float('inf')
                 for line_num, context_line in all_lines:
-                    if 'Proximate Cause' in context_line and '?' in context_line:
-                        # Look for the actual cause in subsequent lines
-                        cause_lines = []
-                        for j in range(line_num + 1, min(len(lines), line_num + 10)):
-                            line_content = lines[j].strip()
-                            if (line_content and 
-                                not any(keyword in line_content for keyword in ['How did we find out', 'How was it Resolved', 'Root Cause', 'Next Steps']) and
-                                not line_content.startswith('Q:') and
-                                not line_content.startswith('A:') and
-                                line_content != '​'):  # Skip empty unicode characters
-                                cause_lines.append(line_content)
-                            elif any(keyword in line_content for keyword in ['How did we find out', 'How was it Resolved']):
-                                break
-                        proximate_cause = " ".join(cause_lines)
-                        break
-                
-                # If no structured proximate cause found, look for the standalone cause line
-                if not proximate_cause:
-                    for line_num, context_line in all_lines:
-                        line_content = context_line.strip()
-                        if (line_content.startswith('Proximate Cause:') or 
-                            ('ERR release' in line_content and 'version mismatch' in line_content) or
-                            ('caused' in line_content.lower() and any(word in line_content.lower() for word in ['mismatch', 'incompatible', 'failure', 'error']))):
+                    line_content = context_line.strip()
+                    if (line_content.startswith('The proximate cause of the incident was') or
+                        line_content.startswith('Proximate Cause:') or
+                        line_content.startswith('The primary cause of the incident was') or
+                        line_content.startswith('The incident was primarily caused by') or
+                        line_content.startswith('The main contributing factor of the incident was') or
+                        line_content.startswith('The exact root cause of the incident') or
+                        line_content.startswith('Caused after Change case was deployed') or
+                        line_content.startswith('Performance regression from index deprecation') or
+                        ('proximate cause' in line_content.lower() and 'incident was' in line_content.lower()) or
+                        ('primary cause' in line_content.lower() and len(line_content) > 50)):
+                        distance = abs(line_num - i)  # Distance from current PRB
+                        if distance < best_distance:
                             if line_content.startswith('Proximate Cause:'):
-                                proximate_cause = line_content.replace('Proximate Cause:', '').strip()
+                                best_proximate_cause = line_content.replace('Proximate Cause:', '').strip()
                             else:
-                                proximate_cause = line_content
-                            break
+                                best_proximate_cause = line_content
+                            best_distance = distance
+                proximate_cause = best_proximate_cause
                 
-                # If no structured "What Happened?" found, look for the actual incident description
-                if not what_happened:
-                    # Look for lines that describe the actual problem (after system messages)
-                    for line_num, context_line in all_lines:
-                        line_content = context_line.strip()
-                        # Look for substantive problem descriptions - specifically target the SDB archival issue
-                        if (line_content and 
-                            len(line_content) > 30 and  # Substantial content
-                            not any(skip in line_content for skip in ['[THIS PRB IS MANAGED BY QUIP2GUS]', 'User Experience:', 'Impact Quantification:', 'Q:', 'A:', 'https://', 'Proximate Cause:', 'Key Questions', 'Created Date Time', 'Select all rows', 'Sorted by', 'Select row for Drill Down']) and
-                            ('SDB Archival is not running' in line_content or 
-                             'archival is not running' in line_content or
-                             any(indicator in line_content.lower() for indicator in ['not running for sdb', 'backup', 'capacity constraints', 'clusters in hyperforce']))):
-                            what_happened = line_content
-                            break
+                # Extract "What Happened?" - find closest match
+                best_what_happened = ""
+                best_distance = float('inf')
+                for line_num, context_line in all_lines:
+                    line_content = context_line.strip()
+                    # Look for substantive problem descriptions
+                    if (line_content and 
+                        len(line_content) > 30 and  # Substantial content
+                        not any(skip in line_content for skip in ['[THIS PRB IS MANAGED BY QUIP2GUS]', 'User Experience:', 'Impact Quantification:', 'Q:', 'A:', 'https://', 'Proximate Cause:', 'Key Questions', 'Created Date Time', 'Select all rows', 'Sorted by', 'Select row for Drill Down', 'Any updates made in GUS']) and
+                        (line_content.startswith('Sherlock detected') or 
+                         line_content.startswith('On September') or
+                         line_content.startswith('On October') or
+                         line_content.startswith('PRB Retrospective | SEV-') or
+                         'SDB Archival is not running' in line_content or 
+                         'archival is not running' in line_content or
+                         'cell experienced significant performance degradation' in line_content or
+                         'incident was detected involving high Average Page Time' in line_content or
+                         any(indicator in line_content.lower() for indicator in ['sherlock detected', 'apt incident', 'anomalies detected', 'not running for sdb', 'backup', 'capacity constraints', 'clusters in hyperforce', 'performance degradation due']))):
+                        distance = abs(line_num - i)  # Distance from current PRB
+                        if distance < best_distance:
+                            best_what_happened = line_content
+                            best_distance = distance
+                what_happened = best_what_happened
                 
                 # Look directly for the actual next steps work items
                 next_steps = ""
@@ -480,13 +531,25 @@ class QualityDataCollector:
                 if work_items:
                     next_steps = " ".join(work_items)
                 
-                # Look directly for the actual resolution line
-                how_resolved = ""
+                # Extract "How was it resolved?" - find closest match
+                best_how_resolved = ""
+                best_distance = float('inf')
                 for line_num, context_line in all_lines:
                     line_content = context_line.strip()
-                    if any(keyword in line_content.lower() for keyword in ['rolled back', 'rollback', 'restarted', 'pods were restarted']) and len(line_content) > 20:
-                        how_resolved = line_content
-                        break
+                    if (line_content and len(line_content) > 20 and
+                        (any(keyword in line_content.lower() for keyword in ['rolled back', 'rollback', 'restarted', 'pods were restarted', 'self-resolved', 'no immediate resolution', 'continuous monitoring', 'resolved', 'immediate actions included', 'the immediate resolution involved', 'autoscaling mechanism', 'flushing the memstore', 'suspending sandbox copies']) or
+                         line_content.startswith('No immediate resolution was applied') or
+                         line_content.startswith('Immediate actions included') or
+                         line_content.startswith('The immediate resolution involved') or
+                         line_content.startswith('Immediate communication with the customer') or
+                         line_content.startswith('The fix involved reverting') or
+                         line_content.startswith('Recreated the following objects') or
+                         line_content.startswith('The incident self-resolved'))):
+                        distance = abs(line_num - i)  # Distance from current PRB
+                        if distance < best_distance:
+                            best_how_resolved = line_content
+                            best_distance = distance
+                how_resolved = best_how_resolved
                 
                 # Extract Resolution section (comprehensive)
                 resolution_lines = []
@@ -546,17 +609,14 @@ class QualityDataCollector:
                     priority=priority,
                     status=status,
                     description=f"Team: {team} | Impact: {customer_impact} | {description[:200]}" if description else f"Problem report {prb_id} managed by {team}",
-                    created_date=created_date
+                    created_date=created_date,
+                    what_happened=what_happened,
+                    customer_experience=user_experience,  # Map user_experience to customer_experience
+                    proximate_cause=proximate_cause,
+                    how_resolved=how_resolved,
+                    team=team,
+                    customer_impact=customer_impact
                 )
-                
-                # Add detailed fields for narrative generation
-                prb_item.what_happened = what_happened
-                prb_item.proximate_cause = proximate_cause  
-                prb_item.how_resolved = how_resolved
-                prb_item.next_steps = next_steps
-                prb_item.user_experience = user_experience
-                prb_item.team = team
-                prb_item.customer_impact = customer_impact
                 
                 prbs.append(prb_item)
             
@@ -894,34 +954,32 @@ Next week: Planning production rollout to P0-P3 stages pending final validation 
         print(f"✓ Loaded {len(deployments)} deployment records from {csv_file}")
         return deployments
     
-    def load_coverage_metrics(self, coverage_file: str) -> List[CoverageMetric]:
-        """Load code coverage metrics from file."""
+    def load_coverage_metrics(self, coverage_file: str = None) -> List[CoverageMetric]:
+        """Load code coverage metrics from file (optional - legacy support)."""
         metrics = []
         
-        if not os.path.exists(coverage_file):
-            print(f"Warning: Coverage file {coverage_file} not found. Creating example.")
-            self._create_example_coverage_file(coverage_file)
+        if coverage_file and os.path.exists(coverage_file):
+            try:
+                if coverage_file.endswith('.json'):
+                    with open(coverage_file, 'r') as f:
+                        coverage_data = json.load(f)
+                        for item in coverage_data:
+                            metrics.append(CoverageMetric(**item))
+                elif coverage_file.endswith('.csv'):
+                    with open(coverage_file, 'r') as f:
+                        reader = csv.DictReader(f)
+                        for row in reader:
+                            metrics.append(CoverageMetric(
+                                component=row.get('component', ''),
+                                line_coverage=float(row.get('line_coverage', 0)),
+                                branch_coverage=float(row.get('branch_coverage', 0)),
+                                function_coverage=float(row.get('function_coverage', 0)),
+                                test_count=int(row.get('test_count', 0))
+                            ))
+            except Exception as e:
+                print(f"Error loading coverage data: {e}")
         
-        try:
-            if coverage_file.endswith('.json'):
-                with open(coverage_file, 'r') as f:
-                    coverage_data = json.load(f)
-                    for item in coverage_data:
-                        metrics.append(CoverageMetric(**item))
-            elif coverage_file.endswith('.csv'):
-                with open(coverage_file, 'r') as f:
-                    reader = csv.DictReader(f)
-                    for row in reader:
-                        metrics.append(CoverageMetric(
-                            component=row.get('component', ''),
-                            line_coverage=float(row.get('line_coverage', 0)),
-                            branch_coverage=float(row.get('branch_coverage', 0)),
-                            function_coverage=float(row.get('function_coverage', 0)),
-                            test_count=int(row.get('test_count', 0))
-                        ))
-        except Exception as e:
-            print(f"Error loading coverage data: {e}")
-        
+        # Always set coverage data (empty list if no file or file not found)
         self.data['coverage'] = [vars(metric) for metric in metrics]
         return metrics
     
@@ -2231,6 +2289,14 @@ RISK DATA:
 {json.dumps(data.get('risks', []), indent=2)}
 
 PRB DATA (Problem Reports/Incidents):
+CONTEXT: Each PRB contains 4 key fields for comprehensive analysis:
+1. "what_happened" - Describes the incident/problem that occurred
+2. "customer_experience" - Details how customers were impacted
+3. "proximate_cause" - Explains the root cause of the issue
+4. "how_resolved" - Describes the mitigation and resolution steps taken
+
+Use these fields to create detailed incident narratives that explain the full story of each PRB, including what went wrong, customer impact, why it happened, and how it was fixed. Focus on lessons learned and preventive measures.
+
 {json.dumps(data.get('prbs', []), indent=2)}
 
 BUGS DATA (Active Production Bugs):
@@ -2247,7 +2313,7 @@ STAGGER DEPLOYMENT DATA:
 CONTEXT: This shows SDB version rollout across our fleet using staged deployment phases. Progression: SB0 (sandbox) -> SB1 -> SB2 -> R0 (production) -> R1 -> R2 (full rollout), with signature and high AOV customers prioritized in early phases. Calculate total fleet size from cell_count values.
 {json.dumps(data.get('stagger_deployments', []), indent=2)}
 
-CODE COVERAGE METRICS (Legacy JSON format):
+CODE COVERAGE METRICS (Component-level data - optional):
 {json.dumps(data.get('coverage', []), indent=2)}
 
 NEW CODE COVERAGE DATA (Text format):
@@ -2454,7 +2520,6 @@ def main():
     parser.add_argument('--prb-file', default='prb.txt', help='PRB/Incident tracking file')
     parser.add_argument('--bugs-file', default='bugs.txt', help='Active bugs tracking file')
     parser.add_argument('--deployment-csv', default='deployment.csv', help='Deployment CSV file (SuperSet export only)')
-    parser.add_argument('--coverage-file', default='coverage.json', help='Coverage metrics file (JSON format)')
     parser.add_argument('--coverage-txt', default='coverage.txt', help='New code coverage file (text format from coverage.txt)')
     parser.add_argument('--ci-file', default='ci.txt', help='CI issues file')
     parser.add_argument('--leftshift-file', default='leftshift.txt', help='LeftShift issues file')
@@ -2482,7 +2547,6 @@ def main():
         args.prb_file = os.path.join(week_dir, os.path.basename(args.prb_file))
         args.bugs_file = os.path.join(week_dir, os.path.basename(args.bugs_file))
         args.deployment_csv = os.path.join(week_dir, os.path.basename(args.deployment_csv))
-        args.coverage_file = os.path.join(week_dir, os.path.basename(args.coverage_file))
         args.coverage_txt = os.path.join(week_dir, os.path.basename(args.coverage_txt))
         args.ci_file = os.path.join(week_dir, os.path.basename(args.ci_file))
         args.leftshift_file = os.path.join(week_dir, os.path.basename(args.leftshift_file))
@@ -2521,9 +2585,9 @@ def main():
     print("Loading deployment data...")
     collector.load_deployment_data(args.deployment_csv)
     
-    print("Loading coverage metrics...")
-    collector.load_coverage_metrics(args.coverage_file)
-    
+    print("Initializing coverage metrics (legacy JSON format no longer required)...")
+    collector.load_coverage_metrics()  # Initialize with empty data
+
     print("Loading new code coverage data...")
     collector.load_new_code_coverage(args.coverage_txt)
     

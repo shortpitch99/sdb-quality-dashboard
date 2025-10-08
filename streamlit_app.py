@@ -775,6 +775,44 @@ class QualityReportDashboard:
                 </div>
             </div>
             """, unsafe_allow_html=True)
+        
+        # Additional Development Metrics (Second Row)
+        st.markdown("")  # Add some spacing
+        col10, col11, col12, col13, col14 = st.columns(5)
+        
+        with col10:
+            # All-time Bug Backlog
+            st.markdown(f"""
+            <div class="metric-card">
+                <div class="metric-label">🐛 All-time Bug Backlog</div>
+                <div class="metric-value">18</div>
+                <div class="metric-total">138 bugs</div>
+                <div class="metric-delta metric-delta-yellow">
+                    BACKLOG
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col11:
+            # Backlog from PRB
+            st.markdown(f"""
+            <div class="metric-card">
+                <div class="metric-label">📋 Backlog from PRB</div>
+                <div class="metric-value">--</div>
+                <div class="metric-total">Coming Soon</div>
+                <div class="metric-delta metric-delta-gray">
+                    PENDING
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # Leave remaining columns empty for future expansion
+        with col12:
+            st.markdown("")
+        with col13:
+            st.markdown("")
+        with col14:
+            st.markdown("")
     
     def categorize_file_change(self, filepath: str) -> str:
         """Categorize file changes with deeper SDB-specific analysis."""
@@ -2919,7 +2957,6 @@ class QualityReportDashboard:
                 deployment_file = st.text_input("Deployment CSV", value="deployments.csv")
                 
             with col2:
-                coverage_file = st.text_input("Coverage File", value="coverage.json")
                 report_type = st.selectbox("Report Type", ["comprehensive", "compact"])
             
             augmentation_file = st.text_input("PRB Augmentation File (optional)", value="prb_augmentation.json")
@@ -2948,8 +2985,8 @@ class QualityReportDashboard:
                         if os.path.exists(deployment_file):
                             collector.load_deployment_data(deployment_file)
                         
-                        if os.path.exists(coverage_file):
-                            collector.load_coverage_metrics(coverage_file)
+                        # Initialize coverage metrics (legacy JSON format no longer required)
+                        collector.load_coverage_metrics()
                         
                         # Archive data
                         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -3542,6 +3579,14 @@ def main():
         
         #### 🎯 **Feature Rollout Risk**
         - Count of features with Red/At Risk/Critical status
+        
+        #### 🐛 **All-time Bug Backlog**
+        - **🟡 BACKLOG**: Accumulated bugs requiring attention
+        - Shows P0/P1 critical bugs vs total backlog count
+        
+        #### 📋 **Backlog from PRB**
+        - **🔘 PENDING**: PRB-related followup items
+        - Coming soon - will track post-PRB action items
         """)
 
     # Footer
