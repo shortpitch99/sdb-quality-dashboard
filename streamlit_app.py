@@ -3077,6 +3077,9 @@ def render_component_dashboard(component: str):
         with open(report_to_use['path'], 'r') as f:
             data = json.load(f)
         
+        # Load LLM content from the report data
+        dashboard.llm_content = data.get('llm_content', {})
+        
         # Create metrics dashboard
         dashboard.create_metrics_dashboard(data)
         
@@ -3089,7 +3092,7 @@ def render_component_dashboard(component: str):
         st.markdown("### 🚨 Problem Reports Analysis")
         col1, col2 = st.columns([1, 1])
         with col1:
-            dashboard.create_prb_severity_chart(data)
+            dashboard.create_prb_analysis(data, f"_{component}")
         with col2:
             dashboard.create_prb_insights(data)
         
@@ -3115,7 +3118,138 @@ def render_component_dashboard(component: str):
         with col1:
             dashboard.create_ci_issues_chart(data)
         with col2:
-            dashboard.create_ci_insights(data)
+            st.markdown("#### 📊 CI Issues Insights")
+            ci_data = data.get('ci_issues', [])
+            if ci_data:
+                total_ci_issues = len(ci_data)
+                # Calculate priority breakdown
+                priority_counts = {}
+                for issue in ci_data:
+                    priority = issue.get('priority', 'Unknown')
+                    priority_counts[priority] = priority_counts.get(priority, 0) + 1
+                
+                # Create priority breakdown string
+                priority_breakdown = ", ".join([f"{p}:{count}" for p, count in sorted(priority_counts.items())])
+                st.metric("Total CI Issues", f"{total_ci_issues} ({priority_breakdown})")
+                
+                teams = list(set(issue.get('team', 'Unknown') for issue in ci_data))
+                st.metric("Teams Affected", len(teams))
+                st.markdown("**Top Teams:**")
+                team_counts = {}
+                for issue in ci_data:
+                    team = issue.get('team', 'Unknown')
+                    team_counts[team] = team_counts.get(team, 0) + 1
+                for team, count in sorted(team_counts.items(), key=lambda x: x[1], reverse=True)[:3]:
+                    st.write(f"• {team}: {count} issues")
+            else:
+                st.info("No CI issues data available")
+        
+        # Security Analysis
+        st.markdown("---")
+        st.markdown("### 🔒 [Security Bugs](https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE000002XKRp2AO)")
+        st.markdown("*Source: Coverity and 3PP Scan*")
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            dashboard.create_security_bugs_chart(data)
+        with col2:
+            st.markdown("#### 🛡️ Security Analysis")
+            security_data = data.get('security_issues', [])
+            if security_data:
+                total_security_bugs = len(security_data)
+                # Calculate priority breakdown
+                priority_counts = {}
+                for bug in security_data:
+                    priority = bug.get('priority', 'Unknown')
+                    priority_counts[priority] = priority_counts.get(priority, 0) + 1
+                
+                # Create priority breakdown string
+                priority_breakdown = ", ".join([f"{p}:{count}" for p, count in sorted(priority_counts.items())])
+                st.metric("Total Security Bugs", f"{total_security_bugs} ({priority_breakdown})")
+                
+                teams = list(set(bug.get('team', bug.get('component', 'Unknown')) for bug in security_data))
+                st.metric("Teams Affected", len(teams))
+                st.markdown("**Security Bug Types:**")
+                bug_types = {}
+                for bug in security_data:
+                    subject = bug.get('subject', '')
+                    if 'RESOURCE_LEAK' in subject:
+                        bug_types['Resource Leak'] = bug_types.get('Resource Leak', 0) + 1
+                    elif 'OVERRUN' in subject:
+                        bug_types['Buffer Overrun'] = bug_types.get('Buffer Overrun', 0) + 1
+                    elif 'USE_AFTER_FREE' in subject:
+                        bug_types['Use After Free'] = bug_types.get('Use After Free', 0) + 1
+                    else:
+                        bug_types['Other'] = bug_types.get('Other', 0) + 1
+                for bug_type, count in sorted(bug_types.items(), key=lambda x: x[1], reverse=True)[:3]:
+                    st.write(f"• {bug_type}: {count}")
+            else:
+                st.info("No security bugs data available")
+
+        # Left Shift Analysis
+        st.markdown("---")
+        st.markdown("### ⬅️ [Left Shift Bugs](https://gus.lightning.force.com/lightning/r/Report/00OEE000002Wjld2AC/view?queryScope=userFolders)")
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            dashboard.create_leftshift_bugs_chart(data)
+        with col2:
+            st.markdown("#### 📈 Left Shift Insights")
+            leftshift_data = data.get('leftshift_issues', [])
+            if leftshift_data:
+                total_leftshift_bugs = len(leftshift_data)
+                # Calculate priority breakdown
+                priority_counts = {}
+                for bug in leftshift_data:
+                    priority = bug.get('priority', 'Unknown')
+                    priority_counts[priority] = priority_counts.get(priority, 0) + 1
+                
+                # Create priority breakdown string
+                priority_breakdown = ", ".join([f"{p}:{count}" for p, count in sorted(priority_counts.items())])
+                st.metric("Total Left Shift Bugs", f"{total_leftshift_bugs} ({priority_breakdown})")
+                
+                teams = list(set(bug.get('team', 'Unknown') for bug in leftshift_data))
+                st.metric("Teams Affected", len(teams))
+                st.markdown("**Recent Activity:**")
+                for bug in leftshift_data[:3]:  # Show top 3 recent bugs
+                    subject = bug.get('subject', 'Unknown Issue')[:50] + "..."
+                    team = bug.get('team', 'Unknown Team')
+                    st.write(f"• {team}: {subject}")
+            else:
+                st.info("No left shift bugs data available")
+
+        # Deployment Analysis
+        st.markdown("---")
+        st.markdown("### 🚀 [Deployment Analysis](https://bdmpresto-superset-server.sfproxy.uip.aws-esvc1-useast2.aws.sfdc.cl/superset/sqllab?savedQueryId=25468)")
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            dashboard.create_deployment_stacked_bar(data)
+        with col2:
+            dashboard.create_version_pie_chart(data)
+        
+        # Add deployment insights
+        dashboard.create_deployment_insights(data)
+
+        # Risk Assessment
+        st.markdown("---")
+        st.markdown("### 🎯 Risk Assessment")
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            dashboard.create_risk_chart(data, f"_{component}")
+        with col2:
+            dashboard.create_risk_insights(data)
+
+        # Code Changes Analysis
+        st.markdown("---")
+        st.markdown("### 📊 Code Changes Analysis")
+        dashboard.create_code_changes_analysis(data)
+
+        # Trend Analysis
+        st.markdown("---")
+        st.markdown("### 📈 Quality Trends")
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            dashboard.create_trend_analysis(data)
+        with col2:
+            dashboard.create_trend_insights(data)
             
     except Exception as e:
         st.error(f"Error loading {component} data: {e}")
