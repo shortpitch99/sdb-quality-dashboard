@@ -3356,7 +3356,7 @@ def main():
                 font-size: 2.5rem;
                 font-weight: 600;
                 letter-spacing: 1px;
-            ">SDB Engine Quality Dashboard</h1>
+            ">SDB Quality Dashboard</h1>
         </div>
         """, unsafe_allow_html=True)
     
