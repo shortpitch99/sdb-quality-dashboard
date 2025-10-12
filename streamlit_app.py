@@ -3340,23 +3340,34 @@ def main():
     elif os.path.exists("assets/SDB_galaxy_banner.jpg"):
         st.image("assets/SDB_galaxy_banner.jpg", width="stretch")
     else:
-        # Fallback to clean galaxy-style banner
+        # Clean professional banner
         st.markdown("""
         <div style="
-            background: linear-gradient(135deg, #080c19 0%, #0a0e1a 50%, #050810 100%);
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
             color: white;
             text-align: center;
             padding: 40px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-family: 'Inter', 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         ">
             <h1 style="
                 margin: 0;
-                font-size: 2.5rem;
-                font-weight: 600;
+                font-size: 3.2rem;
+                font-weight: 700;
                 letter-spacing: 1px;
+                color: white;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
             ">SDB Quality Dashboard</h1>
+            <p style="
+                margin: 10px 0 0 0;
+                font-size: 1.1rem;
+                opacity: 0.9;
+                font-weight: 400;
+                color: #e2e8f0;
+            ">Service Quality Metrics & Analytics</p>
         </div>
         """, unsafe_allow_html=True)
     
