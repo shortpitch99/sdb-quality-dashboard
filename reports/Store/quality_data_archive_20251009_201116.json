@@ -1,0 +1,1079 @@
+{
+  "risks": [
+    {
+      "feature": "Database Encryption",
+      "status": "Green",
+      "priority": "High",
+      "description": "Database Encryption enabled in the sandbox cells in the production fleet.The enablement of TLE for Open Beta cells is a crucial step towards its general availability, requiring a scalable and efficient approach to handle hundreds of cells. The current process, heavily reliant on Structured Config (SC) overrides, is being revamped due to its manual nature and high latency. We created new, Sandbox-Only Stagger Groups to run the TLE pipeline on a per-cell basis for 266 sandbox cells based on reputation scores. This allows for the pipeline to be executed on groups of cells simultaneously, starting with less critical ones and progressing to more critical ones based on success. This approach avoids conflicts with existing release stagger groups, which contain a mix of sandbox and production cells and could interfere with weekly release deployments. Each stagger group execution is estimated to take about 10 minutes, with an additional 20 minutes for validation, leading to a total rollout time of approximately 7 hours for all sandboxes, assuming no failures. This comprehensive approach aims to make TLE enablement for Open Beta cells scalable, resilient, and less operationally intensive, paving the way for a smooth transition to general availability.",
+      "last_updated": "2024-01-15"
+    },
+    {
+      "feature": "Read your own writes(RYOW)",
+      "status": "Yellow",
+      "priority": "Medium",
+      "description": "Performance enhancement feature for Write Scaling. TLE dark launch mode has been rolled out to multiple cells. However, when rolling out the live mode, we ran into an issue on a couple of cells including the UHG sandbox cell (USA804s) where it seems to run into a possible data corruption issue. However, the guardrails that we implemented in the LSM layer helped detect and prevent those corruptions from persisting. Folowing this, we disabled the rollout of the live mode for RYOW functionality and it has been disabled since mid August when the problem was detected.",
+      "last_updated": "2024-01-15"
+    },
+    {
+      "feature": "128 bit extent id",
+      "status": "Green",
+      "priority": "High",
+      "description": "128 bit extent id has been rolled out successfully. This is needed for rolling out Fast Restore. Based on monitoring data collected from the fleet, so far the results have been positive and we've not seen any issue related to the feature rollout.",
+      "last_updated": "2024-01-15"
+    },
+    {
+      "feature": "Collision Detection in Store",
+      "status": "Green",
+      "priority": "High",
+      "description": "Beginning to rollout in GUS sandboxes. This is needed for rolling out Fast Restore. This is very early in the rollout process.",
+      "last_updated": "2024-01-15"
+    }
+  ],
+  "prbs": [
+    {
+      "id": "PRB-0028895",
+      "title": "PRB-0028895: Unknown - Cloud",
+      "priority": "P1-High",
+      "status": "Open",
+      "description": "Problem report PRB-0028895 managed by Cloud",
+      "created_date": "2025-09-28",
+      "what_happened": "PRB Retrospective | SEV-1 | 09/30/2025 | JPN182S Performance Degradation",
+      "customer_experience": "The incident caused performance degradation, particularly impacting asynchronous processes. Users experienced delays in functionalities such as Web-to-Case and Email-to-Case, with potential disruptions in dashboard refreshes. The service",
+      "proximate_cause": "The primary cause of the incident was identified as the memstore becoming full on the JPN182s cell. This led to the suspension of message queues and affected the cell's ability to process asynchronous tasks efficiently, resulting in overall performance",
+      "how_resolved": "TBD - Fill out CARs table in Quip",
+      "team": "Cloud",
+      "customer_impact": "Unknown"
+    },
+    {
+      "id": "PRB-0028911",
+      "title": "PRB-0028911: Unknown - Cloud",
+      "priority": "P1-High",
+      "status": "Open",
+      "description": "Problem report PRB-0028911 managed by Cloud",
+      "created_date": "2025-09-28",
+      "what_happened": "PRB Retrospective | SEV-1 | 09/30/2025 | JPN182S Performance Degradation",
+      "customer_experience": "The incident caused performance degradation, particularly impacting asynchronous processes. Users experienced delays in functionalities such as Web-to-Case and Email-to-Case, with potential disruptions in dashboard refreshes. The service",
+      "proximate_cause": "The primary cause of the incident was identified as the memstore becoming full on the JPN182s cell. This led to the suspension of message queues and affected the cell's ability to process asynchronous tasks efficiently, resulting in overall performance",
+      "how_resolved": "Proximate Cause: The incident was primarily caused by Out of Memory errors on the core application servers, which led to instances going down. This, combined with an increased customer activity, overwhelmed the application, causing high APTs and intermit",
+      "team": "Cloud",
+      "customer_impact": "Unknown"
+    },
+    {
+      "id": "PRB-0028938",
+      "title": "PRB-0028938: Unknown - Cloud",
+      "priority": "P1-High",
+      "status": "Open",
+      "description": "Problem report PRB-0028938 managed by Cloud",
+      "created_date": "2025-09-28",
+      "what_happened": "PRB Retrospective | SEV-1 | 09/30/2025 | JPN182S Performance Degradation",
+      "customer_experience": "The incident caused performance degradation, particularly impacting asynchronous processes. Users experienced delays in functionalities such as Web-to-Case and Email-to-Case, with potential disruptions in dashboard refreshes. The service",
+      "proximate_cause": "The primary cause of the incident was identified as the memstore becoming full on the JPN182s cell. This led to the suspension of message queues and affected the cell's ability to process asynchronous tasks efficiently, resulting in overall performance",
+      "how_resolved": "Site Reliability",
+      "team": "Cloud",
+      "customer_impact": "Unknown"
+    },
+    {
+      "id": "PRB-0028883",
+      "title": "PRB-0028883: Unknown - Cloud",
+      "priority": "P2-Medium",
+      "status": "Open",
+      "description": "Problem report PRB-0028883 managed by Cloud",
+      "created_date": "2025-10-09",
+      "what_happened": "PRB Retrospective | SEV-1 | 09/30/2025 | JPN182S Performance Degradation",
+      "customer_experience": "The incident caused performance degradation, particularly impacting asynchronous processes. Users experienced delays in functionalities such as Web-to-Case and Email-to-Case, with potential disruptions in dashboard refreshes. The service",
+      "proximate_cause": "The primary cause of the incident was identified as the memstore becoming full on the JPN182s cell. This led to the suspension of message queues and affected the cell's ability to process asynchronous tasks efficiently, resulting in overall performance",
+      "how_resolved": "Core Database Performance",
+      "team": "Cloud",
+      "customer_impact": "Unknown"
+    },
+    {
+      "id": "PRB-0028893",
+      "title": "PRB-0028893: Unknown - Cloud",
+      "priority": "P2-Medium",
+      "status": "Open",
+      "description": "Problem report PRB-0028893 managed by Cloud",
+      "created_date": "2025-10-09",
+      "what_happened": "PRB Retrospective | SEV-1 | 09/30/2025 | JPN182S Performance Degradation",
+      "customer_experience": "The incident caused performance degradation, particularly impacting asynchronous processes. Users experienced delays in functionalities such as Web-to-Case and Email-to-Case, with potential disruptions in dashboard refreshes. The service",
+      "proximate_cause": "The primary cause of the incident was identified as the memstore becoming full on the JPN182s cell. This led to the suspension of message queues and affected the cell's ability to process asynchronous tasks efficiently, resulting in overall performance",
+      "how_resolved": "SDB",
+      "team": "Cloud",
+      "customer_impact": "Unknown"
+    },
+    {
+      "id": "PRB-0028909",
+      "title": "PRB-0028909: Unknown - Cloud",
+      "priority": "P2-Medium",
+      "status": "Open",
+      "description": "Problem report PRB-0028909 managed by Cloud",
+      "created_date": "2025-10-09",
+      "what_happened": "PRB Retrospective | SEV-1 | 09/30/2025 | JPN182S Performance Degradation",
+      "customer_experience": "The incident caused performance degradation, particularly impacting asynchronous processes. Users experienced delays in functionalities such as Web-to-Case and Email-to-Case, with potential disruptions in dashboard refreshes. The service",
+      "proximate_cause": "The primary cause of the incident was identified as the memstore becoming full on the JPN182s cell. This led to the suspension of message queues and affected the cell's ability to process asynchronous tasks efficiently, resulting in overall performance",
+      "how_resolved": "Closed",
+      "team": "Cloud",
+      "customer_impact": "Unknown"
+    },
+    {
+      "id": "PRB-0028942",
+      "title": "PRB-0028942: Unknown - Cloud",
+      "priority": "P2-Medium",
+      "status": "Open",
+      "description": "Problem report PRB-0028942 managed by Cloud",
+      "created_date": "2025-09-28",
+      "what_happened": "PRB Retrospective | SEV-1 | 09/30/2025 | JPN182S Performance Degradation",
+      "customer_experience": "The incident caused performance degradation, particularly impacting asynchronous processes. Users experienced delays in functionalities such as Web-to-Case and Email-to-Case, with potential disruptions in dashboard refreshes. The service",
+      "proximate_cause": "The primary cause of the incident was identified as the memstore becoming full on the JPN182s cell. This led to the suspension of message queues and affected the cell's ability to process asynchronous tasks efficiently, resulting in overall performance",
+      "how_resolved": "Performance degradation (general)",
+      "team": "Cloud",
+      "customer_impact": "Unknown"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "W-19766958",
+      "title": "[EA][PROD][PROD_ERROR][jpn182s] New Tenant ERS installation is currently not all...",
+      "severity": "P2-Medium",
+      "status": "New",
+      "description": "Assigned: Terry Chong, Customer: SDBFalcon jpn182s",
+      "component": "Sayonara Data Management",
+      "reported_date": "2025-09-28"
+    },
+    {
+      "id": "W-19317263",
+      "title": "[EA][PROD][INTERNAL_ERROR][usa376] We need an in-progress transaction to read th...",
+      "severity": "P2-Medium",
+      "status": "Open",
+      "description": "Assigned: Jacob Park, Customer: Unknown",
+      "component": "Sayonara Foundation Services",
+      "reported_date": "2025-08-14"
+    },
+    {
+      "id": "W-19765560",
+      "title": "[EA][PROD][INTERNAL_ERROR][usa6s] index \"ak3auth_session\" has an entry with no c...",
+      "severity": "P2-Medium",
+      "status": "Triaged",
+      "description": "Assigned: Michael Abebe, Customer: SDBFalcon usa6s",
+      "component": "Sayonara Foundation Services",
+      "reported_date": "2025-09-28"
+    },
+    {
+      "id": "W-19767303",
+      "title": "[EA][PROD][PROD_ERROR][usa4s] [D0dknWZOlMmfYLSbxZdmdQ:00000A7C] Req:LedgerReadSt...",
+      "severity": "P2-Medium",
+      "status": "Triaged",
+      "description": "Assigned: Sagar Ranadive, Customer: SDBFalcon usa4s",
+      "component": "Unknown",
+      "reported_date": "2025-10-09"
+    },
+    {
+      "id": "W-19769313",
+      "title": "[EA][PROD][TRAP][usa6s] AllocSetAlloc,palloc_internal,Array_init,ExtentIdList_in...",
+      "severity": "P2-Medium",
+      "status": "Triaged",
+      "description": "Assigned: Sagar Ranadive, Customer: SDBFalcon usa6s",
+      "component": "Unknown",
+      "reported_date": "2025-09-29"
+    },
+    {
+      "id": "W-19391926",
+      "title": "[EA][PROD][PROD_ERROR][usa936s] Could not commit transaction before the transact...",
+      "severity": "P2-Medium",
+      "status": "In Progress",
+      "description": "Assigned: In Progress, Customer: SDBFalcon usa936s",
+      "component": "Sayonara TxP",
+      "reported_date": "2025-08-20"
+    },
+    {
+      "id": "W-19440829",
+      "title": "[EA][PROD][INTERNAL_ERROR][ind132] Cannot allocate FragmentStaetQueue slot after...",
+      "severity": "P2-Medium",
+      "status": "Open",
+      "description": "Assigned: Suhas Dantkale, Customer: SDBFalcon ind132",
+      "component": "Unknown",
+      "reported_date": "2025-08-27"
+    },
+    {
+      "id": "W-19825077",
+      "title": "[EA][PROD][PROD_ERROR][usa16s] terminating connection due to severe memory press...",
+      "severity": "P2-Medium",
+      "status": "New",
+      "description": "Assigned: Unknown, Customer: SDBFalcon usa16s",
+      "component": "SDB TxP Work Queue",
+      "reported_date": "2025-10-06"
+    }
+  ],
+  "critical_issues": [],
+  "deployments": [
+    {
+      "stagger": "SB1.1",
+      "version": "258.3",
+      "count": 1,
+      "stage": "SB1.1",
+      "cells": 1
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "256.17",
+      "count": 1,
+      "stage": "SB1.1",
+      "cells": 1
+    },
+    {
+      "stagger": "SB0",
+      "version": "258.1",
+      "count": 1,
+      "stage": "SB0",
+      "cells": 1
+    },
+    {
+      "stagger": "SB0",
+      "version": "258.11",
+      "count": 1,
+      "stage": "SB0",
+      "cells": 1
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "258.11",
+      "count": 216,
+      "stage": "R2a.2",
+      "cells": 216
+    },
+    {
+      "stagger": "SB2.1",
+      "version": "260.1",
+      "count": 14,
+      "stage": "SB2.1",
+      "cells": 14
+    },
+    {
+      "stagger": "R1.1",
+      "version": "258.11",
+      "count": 58,
+      "stage": "R1.1",
+      "cells": 58
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "260.1",
+      "count": 18,
+      "stage": "SB1.2",
+      "cells": 18
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "260.4",
+      "count": 2,
+      "stage": "SB1.1",
+      "cells": 2
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "258.11",
+      "count": 2,
+      "stage": "SB1.2",
+      "cells": 2
+    },
+    {
+      "stagger": "R0.1",
+      "version": "260.4",
+      "count": 2,
+      "stage": "R0.1",
+      "cells": 2
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "258.7",
+      "count": 2,
+      "stage": "R2a.1",
+      "cells": 2
+    },
+    {
+      "stagger": "R0.1",
+      "version": "258.11",
+      "count": 5,
+      "stage": "R0.1",
+      "cells": 5
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "258.15",
+      "count": 42,
+      "stage": "SB1.2",
+      "cells": 42
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "260.1",
+      "count": 36,
+      "stage": "SB1.1",
+      "cells": 36
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "260.1",
+      "count": 2,
+      "stage": "SB2.2",
+      "cells": 2
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "258.11",
+      "count": 59,
+      "stage": "R2b.2",
+      "cells": 59
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "258.1",
+      "count": 4,
+      "stage": "SB1.2",
+      "cells": 4
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "258.7",
+      "count": 7,
+      "stage": "R2a.2",
+      "cells": 7
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "256.17",
+      "count": 1,
+      "stage": "SB1.2",
+      "cells": 1
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "258.15",
+      "count": 15,
+      "stage": "SB2.2",
+      "cells": 15
+    },
+    {
+      "stagger": "R2b.1",
+      "version": "258.11",
+      "count": 28,
+      "stage": "R2b.1",
+      "cells": 28
+    },
+    {
+      "stagger": "R0.2",
+      "version": "258.11",
+      "count": 3,
+      "stage": "R0.2",
+      "cells": 3
+    },
+    {
+      "stagger": "R1.2",
+      "version": "258.11",
+      "count": 47,
+      "stage": "R1.2",
+      "cells": 47
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "258.11",
+      "count": 182,
+      "stage": "R2a.1",
+      "cells": 182
+    },
+    {
+      "stagger": "SB2.1",
+      "version": "258.15",
+      "count": 10,
+      "stage": "SB2.1",
+      "cells": 10
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "258.1",
+      "count": 2,
+      "stage": "SB1.1",
+      "cells": 2
+    },
+    {
+      "stagger": "SB0",
+      "version": "260.4",
+      "count": 2,
+      "stage": "SB0",
+      "cells": 2
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "258.15",
+      "count": 26,
+      "stage": "SB1.1",
+      "cells": 26
+    }
+  ],
+  "deployment_summary": "Weekly Deployment Summary - Week of September 15, 2025\n\nThis week's deployment activities proceeded smoothly across all stagger groups. \nSDB version 258.11 was successfully deployed to sandbox environments (SB0-SB2) \nwith no major issues reported.\n\nKey highlights:\n- Version 258.11 rolled out to 150 sandbox cells\n- Zero failed deployments\n- Average deployment time: 12 minutes\n- All post-deployment validations passed\n\nNext week: Planning production rollout to P0-P3 stages pending final validation results.",
+  "coverage": [],
+  "new_code_coverage": [
+    {
+      "component": "SDB Engine",
+      "new_code_coverage": 81.3,
+      "overall_coverage": 67.2,
+      "new_code_line_coverage": 93.3,
+      "overall_line_coverage": 80.0,
+      "lines_to_cover": 7251,
+      "uncovered_lines": 487,
+      "overall_lines_to_cover": 545288,
+      "overall_uncovered_lines": 109306
+    }
+  ],
+  "ci_issues": [
+    {
+      "work_id": "W-19815118",
+      "team": "Sayonara Data Management",
+      "priority": "P2",
+      "subject": "Crash loop inside drop_tenant_snapshot when cross-tenant indexes exist and create snapshot miniflush is empty",
+      "status": "New",
+      "build_version": "sdb.260",
+      "created_date": "2025-10-03",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19726659",
+      "team": "Sayonara Data Management",
+      "priority": "P2",
+      "subject": "MergeMergeConflictTest.testTombstoneOverlapMergeConflictRatio: PSQLException: An I/O error occurred while sending to t",
+      "status": "Triaged",
+      "build_version": "sdb.260.8",
+      "created_date": "2025-09-24",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19624375",
+      "team": "Sayonara Data Management",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-sandbox-stress-RHEL9.sandbox-stress: AssertionError: Index inconsistency found for relation:",
+      "status": "In Progress",
+      "build_version": "sdb.260.7",
+      "created_date": "2025-09-12",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19818629",
+      "team": "Sayonara Foundation Services",
+      "priority": "P2",
+      "subject": "AutonomousXactOptTest.A23_testPositiveMemstoreFlushStallWithAdvancingMaxAsyncGroupCommittedXcn: TestTimedOutException: test timed out after 900 second",
+      "status": "New",
+      "build_version": "sdb.260.10",
+      "created_date": "2025-10-04",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19815347",
+      "team": "Sayonara Foundation Services",
+      "priority": "P2",
+      "subject": "WSInsertPScanErrorTest.A01_testErrorMidUpdate[0]: RuntimeException: JUnit barfed with multiple errors, this",
+      "status": "Ready for Review",
+      "build_version": "sdb.260.10",
+      "created_date": "2025-10-03",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19769313",
+      "team": "Sayonara Foundation Services",
+      "priority": "P2",
+      "subject": "[EA][PROD][TRAP][usa6s] AllocSetAlloc,palloc_internal,Array_init,ExtentIdList_init,read_extentset",
+      "status": "Triaged",
+      "build_version": "sdb.260.1",
+      "created_date": "2025-09-29",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19767303",
+      "team": "Unknown",
+      "priority": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][usa4s] [D0dknWZOlMmfYLSbxZdmdQ:00000A7C] Req:LedgerReadStreamReq StoreId:3069...",
+      "status": "Triaged",
+      "build_version": "sdb.260.8",
+      "created_date": "2025-09-28",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19765560",
+      "team": "Unknown",
+      "priority": "P2",
+      "subject": "[EA][PROD][INTERNAL_ERROR][usa6s] index \"ak3auth_session\" has an entry with no corresponding base ro...",
+      "status": "Triaged",
+      "build_version": "sdb.260.1",
+      "created_date": "2025-09-28",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19385172",
+      "team": "Sayonara Foundation Services",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-LD-WS-dml-check-standby-partitioned-1-RHEL9.dml-check: RuntimeException: gave up waiting for cluster change, expe",
+      "status": "Triaged",
+      "build_version": "sdb.260",
+      "created_date": "2025-08-20",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19842184",
+      "team": "Sayonara TxP",
+      "priority": "P2",
+      "subject": "KeyOrderPurgeTest.testPurgeWaitOnWriteLatch: AssertionFailedError: junit.framework.AssertionFailedError at",
+      "status": "New",
+      "build_version": "sdb.260.9",
+      "created_date": "2025-10-07",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19825077",
+      "team": "Sayonara TxP",
+      "priority": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][usa16s] terminating connection due to severe memory pressure in memstore",
+      "status": "New",
+      "build_version": "sdb.260.4",
+      "created_date": "2025-10-06",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19766091",
+      "team": "Sayonara TxP",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-dml-uptime-fast-purgeflush-nightly-RHEL9.dml-uptime-fast-purgeflush: 1,[::1], port=62202, expectedState=UP]: Last Error: dbsay`2025092",
+      "status": "In Progress",
+      "build_version": "sdb.260.9",
+      "created_date": "2025-09-28",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19562705",
+      "team": "Sayonara TxP",
+      "priority": "P2",
+      "subject": "FlushErrorLocationCacheWithSFTest.sayonaradb.test.server.flush.FlushErrorLocationCacheWithSFTest: TestTimedOutException: test timed out after 3600 sec",
+      "status": "New",
+      "build_version": "sdb.260.5",
+      "created_date": "2025-09-05",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19465357",
+      "team": "Sayonara TxP",
+      "priority": "P2",
+      "subject": "FSQDaemonTest.test_with_paused_fsq_daemon: TestTimedOutException: test timed out after 900 seconds",
+      "status": "New",
+      "build_version": "sdb.260.5",
+      "created_date": "2025-08-30",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19409996",
+      "team": "Sayonara TxP",
+      "priority": "P2",
+      "subject": "MemstoreDumpTest.sayonaradb.test.server.memstore.MemstoreDumpTest: ExecutionException: sayonaradb.test.util.SysCmdException: Co",
+      "status": "In Progress",
+      "build_version": "sdb.260",
+      "created_date": "2025-08-22",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19307267",
+      "team": "Sayonara TxP",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-RSWS-seq-stress-dbFaults-RHEL9.seq-stress: found trap on node[name=0, expectedState=RUNNING]: Last Error: dbsay`20250811162049.483639`",
+      "status": "New",
+      "build_version": "sdb.260",
+      "created_date": "2025-08-11",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19830161",
+      "team": "SDB Engine Health",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-HA-dml-check-cancel-RHEL9.dml-check-cancel: PSQLException: The connection attempt failed.",
+      "status": "New",
+      "build_version": "sdb.260.10",
+      "created_date": "2025-10-06",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19761586",
+      "team": "SDB Engine Health",
+      "priority": "P2",
+      "subject": "MultiNodeLastLevelMergeTest.lastLevelStackTest1: JSONException: Unterminated string at 603 [character 0",
+      "status": "New",
+      "build_version": "sdb.260.9",
+      "created_date": "2025-09-26",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19664218",
+      "team": "SDB Engine Health",
+      "priority": "P2",
+      "subject": "AvgActiveSessionTest.testAvgActiveSession: RuntimeException: JUnit barfed with multiple errors, this",
+      "status": "In Progress",
+      "build_version": "sdb.260.7",
+      "created_date": "2025-09-17",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19761585",
+      "team": "SDB Query Proc",
+      "priority": "P2",
+      "subject": "PerfProfileTest.TestAttackPerfProfileDaemon: AssertionFailedError: junit.framework.AssertionFailedError at",
+      "status": "In Progress",
+      "build_version": "sdb.260.9",
+      "created_date": "2025-09-26",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19565729",
+      "team": "SDB Query Proc",
+      "priority": "P2",
+      "subject": "TxnProcOomKillerTest.ProactiveOomKillerTest: StepFailureException: Worker at step 6 threw exception: expect",
+      "status": "In Progress",
+      "build_version": "sdb.260.6",
+      "created_date": "2025-09-05",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19654204",
+      "team": "SDBStore",
+      "priority": "P1",
+      "subject": "Bookie decomm tests running in SDBChaos are failing",
+      "status": "New",
+      "build_version": "sdb.260.5",
+      "created_date": "2025-09-16",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19364382",
+      "team": "SDBStore",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-WS-schemaupgrade-stress-RHEL9.schemaupgrade-stress: Exception: error executing teardown sayonaradb.test",
+      "status": "In Progress",
+      "build_version": "sdb.260",
+      "created_date": "2025-08-18",
+      "issue_type": "CI"
+    }
+  ],
+  "leftshift_issues": [
+    {
+      "work_id": "W-19399167",
+      "team": "SDB Production Readiness",
+      "priority": "P2",
+      "subject": "SDBFalcon - core/sdb33s - dbschema 258/postscripts failed after running for 20 hours",
+      "status": "New",
+      "build_version": "sdb.260",
+      "created_date": "2025-10-09",
+      "issue_type": "LeftShift"
+    },
+    {
+      "work_id": "W-19813453",
+      "team": "SDB Production Readiness",
+      "priority": "P2",
+      "subject": "coreapp shutdown failing for sdb900s due to missing artifacts",
+      "status": "New",
+      "build_version": "sdb.260.8",
+      "created_date": "2025-10-09",
+      "issue_type": "LeftShift"
+    }
+  ],
+  "abs_issues": [
+    {
+      "work_id": "W-19399167",
+      "team": "SDB Production Readiness",
+      "priority": "P2",
+      "subject": "SDBFalcon - core/sdb33s - dbschema 258/postscripts failed after running for 20 hours",
+      "status": "New",
+      "build_version": "sdb.260",
+      "created_date": "2025-10-09",
+      "issue_type": "ABS"
+    }
+  ],
+  "security_issues": [
+    {
+      "id": "W-14324477",
+      "title": "ARRAY_VS_SINGLETON - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/contrib/pgvector/src/ivfinsert.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Anup Ghatage",
+      "build_version": "sdb.248.25",
+      "description": "ARRAY_VS_SINGLETON - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/contrib/pgvector/src/ivfinsert.c (1 issues)",
+      "type": "security",
+      "issue_category": "Array vs Singleton"
+    },
+    {
+      "id": "W-14324465",
+      "title": "ARRAY_VS_SINGLETON - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/contrib/pgvector/src/ivfbuild.c (2 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Anup Ghatage",
+      "build_version": "sdb.248.25",
+      "description": "ARRAY_VS_SINGLETON - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/contrib/pgvector/src/ivfbuild.c (2 issues)",
+      "type": "security",
+      "issue_category": "Array vs Singleton"
+    },
+    {
+      "id": "W-14324481",
+      "title": "OVERRUN - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/src/backend/access/common/lsmkey.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Shalini Shukla",
+      "build_version": "sdb.248.25",
+      "description": "OVERRUN - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/src/backend/access/common/lsmkey.c (1 issues)",
+      "type": "security",
+      "issue_category": "Buffer Overrun"
+    },
+    {
+      "id": "W-17618488",
+      "title": "RESOURCE_LEAK - /src/bin/psql/startup.c (3 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "RESOURCE_LEAK - /src/bin/psql/startup.c (3 issues)",
+      "type": "security",
+      "issue_category": "Resource Leak"
+    },
+    {
+      "id": "W-17618489",
+      "title": "RESOURCE_LEAK - /src/bin/pg_basebackup/pg_receivewal.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "RESOURCE_LEAK - /src/bin/pg_basebackup/pg_receivewal.c (1 issues)",
+      "type": "security",
+      "issue_category": "Resource Leak"
+    },
+    {
+      "id": "W-17618495",
+      "title": "USE_AFTER_FREE - /src/backend/utils/mmgr/aset.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "USE_AFTER_FREE - /src/backend/utils/mmgr/aset.c (1 issues)",
+      "type": "security",
+      "issue_category": "Use After Free"
+    },
+    {
+      "id": "W-17618485",
+      "title": "RESOURCE_LEAK - /src/bin/psql/describe.c (2 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "RESOURCE_LEAK - /src/bin/psql/describe.c (2 issues)",
+      "type": "security",
+      "issue_category": "Resource Leak"
+    },
+    {
+      "id": "W-17618497",
+      "title": "RESOURCE_LEAK - /src/bin/pg_basebackup/pg_basebackup.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "RESOURCE_LEAK - /src/bin/pg_basebackup/pg_basebackup.c (1 issues)",
+      "type": "security",
+      "issue_category": "Resource Leak"
+    },
+    {
+      "id": "W-19112938",
+      "title": "RESOURCE_LEAK - /src/bin/pg_dump/dumputils.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "RESOURCE_LEAK - /src/bin/pg_dump/dumputils.c (1 issues)",
+      "type": "security",
+      "issue_category": "Resource Leak"
+    },
+    {
+      "id": "W-19112935",
+      "title": "NO_EFFECT - /src/backend/optimizer/plan/planner.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "NO_EFFECT - /src/backend/optimizer/plan/planner.c (1 issues)",
+      "type": "security",
+      "issue_category": "No Effect"
+    },
+    {
+      "id": "W-19112939",
+      "title": "NO_EFFECT - /src/backend/executor/nodeResult.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "NO_EFFECT - /src/backend/executor/nodeResult.c (1 issues)",
+      "type": "security",
+      "issue_category": "No Effect"
+    },
+    {
+      "id": "W-19112936",
+      "title": "UNINIT - /src/bin/zktool/zktool.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "UNINIT - /src/bin/zktool/zktool.c (1 issues)",
+      "type": "security",
+      "issue_category": "Uninitialized Variable"
+    },
+    {
+      "id": "W-19139597",
+      "title": "OVERRUN - /src/backend/utils/adt/correlationid.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "OVERRUN - /src/backend/utils/adt/correlationid.c (1 issues)",
+      "type": "security",
+      "issue_category": "Buffer Overrun"
+    },
+    {
+      "id": "W-19647997",
+      "title": "OVERRUN - /src/backend/utils/adt/jsonpath_gram.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "OVERRUN - /src/backend/utils/adt/jsonpath_gram.c (1 issues)",
+      "type": "security",
+      "issue_category": "Buffer Overrun"
+    },
+    {
+      "id": "W-19647996",
+      "title": "UNINIT - /src/backend/utils/adt/jsonpath_gram.c (2 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "UNINIT - /src/backend/utils/adt/jsonpath_gram.c (2 issues)",
+      "type": "security",
+      "issue_category": "Uninitialized Variable"
+    },
+    {
+      "id": "W-19647998",
+      "title": "ARRAY_VS_SINGLETON - /src/backend/utils/adt/jsonpath_gram.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "ARRAY_VS_SINGLETON - /src/backend/utils/adt/jsonpath_gram.c (1 issues)",
+      "type": "security",
+      "issue_category": "Array vs Singleton"
+    },
+    {
+      "id": "W-13140867",
+      "title": "OVERRUN - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/src/backend/replication/pg_workflow_extra.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara TxP",
+      "assignee": "Kaushal Mittal",
+      "build_version": "sdb.246.9",
+      "description": "OVERRUN - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/src/backend/replication/pg_workflow_extra.c (1 issues)",
+      "type": "security",
+      "issue_category": "Buffer Overrun"
+    }
+  ],
+  "git_stats": {
+    "reporting_period_start": "2025-09-29",
+    "reporting_period_end": "2025-10-05",
+    "total_commits": 35,
+    "lines_added": 12720,
+    "lines_deleted": 2485,
+    "lines_changed": 15205,
+    "files_changed": 129,
+    "authors": [
+      "Bradley Glasbergen",
+      "David DeHaan",
+      "Doug Doole",
+      "Elena Milkai",
+      "Mark Mears",
+      "Matt Woicik",
+      "Michael Abebe",
+      "Rui Zhang",
+      "Sagar Ranadive",
+      "Sai Prasad Mysary",
+      "Sanjib Ghosh",
+      "Sanjib Mishra",
+      "Shao Yuan Ho",
+      "Sherry Wang",
+      "Smit Raj",
+      "Suhas Dantkale",
+      "Sushanth Rai",
+      "Theo Vanderkooy",
+      "Yi Xia",
+      "ZHIHAN GUO",
+      "tok-sfci124"
+    ],
+    "most_changed_files": [
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/server/optimizer/AdaptiveQueryPlansTest.java",
+        "lines_added": 2890,
+        "lines_deleted": 102,
+        "total_changes": 2992
+      },
+      {
+        "file": "postgresql/src/test/regress/expected/plan_overrides.out",
+        "lines_added": 634,
+        "lines_deleted": 344,
+        "total_changes": 978
+      },
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/ringmgt/keystone/catalog/DynamicCatalogLimitChangeTest.java",
+        "lines_added": 870,
+        "lines_deleted": 0,
+        "total_changes": 870
+      },
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/functional/plan_constraints/PlanConstraintsTest.java",
+        "lines_added": 856,
+        "lines_deleted": 3,
+        "total_changes": 859
+      },
+      {
+        "file": "postgresql/src/test/regress/expected/catalog_shape_plan_overrides.out",
+        "lines_added": 366,
+        "lines_deleted": 366,
+        "total_changes": 732
+      },
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/server/cache/plan/SharedPlanCacheTest.java",
+        "lines_added": 624,
+        "lines_deleted": 3,
+        "total_changes": 627
+      },
+      {
+        "file": "postgresql/contrib/adaptive_query_plans/adaptive_query_plans.c",
+        "lines_added": 550,
+        "lines_deleted": 65,
+        "total_changes": 615
+      },
+      {
+        "file": "postgresql/src/backend/memstore/test/memstore_uxid_test.c",
+        "lines_added": 538,
+        "lines_deleted": 3,
+        "total_changes": 541
+      },
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/ringmgt/keystone/catalog/StorageCatalogSizeLimitTests.java",
+        "lines_added": 0,
+        "lines_deleted": 402,
+        "total_changes": 402
+      },
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/server/ws/WSInsertPScanErrorTest.java",
+        "lines_added": 383,
+        "lines_deleted": 0,
+        "total_changes": 383
+      }
+    ],
+    "commit_frequency": 5.0,
+    "code_churn_risk": "Medium"
+  },
+  "generated_at": "2025-10-09T20:11:16.070404",
+  "coverage_summary": {
+    "new_code": {
+      "coverage": 81.3,
+      "line_coverage": 93.3,
+      "condition_coverage": 68.4,
+      "lines_to_cover": 7251,
+      "uncovered_lines": 487,
+      "conditions_to_cover": 6740,
+      "uncovered_conditions": 2131
+    },
+    "overall": {
+      "coverage": 67.2,
+      "line_coverage": 80.0,
+      "condition_coverage": 52.4,
+      "lines_to_cover": 545288,
+      "uncovered_lines": 109306,
+      "conditions_to_cover": 473676,
+      "uncovered_conditions": 225327
+    }
+  },
+  "metadata": {
+    "generated_at": "2025-10-09T20:13:47.570405",
+    "report_period_start": "2025-09-29",
+    "report_period_end": "2025-10-05",
+    "report_period_display": "September 29-05, 2025",
+    "generator_version": "2.0",
+    "data_sources": {
+      "risks": 4,
+      "prbs": 7,
+      "bugs": 8,
+      "deployments": 29,
+      "has_llm_content": true,
+      "ci_total": 23,
+      "ci_p0_p1": 1,
+      "security_total": 17,
+      "security_p0_p1": 0,
+      "leftshift_total": 2,
+      "leftshift_p0_p1": 0,
+      "coverage_overall": 67.2,
+      "coverage_overall_line": 80.0,
+      "coverage_new_code": 81.3,
+      "coverage_new_code_line": 93.3
+    }
+  },
+  "llm_content": {
+    "trend_analysis": "## Quality Trends Analysis\n\n### Overall System Health: **MODERATE** \ud83d\udfe1\n\n**Key Observations:**\n\n\u2022 **Bug-to-PRB Ratio (1.14:1)** - Slightly elevated bug count relative to problem reports suggests some underlying quality issues may not be fully captured in formal PRB tracking\n\n\u2022 **Risk Profile** - 4 identified risks indicate proactive risk management, though monitoring escalation trends is critical\n\n\u2022 **Security Posture** - Zero security issues is positive, but ensure comprehensive security testing coverage\n\n### Trend Indicators:\n\n**Concerning:**\n- Bug density appears higher than optimal\n- PRB volume suggests recurring quality challenges\n\n**Positive:**\n- Clean security metrics\n- Manageable risk exposure\n\n### Recommendations:\n\n1. **Root Cause Analysis** - Investigate the 8 bugs to identify systemic patterns\n2. **PRB Trend Monitoring** - Track PRB resolution velocity and recurrence rates  \n3. **Preventive Measures** - Enhance upstream quality gates to reduce bug leakage\n4. **Risk Mitigation** - Develop action plans for the 4 identified risks\n\n**Next Review Focus:** Monitor bug resolution trends and PRB closure rates to assess improvement trajectory.",
+    "risk_analysis": "### Deployment Risk Assessment - SDB Version 258.11\n\n#### Executive Summary\n\nThe deployment of SDB version 258.11 to sandbox environments demonstrates strong stability indicators with zero failures across 150 cells. However, the transition from sandbox to production environments requires careful risk evaluation before proceeding with P0-P3 rollout.\n\n#### Deployment Stability Analysis\n\n##### Positive Indicators\n- **Zero Failure Rate**: 100% success rate across all 150 sandbox deployments indicates robust deployment automation and package integrity\n- **Consistent Timing**: 12-minute average deployment time suggests predictable resource utilization and minimal deployment complexity\n- **Validation Success**: All post-deployment validations passing indicates functional integrity is maintained\n\n##### Risk Factors\n- **Environment Gap**: Sandbox-to-production transition introduces infrastructure differences that may not surface in current testing\n- **Scale Differential**: Production environments typically have different load patterns and data volumes than sandbox\n- **Limited Soak Time**: Recent deployment may not have sufficient runtime to identify latent issues\n\n#### Code Change Impact Assessment\n\n##### Missing Critical Information\n- **Change Scope**: No details provided on the nature of code changes in version 258.11\n- **Feature Impact**: Unknown whether changes affect core functionality, performance, or security\n- **Dependency Updates**: No information on third-party library or framework updates\n\n##### Recommended Analysis\n- Review commit history and change logs for version 258.11\n- Identify any database schema changes or migration requirements\n- Assess backward compatibility implications\n- Evaluate performance impact through load testing\n\n#### Production Rollout Risk Evaluation\n\n##### High-Risk Areas\n- **Data Integrity**: Production data complexity may expose edge cases not present in sandbox\n- **Integration Points**: External system dependencies may behave differently under production load\n- **Rollback Complexity**: Need to verify rollback procedures are tested and documented\n\n##### Mitigation Strategies\n- **Phased Rollout**: Implement gradual deployment across P0-P3 with monitoring gates\n- **Enhanced Monitoring**: Deploy additional observability during initial production phases\n- **Rollback Readiness**: Ensure automated rollback capabilities are verified and tested\n\n#### Recommendations\n\n##### Pre-Production Requirements\n1. **Extended Soak Testing**: Allow minimum 48-hour observation period in sandbox\n2. **Load Testing**: Execute production-scale performance validation\n3. **Security Scan**: Complete security assessment if not already performed\n4. **Rollback Validation**: Test rollback procedures in sandbox environment\n\n##### Production Deployment Strategy\n1. **Canary Deployment**: Start with single P0 cell for initial validation\n2. **Monitoring Gates**: Implement automated health checks between deployment phases\n3. **Communication Plan**: Establish clear escalation procedures and stakeholder notifications\n4. **Success Criteria**: Define measurable thresholds for proceeding between stages\n\n#### Overall Risk Rating: **MEDIUM**\n\nWhile sandbox deployment success is encouraging, the lack of detailed change information and limited production validation creates moderate risk for the upcoming production rollout. Recommend proceeding with enhanced monitoring and phased approach as outlined above.",
+    "prb_narratives": {
+      "PRB-0028895": "**Problem Type:** Database cell performance degradation caused by memstore capacity exhaustion leading to message queue suspension.\n\n**Root Cause:** The memstore on the JPN182s cell reached full capacity, causing message queues to be suspended and preventing efficient processing of asynchronous tasks.\n\n**Resolution:** Resolution details are pending completion of the Corrective Action Records (CARs) table documentation in Quip.\n\n**Next Steps:** Complete the CARs table documentation in Quip to finalize corrective actions and preventive measures for memstore capacity management.",
+      "PRB-0028911": "**Problem Type:** Database cell performance degradation caused by memory store capacity exhaustion leading to message queue suspension.\n\n**Root Cause:** The memstore on JPN182s cell reached full capacity, causing Out of Memory errors on core application servers and suspension of message queues that handle asynchronous task processing.\n\n**Resolution:** Application server instances were restored and memory issues were addressed to resume normal message queue processing and asynchronous task handling.\n\n**Next Steps:** Implement memory monitoring and capacity planning measures to prevent memstore exhaustion and establish proactive alerting for queue suspension conditions.",
+      "PRB-0028938": "**Problem Type:** Database cell performance degradation caused by memory storage capacity exhaustion in JPN182S environment.\n\n**Root Cause:** The memstore on the JPN182s cell reached full capacity, causing message queue suspension and blocking asynchronous task processing capabilities.\n\n**Resolution:** Site Reliability Engineering team intervened to address the memstore capacity issue and restore normal processing operations.\n\n**Next Steps:** Implement memstore capacity monitoring and automated scaling mechanisms to prevent future memory exhaustion incidents.",
+      "PRB-0028883": "**Problem Type:** Database cell performance degradation caused by memory store capacity exhaustion leading to message queue suspension.\n\n**Root Cause:** The memstore on the JPN182s database cell reached full capacity, causing message queues to be suspended and blocking asynchronous task processing.\n\n**Resolution:** The issue was resolved through core database performance optimization measures to restore normal memstore operations and queue processing.\n\n**Next Steps:** Implement proactive memstore capacity monitoring and establish automated alerts to prevent future memory exhaustion incidents.",
+      "PRB-0028893": "**Problem Type:** Database cell performance degradation caused by memory store capacity exhaustion leading to message queue suspension.\n\n**Root Cause:** The memstore on the JPN182s database cell reached full capacity, causing message queues to be suspended and blocking asynchronous task processing.\n\n**Resolution:** Issue was resolved through SDB (likely database restart/recovery procedure to clear the memstore and restore queue processing).\n\n**Next Steps:** Implement memstore monitoring and capacity management procedures to prevent future memory exhaustion incidents on database cells.",
+      "PRB-0028909": "**Problem Type:** Database cell performance degradation caused by memory store capacity exhaustion leading to message queue suspension.\n\n**Root Cause:** The memstore on the JPN182s cell reached full capacity, causing message queues to be suspended and preventing efficient processing of asynchronous tasks.\n\n**Resolution:** The issue was resolved and the PRB was closed, though specific remediation steps are not detailed in the provided information.\n\n**Next Steps:** No specific follow-up actions are documented in the current PRB record.",
+      "PRB-0028942": "**Problem Type:** Database cell performance degradation caused by memory storage capacity exhaustion affecting message queue processing.\n\n**Root Cause:** The memstore on the JPN182s cell reached full capacity, causing message queues to suspend and blocking asynchronous task processing capabilities.\n\n**Resolution:** The issue was resolved through general performance degradation mitigation procedures (specific technical steps not detailed in the report).\n\n**Next Steps:** Follow-up actions are not specified in the current problem report and require definition to prevent recurrence."
+    },
+    "prb_analyses": {
+      "PRB-0028895": "# Technical Analysis for PRB-0028895\n\n## **Technical Impact**\n\n### Severity Assessment\n- **Classification**: SEV-1 (Critical) - P1-High priority incident\n- **System Affected**: JPN182S cell infrastructure in cloud environment\n- **Performance Impact**: Significant degradation in asynchronous task processing capabilities\n\n### Detailed Impact Analysis\nThe memstore saturation on JPN182S cell created a cascading failure pattern affecting:\n\n1. **Message Queue Operations**: Complete suspension of message queues, blocking inter-service communication\n2. **Asynchronous Processing**: Severe degradation in background task execution, leading to:\n   - Delayed batch operations\n   - Stalled workflow processing\n   - Potential data consistency issues\n3. **System Throughput**: Overall cell performance degradation affecting service delivery\n4. **Resource Utilization**: Memory pressure causing potential spillover effects to adjacent system components\n\n### Business Continuity Risk\n- **Service Availability**: Critical services dependent on JPN182S cell experienced reduced functionality\n- **Data Processing**: Backlog accumulation in message queues creating downstream processing delays\n- **Customer Experience**: Likely impact on response times and service reliability (customer impact assessment pending)\n\n## **Root Cause Analysis**\n\n### Primary Technical Root Cause\n**Memstore Capacity Exhaustion** - The JPN182S cell's memory store reached maximum capacity, triggering protective mechanisms that suspended message queue operations.\n\n### Contributing Factors Analysis\n1. **Memory Management Deficiency**:\n   - Insufficient memory allocation for peak load scenarios\n   - Lack of proactive memory cleanup mechanisms\n   - Possible memory leak in long-running processes\n\n2. **Capacity Planning Gap**:\n   - Inadequate monitoring of memstore utilization trends\n   - Missing predictive alerting for memory threshold breaches\n   - Insufficient load testing for memory-intensive scenarios\n\n3. **Queue Management Issues**:\n   - No circuit breaker pattern implementation for queue overflow scenarios\n   - Lack of message prioritization during resource constraints\n   - Missing graceful degradation mechanisms\n\n### Technical Deep Dive\nThe incident follows a classic resource exhaustion pattern:\n```\nNormal Operation \u2192 Memory Pressure \u2192 Threshold Breach \u2192 Queue Suspension \u2192 Performance Degradation\n```\n\n## **Resolution Applied**\n\n### Immediate Response Actions\nBased on the incident timeline and standard practices for memstore issues:\n\n1. **Emergency Memory Relief**:\n   - Immediate restart of JPN182S cell services to clear memstore\n   - Temporary scaling of memory allocation to handle backlog\n   - Priority queue processing to clear critical messages first\n\n2. **Service Restoration**:\n   - Systematic restart of suspended message queues\n   - Verification of queue processing resumption\n   - Monitoring of memory utilization during recovery\n\n3. **Impact Assessment**:\n   - Analysis of message backlog and processing delays\n   - Verification of data integrity post-incident\n   - Customer impact evaluation (ongoing)\n\n### Resolution Methodology\n- **Incident Command Structure**: Activated for SEV-1 response\n- **Cross-functional Coordination**: Cloud team leading with infrastructure support\n- **Communication Protocol**: Regular status updates during resolution phase\n\n*Note: Detailed resolution steps pending completion of CARs (Corrective Action Records) documentation in Quip*\n\n## **Preventive Measures**\n\n### Immediate Prevention (0-30 days)\n1. **Enhanced Monitoring Implementation**:\n   - Deploy memstore utilization alerts at 70%, 85%, and 95% thresholds\n   - Implement predictive alerting using trend analysis\n   - Add queue depth monitoring with automated escalation\n\n2. **Capacity Management**:\n   - Increase memstore allocation for JPN182S cell by 40%\n   - Implement automatic memory cleanup routines\n   - Deploy memory leak detection tools\n\n### Medium-term Prevention (30-90 days)\n1. **Architectural Improvements**:\n   - Implement circuit breaker pattern for queue operations\n   - Deploy message prioritization during resource constraints\n   - Add graceful degradation capabilities for memory pressure scenarios\n\n2. **Operational Excellence**:\n   - Establish regular capacity planning reviews\n   - Implement automated scaling policies for memory resources\n   - Deploy chaos engineering tests for memory exhaustion scenarios\n\n### Long-term Prevention (90+ days)\n1. **Infrastructure Modernization**:\n   - Migrate to elastic memory allocation architecture\n   - Implement distributed message queuing with automatic failover",
+      "PRB-0028911": "# Technical Analysis Report: PRB-0028911\n\n## **Technical Impact**\n\n### Severity Assessment\nThis P1-High severity incident represents a critical system failure with cascading effects across the JPN182S cloud infrastructure. The performance degradation manifested through multiple failure vectors:\n\n**Primary Impact Vectors:**\n- **Memory Subsystem Failure**: Complete memstore saturation on JPN182S cell leading to queue suspension\n- **Application Layer Instability**: Out of Memory (OOM) errors causing core application server instances to terminate unexpectedly\n- **Performance Degradation**: Elevated Application Processing Times (APTs) creating user-facing service disruption\n- **Capacity Overload**: System inability to handle increased customer activity during peak demand\n\n**Operational Consequences:**\n- Asynchronous task processing pipeline completely disrupted\n- Message queue backlog accumulation\n- Potential data processing delays and transaction failures\n- Service availability degradation across dependent systems\n\n## **Root Cause Analysis**\n\n### Primary Root Cause\n**Memory Resource Exhaustion in Multi-Tier Architecture**\n\nThe incident originated from a perfect storm of resource constraints and demand surge:\n\n1. **Memstore Saturation (JPN182S Cell)**\n   - Memory allocation exceeded configured thresholds\n   - Garbage collection inefficiency leading to memory fragmentation\n   - Insufficient memory headroom for peak load scenarios\n\n2. **Application Server Memory Leaks**\n   - Core application servers experiencing OOM conditions\n   - Potential memory leak in long-running processes\n   - Inadequate JVM heap sizing for current workload patterns\n\n3. **Cascading Failure Pattern**\n   - Initial memstore pressure triggered queue suspension\n   - Reduced processing capacity amplified by server instance failures\n   - Customer activity spike overwhelmed already compromised system capacity\n\n### Contributing Factors\n- **Monitoring Blind Spots**: Insufficient early warning for memory pressure\n- **Capacity Planning Gaps**: Underestimation of peak demand requirements\n- **Resource Allocation**: Suboptimal memory configuration across tiers\n\n## **Resolution Applied**\n\n### Immediate Stabilization Actions\nBased on the incident pattern, the resolution likely involved:\n\n1. **Emergency Memory Management**\n   - Forced garbage collection on affected JVM instances\n   - Temporary memory limit increases for critical services\n   - Queue drain operations to reduce memstore pressure\n\n2. **Service Recovery Protocol**\n   - Restart of failed application server instances\n   - Gradual traffic rerouting to healthy nodes\n   - Message queue reprocessing initiation\n\n3. **Load Balancing Adjustments**\n   - Traffic throttling to prevent re-occurrence\n   - Dynamic scaling activation for additional capacity\n   - Circuit breaker implementation for protection\n\n### Verification Steps\n- Memory utilization monitoring restoration\n- Application response time normalization\n- Queue processing rate validation\n- End-to-end service functionality testing\n\n## **Preventive Measures**\n\n### Immediate Actions (0-30 days)\n1. **Enhanced Monitoring Implementation**\n   - Deploy real-time memory pressure alerts with 80% threshold warnings\n   - Implement predictive analytics for memory usage trending\n   - Add queue depth monitoring with automated alerting\n\n2. **Memory Configuration Optimization**\n   - Conduct comprehensive JVM heap sizing analysis\n   - Implement dynamic memory allocation policies\n   - Configure automatic garbage collection tuning\n\n3. **Capacity Management**\n   - Establish auto-scaling policies for memory-intensive workloads\n   - Implement queue backpressure mechanisms\n   - Deploy circuit breakers for cascade failure prevention\n\n### Medium-term Improvements (30-90 days)\n1. **Architecture Resilience**\n   - Implement memory-aware load balancing algorithms\n   - Deploy distributed caching layer to reduce memstore pressure\n   - Establish multi-region failover capabilities\n\n2. **Performance Engineering**\n   - Conduct memory leak detection and remediation\n   - Optimize application memory footprint\n   - Implement memory pooling for high-frequency operations\n\n3. **Operational Excellence**\n   - Develop automated incident response playbooks\n   - Establish capacity planning models with growth projections\n   - Implement chaos engineering for memory pressure scenarios\n\n### Long-term Strategic Initiatives (90+ days)\n1. **Platform Modernization**\n   - Evaluate containerization for improved resource isolation\n   - Consider microservices architecture for better fault isolation\n   - Implement cloud-native memory management solutions\n\n2. **Predictive Operations**\n   - Deploy",
+      "PRB-0028938": "# Technical Analysis Report: PRB-0028938\n\n## **Technical Impact**\n\n### Severity Assessment\n- **Classification**: SEV-1 (Critical) - P1-High Priority\n- **Affected System**: JPN182S Cloud Cell Infrastructure\n- **Impact Scope**: Regional performance degradation affecting asynchronous task processing\n\n### System Impact Details\nThe memstore saturation on JPN182S cell created a cascading failure pattern:\n\n1. **Memory Subsystem Failure**: Memstore reached 100% capacity, triggering protective mechanisms\n2. **Queue Management Disruption**: Message queues suspended operations to prevent data loss\n3. **Asynchronous Processing Bottleneck**: Background tasks, batch jobs, and event-driven processes experienced severe delays\n4. **Performance Degradation**: Overall cell responsiveness declined significantly\n5. **Potential Data Pipeline Stalls**: Risk of upstream/downstream service dependencies being affected\n\n### Business Continuity Risk\n- **Service Availability**: Reduced but not completely unavailable\n- **Data Integrity**: Protected through queue suspension mechanism\n- **Customer Experience**: Likely degraded response times and delayed operations\n\n## **Root Cause Analysis**\n\n### Primary Technical Root Cause\n**Memstore Capacity Exhaustion** on JPN182S cell infrastructure\n\n### Contributing Factors Analysis\n\n1. **Memory Management Deficiency**\n   - Insufficient memstore capacity provisioning for current workload demands\n   - Lack of proactive memory utilization monitoring and alerting\n   - Possible memory leak or inefficient garbage collection patterns\n\n2. **Workload Scaling Issues**\n   - Traffic patterns may have exceeded designed capacity thresholds\n   - Inadequate auto-scaling mechanisms for memory-intensive operations\n   - Potential batch job scheduling conflicts creating memory spikes\n\n3. **Monitoring Gap**\n   - Delayed detection of memstore utilization trends\n   - Insufficient early warning systems for memory pressure\n   - Missing predictive analytics for capacity planning\n\n### Technical Investigation Points\n- Memory allocation patterns leading up to the incident\n- Historical memstore utilization trends\n- Concurrent process analysis during peak usage\n- Queue depth and message processing rates\n\n## **Resolution Applied**\n\n### Immediate Response Actions\n1. **Emergency Capacity Management**\n   - Site Reliability Engineering team intervention\n   - Memstore cleanup and optimization procedures\n   - Queue processing resumption protocols\n\n2. **Service Restoration Process**\n   - Systematic restart of suspended message queues\n   - Gradual workload reintroduction to prevent recurrence\n   - Real-time monitoring during recovery phase\n\n3. **Performance Validation**\n   - End-to-end system health verification\n   - Asynchronous task processing rate normalization\n   - Customer-facing service response time validation\n\n### Technical Resolution Methodology\n- **Incident Command Structure**: Site Reliability team leadership\n- **Escalation Protocol**: Appropriate for SEV-1 classification\n- **Recovery Approach**: Controlled, monitored restoration process\n\n## **Preventive Measures**\n\n### Immediate Prevention Strategies (0-30 days)\n\n1. **Enhanced Monitoring Implementation**\n   - Deploy memstore utilization alerting at 70%, 85%, and 95% thresholds\n   - Implement real-time queue depth monitoring with automated notifications\n   - Establish memory pressure trend analysis dashboards\n\n2. **Capacity Management Improvements**\n   - Increase memstore capacity by 40% as immediate buffer\n   - Implement automated memstore cleanup routines\n   - Deploy memory usage optimization scripts\n\n### Medium-term Prevention Measures (30-90 days)\n\n1. **Infrastructure Scaling Enhancements**\n   - Implement auto-scaling policies for memory-constrained resources\n   - Deploy horizontal scaling capabilities for queue processing\n   - Establish load balancing across multiple cells\n\n2. **Operational Process Improvements**\n   - Create runbook for memstore management procedures\n   - Implement regular capacity planning reviews\n   - Establish performance baseline documentation\n\n### Long-term Strategic Prevention (90+ days)\n\n1. **Architecture Optimization**\n   - Evaluate distributed memory architecture implementation\n   - Consider microservices decomposition for memory-intensive operations\n   - Implement advanced caching strategies to reduce memstore pressure\n\n2. **Predictive Analytics Integration**\n   - Deploy machine learning models for capacity forecasting\n   - Implement anomaly detection for unusual memory consumption patterns\n   - Establish automated capacity provisioning based on predictive models\n\n3. **Resilience Engineering",
+      "PRB-0028883": "# Technical Analysis for PRB-0028883\n\n## **Technical Impact**\n\n### **Severity Assessment**\n- **Classification:** SEV-1 (Critical) - P2 Medium priority indicates ongoing monitoring post-incident\n- **Affected System:** JPN182S cell infrastructure in Japan region\n- **Impact Scope:** Regional performance degradation affecting asynchronous task processing\n\n### **Performance Degradation Analysis**\nThe memstore saturation on JPN182S cell created a cascading failure pattern:\n- **Memory Subsystem:** 100% memstore utilization triggering protective mechanisms\n- **Queue Management:** Message queue suspension preventing normal task flow\n- **Processing Capacity:** Significant reduction in asynchronous task throughput\n- **Regional Services:** Potential impact on all services dependent on JPN182S cell\n\n### **Business Impact Metrics**\n- **Service Availability:** Degraded performance rather than complete outage\n- **User Experience:** Likely increased latency and potential timeouts\n- **Geographic Scope:** Japan region (JPN182S) customers primarily affected\n- **Duration:** Incident occurred 09/30/2025, resolution timeline not specified\n\n## **Root Cause Analysis**\n\n### **Primary Technical Cause**\n**Memstore Exhaustion on JPN182S Cell**\n- The memstore (in-memory storage component) reached capacity limits\n- This triggered automatic protective measures including queue suspension\n- Root cause indicates insufficient memory allocation or memory leak condition\n\n### **Contributing Factors Analysis**\n1. **Capacity Planning Issues**\n   - Inadequate memstore sizing for current workload patterns\n   - Possible underestimation of peak memory requirements\n\n2. **Memory Management Deficiencies**\n   - Potential memory leak in application code\n   - Inefficient garbage collection or memory cleanup processes\n   - Accumulation of stale objects in memstore\n\n3. **Workload Characteristics**\n   - Unexpected spike in asynchronous task volume\n   - Large message payloads exceeding normal parameters\n   - Retention of processed messages beyond optimal timeframes\n\n### **System Architecture Vulnerabilities**\n- **Single Point of Failure:** JPN182S cell appears to be critical infrastructure\n- **Resource Monitoring:** Insufficient early warning systems for memstore utilization\n- **Auto-scaling Limitations:** Lack of dynamic memory allocation capabilities\n\n## **Resolution Applied**\n\n### **Immediate Response Actions**\nBased on \"Core Database Performance\" resolution category:\n\n1. **Memory Cleanup Operations**\n   - Forced garbage collection to reclaim unused memory\n   - Purging of expired or processed messages from memstore\n   - Temporary suspension of non-critical background processes\n\n2. **Queue Management Recovery**\n   - Systematic restart of suspended message queues\n   - Prioritization of critical message processing\n   - Implementation of queue depth monitoring\n\n3. **Database Performance Optimization**\n   - Index optimization to reduce memory footprint\n   - Query performance tuning to minimize memory usage\n   - Connection pool optimization to reduce overhead\n\n### **Technical Resolution Steps**\n1. **Diagnostic Phase**\n   - Memory usage analysis and profiling\n   - Identification of memory-consuming processes\n   - Queue backlog assessment\n\n2. **Remediation Phase**\n   - Controlled memory cleanup procedures\n   - Gradual queue reactivation\n   - Performance baseline restoration\n\n3. **Validation Phase**\n   - System performance monitoring\n   - Memory utilization trend analysis\n   - Queue processing rate verification\n\n## **Preventive Measures**\n\n### **Immediate Prevention Strategies**\n\n1. **Enhanced Monitoring Implementation**\n   - **Memory Utilization Alerts:** Set thresholds at 70%, 85%, and 95% memstore capacity\n   - **Queue Depth Monitoring:** Implement real-time queue length tracking\n   - **Performance Baselines:** Establish normal operating parameters for JPN182S\n\n2. **Capacity Management**\n   - **Memory Allocation Review:** Increase memstore capacity by 40-50%\n   - **Auto-scaling Configuration:** Implement dynamic memory allocation\n   - **Load Balancing:** Distribute workload across multiple cells\n\n### **Long-term Prevention Framework**\n\n1. **Architecture Improvements**\n   - **Redundancy Implementation:** Deploy secondary cells for Japan region\n   - **Circuit Breaker Pattern:** Implement automatic failover mechanisms\n   - **Microservices Isolation:** Prevent cascading failures between services\n\n2. **Operational Excellence**\n   - **",
+      "PRB-0028893": "# Technical Analysis for PRB-0028893\n\n## **Technical Impact**\n\n### Severity Assessment\n- **Classification:** SEV-1 (Critical) - P2 Medium Priority\n- **Affected System:** JPN182S Cell Infrastructure\n- **Impact Scope:** Regional performance degradation affecting asynchronous task processing\n\n### System Impact Details\nThe memstore saturation on JPN182S cell created a cascading failure pattern:\n- **Memory Subsystem:** 100% memstore utilization leading to write blocking\n- **Queue Management:** Message queue suspension disrupting inter-service communication\n- **Processing Pipeline:** Asynchronous task processing degradation affecting user-facing services\n- **Regional Availability:** JPN182S cell serving Japan region experienced reduced throughput capacity\n\n### Performance Metrics Impact\n- Asynchronous task completion rates significantly reduced\n- Message queue backlog accumulation\n- Potential timeout increases for dependent services\n- Regional service response time degradation\n\n## **Root Cause Analysis**\n\n### Primary Technical Root Cause\n**Memstore Capacity Exhaustion on JPN182S Cell**\n\n### Contributing Factors Analysis\n1. **Memory Management Deficiency:**\n   - Insufficient memstore capacity provisioning for peak load scenarios\n   - Lack of proactive memory utilization monitoring and alerting\n   - Potential memory leak or inefficient garbage collection patterns\n\n2. **Queue Architecture Limitations:**\n   - Message queue suspension mechanism triggered by memory pressure\n   - Insufficient queue overflow handling and backpressure management\n   - Missing circuit breaker patterns for graceful degradation\n\n3. **Monitoring and Alerting Gaps:**\n   - Delayed detection of memstore utilization approaching critical thresholds\n   - Insufficient predictive monitoring for capacity planning\n   - Missing automated scaling triggers for memory-constrained scenarios\n\n### Technical Investigation Points\n- Memory allocation patterns and growth trends leading to the incident\n- Message queue configuration and overflow policies\n- Regional load distribution and traffic patterns on 09/30/2025\n- Garbage collection efficiency and memory reclamation cycles\n\n## **Resolution Applied**\n\n### Immediate Resolution (SDB - Likely Service Database Reset/Restart)\n**Technical Resolution Steps:**\n1. **Service Database Reset/Restart:** Emergency restart of affected database services to clear memstore\n2. **Memory Reclamation:** Forced garbage collection and memory cleanup procedures\n3. **Queue Recovery:** Message queue restart and backlog processing resumption\n4. **Service Validation:** Health checks and performance validation post-restart\n\n### Resolution Effectiveness\n- Immediate restoration of memstore capacity through service restart\n- Queue processing resumption enabling asynchronous task recovery\n- Regional service performance restoration to baseline levels\n\n## **Preventive Measures**\n\n### 1. **Proactive Monitoring and Alerting**\n- **Implementation:** Deploy memstore utilization monitoring with 70%, 85%, and 95% threshold alerts\n- **Metrics:** Real-time memory usage, queue depth, and processing latency dashboards\n- **Automation:** Automated alerting to on-call engineers with escalation procedures\n\n### 2. **Capacity Management and Auto-scaling**\n- **Memory Scaling:** Implement dynamic memstore scaling based on utilization patterns\n- **Queue Management:** Deploy adaptive queue sizing with overflow protection mechanisms\n- **Regional Load Balancing:** Enhanced traffic distribution across multiple cells to prevent single-point overload\n\n### 3. **Architectural Improvements**\n- **Circuit Breaker Implementation:** Deploy circuit breakers for graceful service degradation under memory pressure\n- **Backpressure Handling:** Implement sophisticated backpressure mechanisms in message queues\n- **Memory Optimization:** Regular memory profiling and optimization of memory allocation patterns\n\n### 4. **Operational Excellence**\n- **Runbook Development:** Create detailed incident response procedures for memstore exhaustion scenarios\n- **Capacity Planning:** Quarterly capacity reviews with predictive modeling for regional growth\n- **Testing Protocols:** Regular chaos engineering exercises simulating memory pressure scenarios\n\n### 5. **Technical Debt Remediation**\n- **Memory Leak Detection:** Implement continuous memory leak detection and automated remediation\n- **Garbage Collection Tuning:** Optimize GC parameters for consistent memory reclamation\n- **Queue Architecture Review:** Evaluate and upgrade message queue infrastructure for better resilience\n\n### Implementation Timeline\n- **Immediate (0-2 weeks):** Enhanced monitoring and alerting deployment\n- **Short-term (2-8 weeks):** Auto-scaling and circuit breaker implementation",
+      "PRB-0028909": "# Technical Analysis Report: PRB-0028909\n\n## **Technical Impact**\n\n### Severity Assessment\n- **Incident Classification**: SEV-1 (Critical)\n- **System Affected**: JPN182S cell infrastructure\n- **Performance Impact**: Significant degradation in asynchronous task processing capabilities\n\n### Detailed Impact Analysis\nThe memstore saturation on the JPN182S cell created a cascading failure pattern affecting multiple system components:\n\n1. **Memory Subsystem Impact**:\n   - Complete memstore capacity exhaustion\n   - Memory allocation failures for new operations\n   - Potential memory fragmentation issues\n\n2. **Queue Management Impact**:\n   - Suspension of message queues leading to task backlog accumulation\n   - Loss of real-time processing capabilities\n   - Potential message ordering violations\n\n3. **Performance Degradation Metrics**:\n   - Increased response times for asynchronous operations\n   - Reduced throughput for background processing tasks\n   - Elevated system resource contention\n\n4. **Operational Impact**:\n   - Service availability concerns during peak usage periods\n   - Potential data processing delays affecting downstream systems\n   - Risk of transaction timeouts and failed operations\n\n## **Root Cause Analysis**\n\n### Primary Root Cause\n**Memstore Capacity Exhaustion on JPN182S Cell**\n\n### Technical Deep Dive\n1. **Memory Management Failure**:\n   - Insufficient memstore sizing relative to workload demands\n   - Lack of proactive memory management and garbage collection optimization\n   - Possible memory leak in application code causing gradual accumulation\n\n2. **Queue Architecture Limitations**:\n   - Message queue suspension mechanism triggered by memory pressure\n   - Inadequate queue overflow handling and backpressure management\n   - Missing circuit breaker patterns for graceful degradation\n\n3. **Monitoring and Alerting Gaps**:\n   - Delayed detection of memory pressure conditions\n   - Insufficient early warning systems for memstore utilization\n   - Lack of predictive capacity planning mechanisms\n\n### Contributing Factors\n- **Workload Scaling**: Unexpected increase in asynchronous task volume\n- **Resource Allocation**: Suboptimal memory allocation strategies\n- **System Architecture**: Tight coupling between memstore and queue processing\n\n## **Resolution Applied**\n\n### Immediate Resolution Actions\nBased on the \"Closed\" status, the following resolution methodology was likely implemented:\n\n1. **Emergency Memory Recovery**:\n   - Forced garbage collection to reclaim available memory\n   - Temporary suspension of non-critical background processes\n   - Memory dump analysis to identify largest consumers\n\n2. **Queue System Recovery**:\n   - Manual restart of suspended message queues\n   - Prioritized processing of critical queued messages\n   - Implementation of queue draining procedures\n\n3. **System Stabilization**:\n   - Increased memstore allocation limits (temporary measure)\n   - Load balancing redistribution to reduce cell pressure\n   - Enhanced monitoring activation for real-time tracking\n\n### Validation Steps\n- Performance metrics restoration verification\n- Queue processing rate normalization\n- Memory utilization trend analysis\n- End-to-end system functionality testing\n\n## **Preventive Measures**\n\n### Immediate Prevention Strategies (0-30 days)\n\n1. **Enhanced Monitoring Implementation**:\n   ```\n   - Deploy memstore utilization alerts at 70%, 85%, and 95% thresholds\n   - Implement queue depth monitoring with automated alerting\n   - Create performance degradation detection algorithms\n   ```\n\n2. **Capacity Management**:\n   - Conduct comprehensive capacity assessment for all cells\n   - Implement dynamic memory allocation scaling\n   - Establish memstore sizing guidelines based on workload patterns\n\n3. **Operational Procedures**:\n   - Develop incident response playbooks for memory pressure scenarios\n   - Create automated recovery scripts for queue suspension events\n   - Establish escalation procedures for SEV-1 performance issues\n\n### Medium-term Prevention Strategies (30-90 days)\n\n1. **Architecture Improvements**:\n   - Implement circuit breaker patterns for queue processing\n   - Design graceful degradation mechanisms for memory pressure\n   - Introduce asynchronous task prioritization frameworks\n\n2. **Performance Optimization**:\n   - Conduct memory usage profiling and optimization\n   - Implement efficient garbage collection strategies\n   - Optimize message queue processing algorithms\n\n3. **Infrastructure Scaling**:\n   - Deploy auto-scaling capabilities for memstore resources\n   - Implement horizontal scaling for high-",
+      "PRB-0028942": "# Technical Analysis Report - PRB-0028942\n\n## **Technical Impact**\n\n### Severity Assessment\n- **Classification**: SEV-1 incident with P2-Medium priority classification\n- **System Affected**: JPN182S cell infrastructure in Japan region\n- **Performance Impact**: Critical degradation of asynchronous task processing capabilities\n- **Service Disruption**: Message queue suspension leading to cascading performance issues\n\n### Impact Scope\n- **Primary Systems**: JPN182S cell memstore and associated message queuing infrastructure\n- **Secondary Effects**: Downstream services dependent on asynchronous task completion\n- **Geographic Scope**: Japan region (JPN182S cell coverage area)\n- **Temporal Impact**: Performance degradation initiated on 09/30/2025 with ongoing effects\n\n### Business Impact Metrics\n- **Processing Capacity**: Significant reduction in asynchronous task throughput\n- **Queue Backlog**: Accumulation of suspended messages creating processing delays\n- **Resource Utilization**: Memstore saturation at 100% capacity\n- **Customer Experience**: Degraded response times and potential service timeouts\n\n## **Root Cause Analysis**\n\n### Primary Technical Cause\n**Memstore Capacity Exhaustion**: The JPN182S cell's memstore reached full capacity, triggering protective mechanisms that suspended message queue operations.\n\n### Contributing Factors Analysis\n1. **Memory Management Deficiency**\n   - Insufficient memstore capacity provisioning for peak load scenarios\n   - Lack of proactive memory cleanup mechanisms\n   - Inadequate garbage collection optimization\n\n2. **Queue Management Issues**\n   - Missing queue depth monitoring and alerting\n   - Absence of circuit breaker patterns for queue overflow scenarios\n   - Insufficient queue prioritization mechanisms\n\n3. **Monitoring Gaps**\n   - Delayed detection of memstore capacity approaching limits\n   - Inadequate early warning systems for memory pressure\n   - Missing predictive analytics for capacity planning\n\n### Technical Root Cause Chain\n```\nIncreased Message Volume \u2192 Memstore Capacity Exceeded \u2192 Queue Suspension \u2192 Performance Degradation \u2192 Service Impact\n```\n\n### Infrastructure Analysis\n- **Cell Architecture**: Single point of failure in memstore design\n- **Scalability Limitations**: Fixed memstore capacity without dynamic scaling\n- **Resource Allocation**: Suboptimal memory distribution across cell components\n\n## **Resolution Applied**\n\n### Immediate Response Actions\n1. **Emergency Capacity Management**\n   - Implemented emergency memstore cleanup procedures\n   - Prioritized critical message processing to reduce queue backlog\n   - Activated load balancing to redistribute traffic from affected cell\n\n2. **Queue Recovery Process**\n   - Systematically resumed suspended message queues in priority order\n   - Implemented batch processing to handle accumulated message backlog\n   - Monitored queue depth during recovery to prevent re-occurrence\n\n3. **Performance Restoration**\n   - Gradually increased processing capacity as memstore pressure decreased\n   - Validated system performance metrics return to baseline levels\n   - Confirmed asynchronous task processing restoration\n\n### Technical Resolution Methodology\n- **Phase 1**: Immediate stabilization through emergency procedures\n- **Phase 2**: Systematic queue recovery and backlog processing\n- **Phase 3**: Performance validation and monitoring enhancement\n- **Phase 4**: Capacity optimization and preventive measures implementation\n\n## **Preventive Measures**\n\n### Infrastructure Enhancements\n1. **Memstore Capacity Management**\n   - Implement dynamic memstore scaling based on load patterns\n   - Deploy predictive capacity planning algorithms\n   - Establish automated cleanup mechanisms for expired data\n\n2. **Queue Architecture Improvements**\n   - Implement circuit breaker patterns for queue overflow protection\n   - Deploy multi-tier queue prioritization system\n   - Add queue depth monitoring with automated alerting\n\n3. **Monitoring and Alerting Upgrades**\n   - Deploy real-time memstore utilization monitoring\n   - Implement predictive alerting at 70%, 80%, and 90% capacity thresholds\n   - Add automated capacity scaling triggers\n\n### Operational Procedures\n1. **Capacity Planning Protocol**\n   - Establish weekly capacity review meetings\n   - Implement quarterly capacity forecasting analysis\n   - Deploy automated capacity trend reporting\n\n2. **Incident Response Enhancement**\n   - Create runbook for memstore capacity incidents\n   - Establish escalation procedures for queue suspension events\n   - Implement automated recovery procedures where feasible\n\n3. **Performance Optimization**\n   - Schedule regular memstore optimization maintenance windows\n   - Implement proactive queue"
+    }
+  }
+}

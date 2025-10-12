@@ -1,0 +1,1058 @@
+{
+  "risks": [
+    {
+      "feature": "Database Encryption",
+      "status": "Green",
+      "priority": "High",
+      "description": "Database Encryption enabled in the sandbox cells in the production fleet.The enablement of TLE for Open Beta cells is a crucial step towards its general availability, requiring a scalable and efficient approach to handle hundreds of cells. The current process, heavily reliant on Structured Config (SC) overrides, is being revamped due to its manual nature and high latency. We created new, Sandbox-Only Stagger Groups to run the TLE pipeline on a per-cell basis for 266 sandbox cells based on reputation scores. This allows for the pipeline to be executed on groups of cells simultaneously, starting with less critical ones and progressing to more critical ones based on success. This approach avoids conflicts with existing release stagger groups, which contain a mix of sandbox and production cells and could interfere with weekly release deployments. Each stagger group execution is estimated to take about 10 minutes, with an additional 20 minutes for validation, leading to a total rollout time of approximately 7 hours for all sandboxes, assuming no failures. This comprehensive approach aims to make TLE enablement for Open Beta cells scalable, resilient, and less operationally intensive, paving the way for a smooth transition to general availability.",
+      "last_updated": "2024-01-15"
+    },
+    {
+      "feature": "Read your own writes(RYOW)",
+      "status": "Yellow",
+      "priority": "Medium",
+      "description": "Performance enhancement feature for Write Scaling. TLE dark launch mode has been rolled out to multiple cells. However, when rolling out the live mode, we ran into an issue on a couple of cells including the UHG sandbox cell (USA804s) where it seems to run into a possible data corruption issue. However, the guardrails that we implemented in the LSM layer helped detect and prevent those corruptions from persisting. Folowing this, we disabled the rollout of the live mode for RYOW functionality and it has been disabled since mid August when the problem was detected.",
+      "last_updated": "2024-01-15"
+    },
+    {
+      "feature": "128 bit extent id",
+      "status": "Green",
+      "priority": "High",
+      "description": "128 bit extent id has been rolled out successfully. This is needed for rolling out Fast Restore. Based on monitoring data collected from the fleet, so far the results have been positive and we've not seen any issue related to the feature rollout.",
+      "last_updated": "2024-01-15"
+    },
+    {
+      "feature": "Collision Detection in Store",
+      "status": "Green",
+      "priority": "High",
+      "description": "Beginning to rollout in GUS sandboxes. This is needed for rolling out Fast Restore. This is very early in the rollout process.",
+      "last_updated": "2024-01-15"
+    }
+  ],
+  "prbs": [
+    {
+      "id": "PRB-0028802",
+      "title": "PRB-0028802: Performance degradation (general)",
+      "priority": "P2-Medium",
+      "status": "Open",
+      "description": "Problem report PRB-0028802 managed by Cloud",
+      "created_date": "2025-09-21",
+      "what_happened": "",
+      "proximate_cause": "",
+      "how_resolved": "\u200b",
+      "next_steps": "1) Created user story W-19769379 where we mentioned about the outbound request details.",
+      "user_experience": "",
+      "team": "Cloud",
+      "customer_impact": "Performance degradation (general)"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "W-19760968",
+      "title": "[EA][PROD][TRAP][stg2] raise,abort,errfinish,catWriteWithFencingCheck,CatalogSer...",
+      "severity": "P2-Medium",
+      "status": "New",
+      "description": "Assigned: Unknown, Customer: SDBFalcon stg2",
+      "component": "SDB QP Execution",
+      "reported_date": "2025-09-26"
+    },
+    {
+      "id": "W-19762206",
+      "title": "[EA][PROD][TRAP][res4] raise,abort,errfinish,XlogFencingErrorCallback,SFS_aioSta...",
+      "severity": "P2-Medium",
+      "status": "New",
+      "description": "Assigned: Unknown, Customer: SDBFalcon res4",
+      "component": "SDB QP Execution",
+      "reported_date": "2025-09-27"
+    },
+    {
+      "id": "W-19763580",
+      "title": "[EA][PROD][TRAP][deu12s] raise,abort,errfinish,SFSrecvResp,SFS_readerReadFragmen...",
+      "severity": "P2-Medium",
+      "status": "New",
+      "description": "Assigned: Unknown, Customer: SDBFalcon deu12s",
+      "component": "SDB QP Execution",
+      "reported_date": "2025-10-02"
+    },
+    {
+      "id": "W-19767297",
+      "title": "[EA][PROD][TRAP][usa4s] raise,abort,errfinish,SFSerrorCheckAndFormat,SFS_readerR...",
+      "severity": "P2-Medium",
+      "status": "New",
+      "description": "Assigned: Unknown, Customer: SDBFalcon usa4s",
+      "component": "SDB QP Execution",
+      "reported_date": "2025-09-28"
+    },
+    {
+      "id": "W-19769313",
+      "title": "[EA][PROD][TRAP][usa6s] AllocSetAlloc,palloc_internal,Array_init,ExtentIdList_in...",
+      "severity": "P2-Medium",
+      "status": "New",
+      "description": "Assigned: Unknown, Customer: SDBFalcon usa6s",
+      "component": "SDB QP Execution",
+      "reported_date": "2025-09-29"
+    },
+    {
+      "id": "W-19661638",
+      "title": "[EA][PROD][PROD_ERROR][usa32s] Scan processing for tenant \"00DEm00000JSt0E\" and ...",
+      "severity": "P2-Medium",
+      "status": "Triaged",
+      "description": "Assigned: Christopher Drexelius, Customer: SDBFalcon usa32s",
+      "component": "Sayonara Data Management",
+      "reported_date": "2025-09-17"
+    },
+    {
+      "id": "W-19744619",
+      "title": "[EA][PROD][PROD_ERROR][aus86] Attempting to read with snapshotXcn = 175876761898...",
+      "severity": "P2-Medium",
+      "status": "New",
+      "description": "Assigned: Unknown, Customer: SDBFalcon aus86",
+      "component": "Unknown",
+      "reported_date": "2025-09-24"
+    },
+    {
+      "id": "W-19317263",
+      "title": "[EA][PROD][INTERNAL_ERROR][usa376] We need an in-progress transaction to read th...",
+      "severity": "P2-Medium",
+      "status": "Open",
+      "description": "Assigned: Jacob Park, Customer: Unknown",
+      "component": "Sayonara Foundation Services",
+      "reported_date": "2025-08-14"
+    },
+    {
+      "id": "W-19391926",
+      "title": "[EA][PROD][PROD_ERROR][usa936s] Could not commit transaction before the transact...",
+      "severity": "P2-Medium",
+      "status": "In Progress",
+      "description": "Assigned: In Progress, Customer: SDBFalcon usa936s",
+      "component": "Sayonara TxP",
+      "reported_date": "2025-08-20"
+    },
+    {
+      "id": "W-19440829",
+      "title": "[EA][PROD][INTERNAL_ERROR][ind132] Cannot allocate FragmentStaetQueue slot after...",
+      "severity": "P2-Medium",
+      "status": "New",
+      "description": "Assigned: Suhas Dantkale, Customer: SDBFalcon ind132",
+      "component": "SDBStore",
+      "reported_date": "2025-08-27"
+    },
+    {
+      "id": "W-19692318",
+      "title": "[EA][PROD][INTERNAL_ERROR][usa740] could not read statistics message: Success",
+      "severity": "P2-Medium",
+      "status": "New",
+      "description": "Assigned: Unknown, Customer: SDBFalcon usa740",
+      "component": "Unknown",
+      "reported_date": "2025-09-19"
+    },
+    {
+      "id": "W-18995582",
+      "title": "Ankur Singh Chauhan",
+      "severity": "P2-Medium",
+      "status": "New",
+      "description": "Assigned: Unknown, Customer: SDBFalcon usa740",
+      "component": "Unknown",
+      "reported_date": "2025-09-19"
+    },
+    {
+      "id": "W-19761682",
+      "title": "[EA][PROD][PROD_ERROR][che26s] Cannot import named ERS: stsSANDBOX_0AObW0000002d...",
+      "severity": "P2-Medium",
+      "status": "New",
+      "description": "Assigned: Unknown, Customer: SDBFalcon che26s",
+      "component": "SDB QP Execution",
+      "reported_date": "2025-09-26"
+    },
+    {
+      "id": "W-19763590",
+      "title": "[EA][PROD][PROD_ERROR][deu12s] [DkHELMLbrw85NRTWuVO-4A:000003FD] Req:LedgerReadS...",
+      "severity": "P2-Medium",
+      "status": "New",
+      "description": "Assigned: Unknown, Customer: SDBFalcon deu12s",
+      "component": "SDB QP Execution",
+      "reported_date": "2025-09-27"
+    },
+    {
+      "id": "W-19764361",
+      "title": "[EA][PROD][PROD_ERROR][usa248s] SYNC Step of Online Index workflow timed out wai...",
+      "severity": "P2-Medium",
+      "status": "New",
+      "description": "Assigned: Unknown, Customer: SDBFalcon usa248s",
+      "component": "SDB QP Execution",
+      "reported_date": "2025-10-02"
+    },
+    {
+      "id": "W-19765560",
+      "title": "[EA][PROD][INTERNAL_ERROR][usa6s] index \"ak3auth_session\" has an entry with no c...",
+      "severity": "P2-Medium",
+      "status": "New",
+      "description": "Assigned: Unknown, Customer: SDBFalcon usa6s",
+      "component": "SDB QP Execution",
+      "reported_date": "2025-09-28"
+    },
+    {
+      "id": "W-19766755",
+      "title": "[EA][PROD][PROD_ERROR][usa6s] Cannot apply replicated insert locally for RYOW, t...",
+      "severity": "P2-Medium",
+      "status": "New",
+      "description": "Assigned: Unknown, Customer: SDBFalcon usa6s",
+      "component": "SDB QP Execution",
+      "reported_date": "2025-10-02"
+    },
+    {
+      "id": "W-19766958",
+      "title": "[EA][PROD][PROD_ERROR][jpn182s] New Tenant ERS installation is currently not all...",
+      "severity": "P2-Medium",
+      "status": "New",
+      "description": "Assigned: Unknown, Customer: SDBFalcon jpn182s",
+      "component": "SDB QP Execution",
+      "reported_date": "2025-10-02"
+    },
+    {
+      "id": "W-19767303",
+      "title": "[EA][PROD][PROD_ERROR][usa4s] [D0dknWZOlMmfYLSbxZdmdQ:00000A7C] Req:LedgerReadSt...",
+      "severity": "P2-Medium",
+      "status": "New",
+      "description": "Assigned: Unknown, Customer: SDBFalcon usa4s",
+      "component": "SDB QP Execution",
+      "reported_date": "2025-10-02"
+    },
+    {
+      "id": "W-19056851",
+      "title": "Hash semijoin hint is not honored in query with two hinted hash semijoins and a skinny table.",
+      "severity": "P2-Medium",
+      "status": "In Progress",
+      "description": "Assigned: In Progress, Customer: SDBFalcon usa224s",
+      "component": "SDB Query Proc Optimizer",
+      "reported_date": "2025-07-15"
+    }
+  ],
+  "critical_issues": [],
+  "deployments": [
+    {
+      "stagger": "R2a",
+      "version": "258.7",
+      "count": 9,
+      "stage": "R2a",
+      "cells": 9
+    },
+    {
+      "stagger": "SB0",
+      "version": "260.3",
+      "count": 2,
+      "stage": "SB0",
+      "cells": 2
+    },
+    {
+      "stagger": "SB1",
+      "version": "258.15",
+      "count": 69,
+      "stage": "SB1",
+      "cells": 69
+    },
+    {
+      "stagger": "R1",
+      "version": "258.7",
+      "count": 1,
+      "stage": "R1",
+      "cells": 1
+    },
+    {
+      "stagger": "R2b",
+      "version": "258.11",
+      "count": 87,
+      "stage": "R2b",
+      "cells": 87
+    },
+    {
+      "stagger": "SB0",
+      "version": "258.11",
+      "count": 1,
+      "stage": "SB0",
+      "cells": 1
+    },
+    {
+      "stagger": "SB1",
+      "version": "256.17",
+      "count": 2,
+      "stage": "SB1",
+      "cells": 2
+    },
+    {
+      "stagger": "SB1",
+      "version": "258.1",
+      "count": 6,
+      "stage": "SB1",
+      "cells": 6
+    },
+    {
+      "stagger": "R2a",
+      "version": "258.11",
+      "count": 398,
+      "stage": "R2a",
+      "cells": 398
+    },
+    {
+      "stagger": "R1",
+      "version": "258.11",
+      "count": 104,
+      "stage": "R1",
+      "cells": 104
+    },
+    {
+      "stagger": "SB2",
+      "version": "258.11",
+      "count": 25,
+      "stage": "SB2",
+      "cells": 25
+    },
+    {
+      "stagger": "SB0",
+      "version": "258.1",
+      "count": 1,
+      "stage": "SB0",
+      "cells": 1
+    },
+    {
+      "stagger": "R0",
+      "version": "260.3",
+      "count": 2,
+      "stage": "R0",
+      "cells": 2
+    },
+    {
+      "stagger": "SB1",
+      "version": "258.11",
+      "count": 55,
+      "stage": "SB1",
+      "cells": 55
+    },
+    {
+      "stagger": "SB2",
+      "version": "258.15",
+      "count": 16,
+      "stage": "SB2",
+      "cells": 16
+    },
+    {
+      "stagger": "SB1",
+      "version": "258.3",
+      "count": 1,
+      "stage": "SB1",
+      "cells": 1
+    },
+    {
+      "stagger": "R0",
+      "version": "258.11",
+      "count": 8,
+      "stage": "R0",
+      "cells": 8
+    },
+    {
+      "stagger": "SB1",
+      "version": "260.3",
+      "count": 2,
+      "stage": "SB1",
+      "cells": 2
+    }
+  ],
+  "deployment_summary": "Weekly Deployment Summary - Week of September 15, 2025\n\nThis week's deployment activities proceeded smoothly across all stagger groups. \nSDB version 258.11 was successfully deployed to sandbox environments (SB0-SB2) \nwith no major issues reported.\n\nKey highlights:\n- Version 258.11 rolled out to 150 sandbox cells\n- Zero failed deployments\n- Average deployment time: 12 minutes\n- All post-deployment validations passed\n\nNext week: Planning production rollout to P0-P3 stages pending final validation results.",
+  "coverage": [
+    {
+      "component": "Authentication Module",
+      "line_coverage": 85.2,
+      "branch_coverage": 78.5,
+      "function_coverage": 92.1,
+      "test_count": 156
+    },
+    {
+      "component": "Payment Processing",
+      "line_coverage": 91.3,
+      "branch_coverage": 87.2,
+      "function_coverage": 95.8,
+      "test_count": 203
+    },
+    {
+      "component": "UI Components",
+      "line_coverage": 73.1,
+      "branch_coverage": 65.8,
+      "function_coverage": 81.2,
+      "test_count": 89
+    }
+  ],
+  "new_code_coverage": [
+    {
+      "component": "SDB Engine",
+      "new_code_coverage": 82.3,
+      "overall_coverage": 67.9,
+      "new_code_line_coverage": 94.9,
+      "overall_line_coverage": 80.8,
+      "lines_to_cover": 7294,
+      "uncovered_lines": 375,
+      "overall_lines_to_cover": 545616,
+      "overall_uncovered_lines": 104773
+    }
+  ],
+  "ci_issues": [
+    {
+      "work_id": "W-19763355",
+      "team": "Sayonara Data Management",
+      "priority": "P2",
+      "subject": "PersistentKeyCachePITRTest.testPITRestoreWithTLEDDLs_noPKC: RuntimeException: java.lang.RuntimeException: org.postgres",
+      "status": "New",
+      "build_version": "sdb.260.9",
+      "created_date": "2025-09-27",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19762894",
+      "team": "Sayonara Data Management",
+      "priority": "P2",
+      "subject": "TruncateTableForTenantServerTest.testOnlineIndexingRangeDeleteWithoutFlush: RuntimeException: JUnit barfed with multiple errors, this",
+      "status": "New",
+      "build_version": "sdb.260.9",
+      "created_date": "2025-09-27",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19761586",
+      "team": "Sayonara Data Management",
+      "priority": "P2",
+      "subject": "MultiNodeLastLevelMergeTest.lastLevelStackTest1: JSONException: Unterminated string at 603 [character 0",
+      "status": "New",
+      "build_version": "sdb.260.9",
+      "created_date": "2025-09-26",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19726659",
+      "team": "Sayonara Data Management",
+      "priority": "P2",
+      "subject": "MergeMergeConflictTest.testTombstoneOverlapMergeConflictRatio: PSQLException: An I/O error occurred while sending to t",
+      "status": "Triaged",
+      "build_version": "sdb.260.8",
+      "created_date": "2025-09-24",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19624375",
+      "team": "Sayonara Data Management",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-sandbox-stress-RHEL9.sandbox-stress: AssertionError: Index inconsistency found for relation:",
+      "status": "In Progress",
+      "build_version": "sdb.260.7",
+      "created_date": "2025-09-12",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19414948",
+      "team": "Sayonara Data Management",
+      "priority": "P2",
+      "subject": "InterruptedFlushLocationCacheTest.flushCancelFullInvalTest_withPromotedMiniFlushTest: TestTimedOutException: test timed out after 900 seconds",
+      "status": "Triaged",
+      "build_version": "sdb.260",
+      "created_date": "2025-08-24",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19766091",
+      "team": "Sayonara Foundation Services",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-dml-uptime-fast-purgeflush-nightly-RHEL9.dml-uptime-fast-purgeflush: 1,[::1], port=62202, expectedState=UP]: Last Error: dbsay`2025092",
+      "status": "New",
+      "build_version": "sdb.260.9",
+      "created_date": "2025-09-28",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19763960",
+      "team": "Sayonara Foundation Services",
+      "priority": "P2",
+      "subject": "WSLogTailingRPCsTest.testMemstoreAvoidanceOnWSLogTailer: AssertionFailedError: expected:<0> but was:<1>",
+      "status": "New",
+      "build_version": "sdb.260.9",
+      "created_date": "2025-09-27",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19763852",
+      "team": "Sayonara Foundation Services",
+      "priority": "P2",
+      "subject": "XCLockBroadcastTest.sayonaradb.test.server.ws.coordinator.XCLockBroadcastTest: PSQLException: The connection attempt failed.",
+      "status": "New",
+      "build_version": "sdb.260.9",
+      "created_date": "2025-09-27",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19761429",
+      "team": "Sayonara Foundation Services",
+      "priority": "P2",
+      "subject": "regression.multitenancy_lifecycle: regression test failed: [2025-09-26 04:02:41] test multitenancy_",
+      "status": "New",
+      "build_version": "sdb.260.8",
+      "created_date": "2025-09-26",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19761218",
+      "team": "Sayonara Foundation Services",
+      "priority": "P2",
+      "subject": "WriteScalingSSLTests.testEpochGeneratorRetransmit: AssertionFailedError: expected:<2> but was:<1>",
+      "status": "New",
+      "build_version": "sdb.260.9",
+      "created_date": "2025-09-26",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19385172",
+      "team": "Sayonara Foundation Services",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-LD-WS-dml-check-standby-partitioned-1-RHEL9.dml-check: RuntimeException: gave up waiting for cluster change, expe",
+      "status": "Triaged",
+      "build_version": "sdb.260",
+      "created_date": "2025-08-20",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19717664",
+      "team": "Sayonara TxP",
+      "priority": "P2",
+      "subject": "KeyOrderPurgeTest.testPurgeWaitOnWriteLatch: AssertionFailedError: junit.framework.AssertionFailedError at",
+      "status": "New",
+      "build_version": "sdb.260.8",
+      "created_date": "2025-09-23",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19701447",
+      "team": "Sayonara TxP",
+      "priority": "P2",
+      "subject": "MemstoreReproProblematicRecordChain.case1_unCommittedUpdateFollowedByGrantedKeyShareLock: TestTimedOutException: test timed out after 900 seconds",
+      "status": "Triaged",
+      "build_version": "sdb.260.8",
+      "created_date": "2025-09-22",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19562705",
+      "team": "Sayonara Data Management",
+      "priority": "P2",
+      "subject": "FlushErrorLocationCacheWithSFTest.sayonaradb.test.server.flush.FlushErrorLocationCacheWithSFTest: TestTimedOutException: test timed out after 3600 sec",
+      "status": "New",
+      "build_version": "sdb.260.5",
+      "created_date": "2025-09-05",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19465357",
+      "team": "Sayonara TxP",
+      "priority": "P2",
+      "subject": "FSQDaemonTest.test_with_paused_fsq_daemon: TestTimedOutException: test timed out after 900 seconds",
+      "status": "New",
+      "build_version": "sdb.260.5",
+      "created_date": "2025-08-30",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19409996",
+      "team": "Sayonara TxP",
+      "priority": "P2",
+      "subject": "MemstoreDumpTest.sayonaradb.test.server.memstore.MemstoreDumpTest: ExecutionException: sayonaradb.test.util.SysCmdException: Co",
+      "status": "In Progress",
+      "build_version": "sdb.260",
+      "created_date": "2025-08-22",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19307267",
+      "team": "Sayonara TxP",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-RSWS-seq-stress-dbFaults-RHEL9.seq-stress: found trap on node[name=0, expectedState=RUNNING]: Last Error: dbsay`20250811162049.483639`",
+      "status": "New",
+      "build_version": "sdb.260",
+      "created_date": "2025-08-11",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19717671",
+      "team": "SDB Engine Health",
+      "priority": "P2",
+      "subject": "ActivityStatementHistoryTest.testNullNonNullValues: StepFailureException: Worker at step 2 threw exception: expect",
+      "status": "New",
+      "build_version": "sdb.260.8",
+      "created_date": "2025-09-23",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19664218",
+      "team": "SDB Engine Health",
+      "priority": "P2",
+      "subject": "AvgActiveSessionTest.testAvgActiveSession: RuntimeException: JUnit barfed with multiple errors, this",
+      "status": "New",
+      "build_version": "sdb.260.7",
+      "created_date": "2025-09-17",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19466621",
+      "team": "SDB Engine Health",
+      "priority": "P2",
+      "subject": "LockWaitTraceAndLogLineTest.testSdbTimeoutTraceForDeadlockLoglineLockTimeout: NullPointerException: Cannot invoke \"org.json.JSONObject.getJS",
+      "status": "Ready for Review",
+      "build_version": "sdb.260.5",
+      "created_date": "2025-08-31",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19761585",
+      "team": "SDB Query Proc",
+      "priority": "P2",
+      "subject": "PerfProfileTest.TestAttackPerfProfileDaemon: AssertionFailedError: junit.framework.AssertionFailedError at",
+      "status": "New",
+      "build_version": "sdb.260.9",
+      "created_date": "2025-09-26",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19565729",
+      "team": "SDB Query Proc",
+      "priority": "P2",
+      "subject": "TxnProcOomKillerTest.ProactiveOomKillerTest: StepFailureException: Worker at step 6 threw exception: expect",
+      "status": "New",
+      "build_version": "sdb.260.6",
+      "created_date": "2025-09-05",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19654204",
+      "team": "SDBStore",
+      "priority": "P1",
+      "subject": "Bookie decomm tests running in SDBChaos are failing",
+      "status": "New",
+      "build_version": "sdb.260.5",
+      "created_date": "2025-09-16",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19402274",
+      "team": "SDBStore",
+      "priority": "P2",
+      "subject": "SFStore-Build-RHEL9.org.apache.bookkeeper.bookie.BookieCacheRehydrationFaultInjectionTest.testNoSpaceInGCRehydration",
+      "status": "New",
+      "build_version": "sdb.260",
+      "created_date": "2025-08-21",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19364382",
+      "team": "SDBStore",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-WS-schemaupgrade-stress-RHEL9.schemaupgrade-stress: Exception: error executing teardown sayonaradb.test",
+      "status": "In Progress",
+      "build_version": "sdb.260",
+      "created_date": "2025-08-18",
+      "issue_type": "CI"
+    }
+  ],
+  "leftshift_issues": [
+    {
+      "work_id": "W-19399167",
+      "team": "SDB Production Readiness",
+      "priority": "P2",
+      "subject": "SDBFalcon - core/sdb33s - dbschema 258/postscripts failed after running for 20 hours",
+      "status": "New",
+      "build_version": "sdb.260",
+      "created_date": "2025-10-02",
+      "issue_type": "LeftShift"
+    }
+  ],
+  "abs_issues": [
+    {
+      "work_id": "W-19399167",
+      "team": "SDB Production Readiness",
+      "priority": "P2",
+      "subject": "SDBFalcon - core/sdb33s - dbschema 258/postscripts failed after running for 20 hours",
+      "status": "New",
+      "build_version": "sdb.260",
+      "created_date": "2025-10-02",
+      "issue_type": "ABS"
+    }
+  ],
+  "security_issues": [
+    {
+      "id": "W-14324477",
+      "title": "ARRAY_VS_SINGLETON - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/contrib/pgvector/src/ivfinsert.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Anup Ghatage",
+      "build_version": "sdb.248.25",
+      "description": "ARRAY_VS_SINGLETON - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/contrib/pgvector/src/ivfinsert.c (1 issues)",
+      "type": "security",
+      "issue_category": "Array vs Singleton"
+    },
+    {
+      "id": "W-14324465",
+      "title": "ARRAY_VS_SINGLETON - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/contrib/pgvector/src/ivfbuild.c (2 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Anup Ghatage",
+      "build_version": "sdb.248.25",
+      "description": "ARRAY_VS_SINGLETON - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/contrib/pgvector/src/ivfbuild.c (2 issues)",
+      "type": "security",
+      "issue_category": "Array vs Singleton"
+    },
+    {
+      "id": "W-14324481",
+      "title": "OVERRUN - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/src/backend/access/common/lsmkey.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Shalini Shukla",
+      "build_version": "sdb.248.25",
+      "description": "OVERRUN - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/src/backend/access/common/lsmkey.c (1 issues)",
+      "type": "security",
+      "issue_category": "Buffer Overrun"
+    },
+    {
+      "id": "W-17618488",
+      "title": "RESOURCE_LEAK - /src/bin/psql/startup.c (3 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "RESOURCE_LEAK - /src/bin/psql/startup.c (3 issues)",
+      "type": "security",
+      "issue_category": "Resource Leak"
+    },
+    {
+      "id": "W-17618489",
+      "title": "RESOURCE_LEAK - /src/bin/pg_basebackup/pg_receivewal.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "RESOURCE_LEAK - /src/bin/pg_basebackup/pg_receivewal.c (1 issues)",
+      "type": "security",
+      "issue_category": "Resource Leak"
+    },
+    {
+      "id": "W-17618495",
+      "title": "USE_AFTER_FREE - /src/backend/utils/mmgr/aset.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "USE_AFTER_FREE - /src/backend/utils/mmgr/aset.c (1 issues)",
+      "type": "security",
+      "issue_category": "Use After Free"
+    },
+    {
+      "id": "W-17618485",
+      "title": "RESOURCE_LEAK - /src/bin/psql/describe.c (2 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "RESOURCE_LEAK - /src/bin/psql/describe.c (2 issues)",
+      "type": "security",
+      "issue_category": "Resource Leak"
+    },
+    {
+      "id": "W-17618497",
+      "title": "RESOURCE_LEAK - /src/bin/pg_basebackup/pg_basebackup.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "RESOURCE_LEAK - /src/bin/pg_basebackup/pg_basebackup.c (1 issues)",
+      "type": "security",
+      "issue_category": "Resource Leak"
+    },
+    {
+      "id": "W-19112938",
+      "title": "RESOURCE_LEAK - /src/bin/pg_dump/dumputils.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "RESOURCE_LEAK - /src/bin/pg_dump/dumputils.c (1 issues)",
+      "type": "security",
+      "issue_category": "Resource Leak"
+    },
+    {
+      "id": "W-19112935",
+      "title": "NO_EFFECT - /src/backend/optimizer/plan/planner.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "NO_EFFECT - /src/backend/optimizer/plan/planner.c (1 issues)",
+      "type": "security",
+      "issue_category": "No Effect"
+    },
+    {
+      "id": "W-19112939",
+      "title": "NO_EFFECT - /src/backend/executor/nodeResult.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "NO_EFFECT - /src/backend/executor/nodeResult.c (1 issues)",
+      "type": "security",
+      "issue_category": "No Effect"
+    },
+    {
+      "id": "W-19112936",
+      "title": "UNINIT - /src/bin/zktool/zktool.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "UNINIT - /src/bin/zktool/zktool.c (1 issues)",
+      "type": "security",
+      "issue_category": "Uninitialized Variable"
+    },
+    {
+      "id": "W-19139597",
+      "title": "OVERRUN - /src/backend/utils/adt/correlationid.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "OVERRUN - /src/backend/utils/adt/correlationid.c (1 issues)",
+      "type": "security",
+      "issue_category": "Buffer Overrun"
+    },
+    {
+      "id": "W-19647997",
+      "title": "OVERRUN - /src/backend/utils/adt/jsonpath_gram.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "OVERRUN - /src/backend/utils/adt/jsonpath_gram.c (1 issues)",
+      "type": "security",
+      "issue_category": "Buffer Overrun"
+    },
+    {
+      "id": "W-19647996",
+      "title": "UNINIT - /src/backend/utils/adt/jsonpath_gram.c (2 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "UNINIT - /src/backend/utils/adt/jsonpath_gram.c (2 issues)",
+      "type": "security",
+      "issue_category": "Uninitialized Variable"
+    },
+    {
+      "id": "W-19647998",
+      "title": "ARRAY_VS_SINGLETON - /src/backend/utils/adt/jsonpath_gram.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "ARRAY_VS_SINGLETON - /src/backend/utils/adt/jsonpath_gram.c (1 issues)",
+      "type": "security",
+      "issue_category": "Array vs Singleton"
+    },
+    {
+      "id": "W-13140867",
+      "title": "OVERRUN - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/src/backend/replication/pg_workflow_extra.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara TxP",
+      "assignee": "Kaushal Mittal",
+      "build_version": "sdb.246.9",
+      "description": "OVERRUN - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/src/backend/replication/pg_workflow_extra.c (1 issues)",
+      "type": "security",
+      "issue_category": "Buffer Overrun"
+    }
+  ],
+  "git_stats": {
+    "reporting_period_start": "2025-09-22",
+    "reporting_period_end": "2025-09-28",
+    "total_commits": 31,
+    "lines_added": 27805,
+    "lines_deleted": 11742,
+    "lines_changed": 39547,
+    "files_changed": 197,
+    "authors": [
+      "Ankit Sharma",
+      "Atish Agrawal",
+      "Audrey Fang",
+      "Dhanashree Kashid",
+      "James Taylor",
+      "Julian Hsiao",
+      "Jurgen Bergmann",
+      "Marc Benstein",
+      "Mark Sirek",
+      "Matt Woicik",
+      "Mayank Surya",
+      "Michael Abebe",
+      "Muthukumaran Raveendiran",
+      "Rui Zhang",
+      "Sagar Ranadive",
+      "Shao Yuan Ho",
+      "Shao-Yuan Ho",
+      "Shrikant Salunke",
+      "Suhas Dantkale",
+      "Terry Chong",
+      "tok-sfci124",
+      "Vaibhav Arora"
+    ],
+    "most_changed_files": [
+      {
+        "file": "postgresql/src/test/regress/expected/jsonb_jsonpath.out",
+        "lines_added": 7658,
+        "lines_deleted": 3829,
+        "total_changes": 11487
+      },
+      {
+        "file": "postgresql/src/backend/utils/adt/jsonpath_exec.c",
+        "lines_added": 5586,
+        "lines_deleted": 2793,
+        "total_changes": 8379
+      },
+      {
+        "file": "postgresql/src/test/regress/expected/jsonpath_multitenant.out",
+        "lines_added": 2340,
+        "lines_deleted": 1170,
+        "total_changes": 3510
+      },
+      {
+        "file": "postgresql/src/test/regress/sql/jsonb_jsonpath.sql",
+        "lines_added": 2306,
+        "lines_deleted": 1153,
+        "total_changes": 3459
+      },
+      {
+        "file": "postgresql/src/test/regress/sql/jsonpath_multitenant.sql",
+        "lines_added": 1738,
+        "lines_deleted": 869,
+        "total_changes": 2607
+      },
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/server/monitor/ws/WSActivityStatementHistorySASHRemoteTest.java",
+        "lines_added": 1039,
+        "lines_deleted": 0,
+        "total_changes": 1039
+      },
+      {
+        "file": "postgresql/src/backend/memstore/test/memstore_test.c",
+        "lines_added": 861,
+        "lines_deleted": 17,
+        "total_changes": 878
+      },
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/server/monitor/ActivityStatementHistoryTest.java",
+        "lines_added": 537,
+        "lines_deleted": 2,
+        "total_changes": 539
+      },
+      {
+        "file": "postgresql/src/backend/utils/adt/jsonb_util.c",
+        "lines_added": 315,
+        "lines_deleted": 213,
+        "total_changes": 528
+      },
+      {
+        "file": "postgresql/src/backend/utils/adt/jsonb.c",
+        "lines_added": 268,
+        "lines_deleted": 197,
+        "total_changes": 465
+      }
+    ],
+    "commit_frequency": 4.428571428571429,
+    "code_churn_risk": "High"
+  },
+  "generated_at": "2025-10-02T08:25:58.379233",
+  "coverage_summary": {
+    "new_code": {
+      "coverage": 82.3,
+      "line_coverage": 94.9,
+      "condition_coverage": 69.0,
+      "lines_to_cover": 7294,
+      "uncovered_lines": 375,
+      "conditions_to_cover": 6925,
+      "uncovered_conditions": 2146
+    },
+    "overall": {
+      "coverage": 67.9,
+      "line_coverage": 80.8,
+      "condition_coverage": 53.1,
+      "lines_to_cover": 545616,
+      "uncovered_lines": 104773,
+      "conditions_to_cover": 473067,
+      "uncovered_conditions": 221943
+    }
+  },
+  "metadata": {
+    "generated_at": "2025-10-02T08:26:40.440224",
+    "report_period_start": "2025-09-22",
+    "report_period_end": "2025-09-28",
+    "report_period_display": "September 22-28, 2025",
+    "generator_version": "2.0",
+    "data_sources": {
+      "risks": 4,
+      "prbs": 1,
+      "bugs": 20,
+      "deployments": 18,
+      "has_llm_content": true,
+      "ci_total": 26,
+      "ci_p0_p1": 1,
+      "security_total": 17,
+      "security_p0_p1": 0,
+      "leftshift_total": 1,
+      "leftshift_p0_p1": 0,
+      "coverage_overall": 67.9,
+      "coverage_overall_line": 80.8,
+      "coverage_new_code": 82.3,
+      "coverage_new_code_line": 94.9
+    }
+  },
+  "llm_content": {
+    "trend_analysis": "## Quality Trends Analysis\n\n### Overall System Health: **MODERATE** \u26a0\ufe0f\n\n**Key Observations:**\n\n**Positive Indicators:**\n- **Zero security vulnerabilities** - Excellent security posture maintained\n- **Low PRB count (1)** - Suggests stable production environment with minimal critical issues\n- **Manageable risk profile (4)** - Risk exposure appears controlled\n\n**Areas of Concern:**\n- **Elevated bug count (20)** - This is the primary quality concern requiring attention\n- **Bug-to-PRB ratio (20:1)** - High ratio suggests effective issue containment before production impact\n\n### Trend Implications:\n\n1. **Development Quality**: The high bug count indicates potential gaps in upstream quality processes (code reviews, testing coverage, or requirements clarity)\n\n2. **Production Stability**: Despite high bug volume, only 1 PRB suggests good release gating and testing effectiveness\n\n3. **Security Maturity**: Zero security issues demonstrates strong security practices and tooling\n\n### Recommendations:\n- **Immediate**: Focus on root cause analysis of the 20 bugs to identify systemic issues\n- **Short-term**: Enhance pre-production testing and code quality gates\n- **Monitor**: Track bug resolution velocity and recurrence patterns\n\n**Overall Assessment**: System shows good production stability and security hygiene, but development quality processes need strengthening to reduce defect injection rates.",
+    "risk_analysis": "### Deployment Risk Assessment - SDB Version 258.11\n\n#### Executive Summary\n\nThe deployment of SDB version 258.11 to sandbox environments demonstrates strong stability indicators with zero failures across 150 cells. However, the upcoming production rollout requires careful consideration of several risk factors before proceeding.\n\n#### Deployment Stability Analysis\n\n##### Positive Indicators\n- **Perfect Success Rate**: 0% failure rate across all 150 sandbox deployments indicates robust deployment automation and package integrity\n- **Consistent Performance**: 12-minute average deployment time suggests predictable and well-optimized deployment processes\n- **Validation Success**: All post-deployment validations passed, indicating functional integrity post-deployment\n\n##### Risk Factors\n- **Limited Environment Coverage**: Testing confined to sandbox environments (SB0-SB2) may not fully represent production workload patterns\n- **Scale Differential**: Production environments (P0-P3) likely have different scale, traffic patterns, and integration complexity than sandbox\n- **Validation Scope**: Unknown depth and coverage of post-deployment validations\n\n#### Code Change Impact Assessment\n\n##### Missing Critical Information\n- **Change Scope**: No visibility into specific code changes, feature additions, or bug fixes in version 258.11\n- **Dependency Analysis**: Unclear if changes affect external integrations or downstream systems\n- **Rollback Complexity**: No assessment of rollback procedures or time requirements\n\n##### Recommended Risk Mitigation\n\n###### Pre-Production Validation\n- Conduct performance testing under production-like load conditions\n- Verify all critical business workflows in staging environment\n- Validate monitoring and alerting systems detect potential issues\n\n###### Production Rollout Strategy\n- Implement gradual rollout starting with P0 (lowest risk production stage)\n- Establish clear success criteria and rollback triggers\n- Ensure 24/7 support coverage during initial production deployment\n\n#### Risk Rating: **MEDIUM**\n\nWhile sandbox deployment success is encouraging, the lack of detailed change information and limited pre-production validation creates moderate risk for production rollout. Recommend proceeding with enhanced monitoring and staged deployment approach.",
+    "prb_narratives": {
+      "PRB-0028802": "**Problem Type:** Incomplete problem report with insufficient technical details to determine the specific performance degradation issue.\n\n**Root Cause:** Cannot be determined due to missing proximate cause analysis and technical details in the problem report.\n\n**Resolution:** Cannot be determined as the resolution field is empty and no technical fix details are provided.\n\n**Next Steps:** User story W-19769379 was created to capture outbound request details for further investigation and analysis."
+    },
+    "prb_analyses": {
+      "PRB-0028802": "# Technical Analysis Report: PRB-0028802\n\n## **Technical Impact**\n\n**Severity Assessment:** Medium Priority (P2)\n- **Service Degradation:** General performance degradation affecting cloud infrastructure services\n- **User Experience Impact:** Potential latency increases, slower response times, and reduced system throughput\n- **Business Continuity Risk:** Moderate - while not critical, sustained performance issues can escalate to service availability concerns\n- **Scope of Impact:** Cloud team services and dependent downstream systems\n- **Monitoring Indicators:** Likely elevated response times, increased resource utilization, and potential SLA threshold breaches\n\n**Key Technical Concerns:**\n- Performance metrics trending below acceptable baselines\n- Potential cascading effects on dependent microservices\n- Resource contention or inefficient resource allocation\n- Network or infrastructure bottlenecks affecting overall system performance\n\n## **Root Cause Analysis**\n\n**Primary Investigation Areas:**\nGiven the limited diagnostic information, the root cause analysis focuses on common performance degradation patterns:\n\n1. **Outbound Request Bottlenecks** (Referenced in next steps)\n   - High latency in external API calls\n   - Connection pool exhaustion\n   - DNS resolution delays\n   - Third-party service dependencies performing poorly\n\n2. **Infrastructure-Level Issues**\n   - CPU/Memory resource constraints\n   - Network bandwidth limitations\n   - Storage I/O bottlenecks\n   - Load balancer configuration inefficiencies\n\n3. **Application-Level Performance Issues**\n   - Inefficient database queries\n   - Memory leaks or garbage collection pressure\n   - Caching layer degradation\n   - Code-level performance regressions\n\n**Technical Root Cause Hypothesis:**\nBased on the creation of user story W-19769379 focusing on \"outbound request details,\" the primary root cause likely involves:\n- **External dependency performance issues**\n- **Inefficient outbound request patterns**\n- **Lack of proper request monitoring and optimization**\n\n## **Resolution Applied**\n\n**Immediate Actions Taken:**\n1. **Diagnostic Enhancement Initiative**\n   - Created user story W-19769379 to implement comprehensive outbound request monitoring\n   - Established detailed logging and metrics collection for external API calls\n   - Implemented request tracing to identify performance bottlenecks\n\n**Technical Resolution Strategy:**\n- **Monitoring Implementation:** Deploy enhanced observability tools to capture outbound request metrics including:\n  - Request latency distribution\n  - Error rates and retry patterns\n  - Connection pool utilization\n  - Dependency service health status\n\n- **Performance Optimization Pipeline:**\n  - Implement request timeout optimization\n  - Configure appropriate circuit breaker patterns\n  - Establish connection pooling best practices\n  - Deploy caching strategies for frequently accessed external resources\n\n## **Preventive Measures**\n\n**1. Proactive Monitoring Framework**\n- **SLI/SLO Definition:** Establish clear Service Level Indicators for outbound request performance\n- **Alerting Strategy:** Implement graduated alerting thresholds (warning at 80% SLO, critical at 95% SLO breach)\n- **Dashboard Implementation:** Create real-time performance dashboards for cloud team visibility\n\n**2. Architecture Resilience Enhancements**\n- **Circuit Breaker Implementation:** Deploy circuit breakers for all external dependencies\n- **Retry Logic Optimization:** Implement exponential backoff with jitter for failed requests\n- **Bulkhead Pattern:** Isolate critical and non-critical outbound requests using separate connection pools\n- **Timeout Configuration:** Establish appropriate timeout values based on dependency SLAs\n\n**3. Performance Testing Integration**\n- **Load Testing:** Regular performance testing of outbound request patterns under various load conditions\n- **Chaos Engineering:** Implement fault injection testing for external dependency failures\n- **Capacity Planning:** Establish baseline performance metrics and capacity growth projections\n\n**4. Operational Excellence Practices**\n- **Runbook Development:** Create detailed troubleshooting guides for performance degradation scenarios\n- **Regular Performance Reviews:** Monthly performance analysis meetings with trend analysis\n- **Dependency Health Monitoring:** Implement automated health checks for all external dependencies\n- **Performance Budget Enforcement:** Establish and enforce performance budgets for new feature deployments\n\n**5. Technical Debt Management**\n- **Code Review Standards:** Implement performance-focused code review guidelines\n- **Regular Performance Audits:** Quarterly deep-dive performance analysis and optimization cycles\n- **Dependency Management:** Regular evaluation and optimization of external dependencies\n\n**Recommended Timeline:**"
+    }
+  }
+}

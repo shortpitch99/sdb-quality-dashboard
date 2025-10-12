@@ -32,7 +32,7 @@ env/
 .venv
 
 # Reports and generated files
-reports/
+# reports/ - Allow sample reports to be committed
 *.log
 # quality_data_archive_*.json
 quality_report_*.md
