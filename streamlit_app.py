@@ -11,6 +11,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 import glob
 from typing import Dict, List, Any, Optional
@@ -2288,10 +2289,8 @@ class QualityReportDashboard:
         score_cols = ['Feature Rollout Risk', 'Sev 0/1 PRBs', 'P0/P1 Production Bugs', 
                      'P0/P1 CI Issues', 'P0/P1 Security Issues', 'P0/P1 Left Shift']
         
-        st.subheader("📈 Week-over-Week Quality Trends")
         
         # Create dual-axis chart
-        from plotly.subplots import make_subplots
         fig = make_subplots(specs=[[{"secondary_y": True}]])
 
         # Define colors for each metric
@@ -3082,6 +3081,16 @@ def render_component_dashboard(component: str):
         
         # Create metrics dashboard
         dashboard.create_metrics_dashboard(data)
+        
+        # Weekly Trends Analysis (right after KPI metrics)
+        st.markdown("---")
+        st.markdown("### 📊 Weekly Trends")
+        component_reports = dashboard.get_component_reports(component)
+        if len(component_reports) > 1:
+            st.markdown("#### Week-over-Week KPI Trends")
+            dashboard.create_weekly_trends(component_reports)
+        else:
+            st.info("📈 Weekly trends require multiple reports. Generate more reports to see trend analysis.")
         
         st.markdown("---")
         
