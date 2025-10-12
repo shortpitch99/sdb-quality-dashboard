@@ -1,7 +1,15 @@
 #!/bin/bash
 
 # SDB Quality Report Generator
-# This script generates a comprehensive quality report for the SDB Engine
+# This script generates a comprehensive quality report for SDB components
+#
+# Usage: ./run_report.sh [week] [component]
+# Examples:
+#   ./run_report.sh cw40 Engine
+#   ./run_report.sh cw40 Store
+#   ./run_report.sh cw40 Archival
+#
+# Components: Engine, Store, Archival, SDD, msSDB, "Core App Efficiency"
 #
 # DATA SOURCE URLs - ALL CONFIRMED:
 # - PRB Report:    https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE000001TXjB2AW
@@ -12,7 +20,31 @@
 # - Security:      https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=lightningdashboard&wave__assetId=01ZEE000001BaVp2AK
 # - SonarQube:     https://sonarqube.sfcq.buildndeliver-s.aws-esvc1-useast2.aws.sfdc.cl/component_measures?id=sayonara.sayonaradb.sdb&metric=uncovered_lines&view=list
 
+# Parse arguments
+WEEK="$1"
+COMPONENT="$2"
+
+# Check if both parameters are provided
+if [ -z "$WEEK" ] || [ -z "$COMPONENT" ]; then
+    echo "❌ Error: Both week and component parameters are required"
+    echo ""
+    echo "Usage: $0 <week> <component>"
+    echo ""
+    echo "Examples:"
+    echo "  $0 cw40 Engine"
+    echo "  $0 cw40 Store"
+    echo "  $0 cw40 Archival"
+    echo "  $0 cw40 SDD"
+    echo "  $0 cw40 msSDB"
+    echo "  $0 cw40 \"Core App Efficiency\""
+    echo ""
+    echo "Available components: Engine, Store, Archival, SDD, msSDB, Core App Efficiency"
+    exit 1
+fi
+
 echo "🚀 Starting SDB Quality Report Generation..."
+echo "📅 Week: $WEEK"
+echo "📊 Component: $COMPONENT"
 echo "==============================================="
 
 # Check if virtual environment exists
@@ -32,14 +64,9 @@ echo "🔍 Checking required data files..."
 
 missing_files=()
 
-# Determine data directory based on week parameter
-if [ "$1" ]; then
-    data_dir="weeks/$1"
-    echo "📂 Looking for data files in: $data_dir/"
-else
-    data_dir="."
-    echo "📂 Looking for data files in current directory"
-fi
+# Determine data directory based on week and component parameters
+data_dir="weeks/$WEEK/$COMPONENT"
+echo "📂 Looking for data files in: $data_dir/"
 
 if [ ! -f "$data_dir/risks.txt" ]; then
     missing_files+=("risks.txt")
@@ -115,44 +142,29 @@ echo "📁 Archiving functionality enabled - previous reports preserved"
 # Generate the quality report
 echo "📊 Generating comprehensive quality report..."
 
-# Check if week argument is provided
-if [ "$1" ]; then
-    echo "📅 Using calendar week: $1"
-    python3 quality_report_generator.py \
-      --week $1 \
-      --git-repo-path /Users/rchowdhuri/SDB \
-      --report-type comprehensive \
-      --skip-confirmation
-else
-    # Default behavior - use current directory files
-    python3 quality_report_generator.py \
-      --risk-file risks.txt \
-      --prb-file prb.txt \
-      --bugs-file bugs.txt \
-      --deployment-csv deployment.csv \
-      --coverage-txt coverage.txt \
-      --ci-file ci.txt \
-      --leftshift-file leftshift.txt \
-      --abs-file abs.txt \
-      --security-file security.txt \
-      --git-repo-path /Users/rchowdhuri/SDB \
-      --report-type comprehensive \
-      --skip-confirmation
-fi
+# Generate report with mandatory week and component parameters
+echo "📅 Using calendar week: $WEEK"
+echo "🔧 Using component: $COMPONENT"
+python3 quality_report_generator.py \
+  --week "$WEEK" \
+  --component "$COMPONENT" \
+  --git-repo-path /Users/rchowdhuri/SDB \
+  --report-type comprehensive \
+  --skip-confirmation
 
 if [ $? -eq 0 ]; then
     echo ""
     echo "✅ Quality report generated successfully!"
-    echo "📁 Reports available in: ./reports/"
+    echo "📁 Reports available in: ./reports/$COMPONENT/"
     echo ""
     echo "🌐 To view in dashboard, run: ./run_dashboard.sh"
     echo ""
     
-    # Show the latest report file
-    latest_report=$(ls -t reports/*.md 2>/dev/null | head -1)
+    # Show the latest report file for this component
+    latest_report=$(ls -t reports/$COMPONENT/*.json 2>/dev/null | head -1)
     if [ -n "$latest_report" ]; then
         echo "📄 Latest report: $latest_report"
-        echo "📏 Report size: $(wc -l < "$latest_report") lines"
+        echo "📏 Report size: $(wc -c < "$latest_report") bytes"
     fi
 else
     echo ""

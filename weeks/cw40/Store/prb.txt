@@ -1,0 +1,216 @@
+Created Date Time Select all rows for Drill Down.
+Created Date Time
+Sorted by Created Date Time, oldest-to-newestAscending
+Problem Priority
+Sorted by Problem Priority, ascending picklist orderAscending
+Problem Number
+Sorted by Problem Number, A-to-ZAscending
+Select row for Drill Down.
+9/28/2025 - 10/4/2025(7)
+P1(3)
+PRB-0028895(1)
+PRB-0028911(1)
+PRB-0028938(1)
+P2(4)
+PRB-0028883(1)
+PRB-0028893(1)
+PRB-0028909(1)
+PRB-0028942(1)
+Created Date Time
+Sorted by Created Date Time, oldest-to-newestAscending
+Problem Priority
+Sorted by Problem Priority, ascending picklist orderAscending
+Problem Number
+Sorted by Problem Number, A-to-ZAscending
+Team: Team Name
+Cloud
+Problem State
+Customer Impact
+External RCA Requested
+Problem Description
+Repeat Incident
+Created Date
+Initial Work Issue: Work ID
+Customer Experience
+What Happened?
+Proximate Cause (Why did it happen)?
+How did we find out about the issue?
+How was it Resolved?
+Root Cause
+Next Steps
+Retro Summary
+Owner: Full Name
+9/28/2025 - 10/4/2025(7)
+P1(3)
+PRB-0028895(1)
+Sayonara Data Management
+SDB
+Under Investigation
+Performance degradation (general)
+feature not included
+PRB Retrospective | SEV-1 | 09/30/2025 | JPN182S Performance Degradation
+
+[THIS PRB IS MANAGED BY QUIP2GUS]
+feature not included
+9/29/2025
+W-19779110
+User Experience: The incident caused performance degradation, particularly impacting asynchronous processes. Users experienced delays in functionalities such as Web-to-Case and Email-to-Case, with potential disruptions in dashboard refreshes. The service...
+[THIS PRB IS MANAGED BY QUIP2GUS]
+Any updates made in GUS will be overwritten! Update Quip doc: https://salesforce.quip.com/sLRHAig9D0tp
+​
+On September 30, 2025, the JPN182s cell experienced significant performance degradation due
+The primary cause of the incident was identified as the memstore becoming full on the JPN182s cell. This led to the suspension of message queues and affected the cell's ability to process asynchronous tasks efficiently, resulting in overall performance
+NA
+Immediate actions included flushing the memstore and suspending sandbox copies to alleviate the load on JPN182s. The CDSE team also disabled the quick copy feature and halted ongoing mergers to facilitate the memstore flush. These actions were executed i
+-
+TBD - Fill out CARs table in Quip
+Proximate Cause: The primary cause of the incident was identified as the memstore becoming full on the JPN182s cell. This led to the suspension of message queues and affected the cells ability to process asynchronous tasks efficiently, resulting in overa
+Site Reliability
+PRB-0028911(1)
+Sayonara Data Management
+SDB
+Closed
+-
+feature not included
+PRB Retrospective | SEV-1 | 10/01/2025 | jpn182s coreapp disruption and high APTs
+
+[THIS PRB IS MANAGED BY QUIP2GUS]
+feature not included
+10/1/2025
+-
+User Experience: Salesforce instance would be unavailable during the service disruption. | Impact Quantification: Q: What #/% of users/customers/requests got impacted (aggregated across all infra units)?. A: .
+[THIS PRB IS MANAGED BY QUIP2GUS]
+Any updates made in GUS will be overwritten! Update Quip doc: https://salesforce.quip.com/Nr1eAZrEryJy
+​
+- SR responded to a kaiju alert noting low avail/alive-ping on the core-app for this sandbo
+The incident was primarily caused by Out of Memory errors on the core application servers, which led to instances going down. This, combined with an increased customer activity, overwhelmed the application, causing high APTs and intermittent service disr...
+https://salesforce.pagerduty.com/incidents/Q3VR30AB8GK9LU?utm_campaign=channel&utm_source=slack
+The immediate resolution involved the autoscaling mechanism automatically increasing the application instances from 6 to 9, which temporarily improved performance. Additionally, the CSP automated actions managed to reduce high DBCPU levels, stabilizing t
+-
+TBD - Fill out CARs table in Quip
+Proximate Cause: The incident was primarily caused by Out of Memory errors on the core application servers, which led to instances going down. This, combined with an increased customer activity, overwhelmed the application, causing high APTs and intermit
+Site Reliability
+PRB-0028938(1)
+Core Database Performance
+SDB
+Closed
+Performance degradation (general)
+feature not included
+PRB Retrospective | SEV-1 | 10/03/2025 | JPN182s Slowness
+
+[THIS PRB IS MANAGED BY QUIP2GUS]
+feature not included
+10/3/2025
+-
+User Experience: The incident resulted in performance degradation, specifically characterised by intermittent spikes in service response times due to asynchronous MQ jobs. Customers experienced delays and slowness, impacting their ability to efficiently ...
+[THIS PRB IS MANAGED BY QUIP2GUS]
+Any updates made in GUS will be overwritten! Update Quip doc: https://salesforce.quip.com/s2MIAcYbiqES
+​
+https://moncloud-grafana.internal.salesforce.com/d/SN6N5HNGz/mq-monitoring-dashboard-falcon
+The main contributing factor of the incident was identified as long-running MQ jobs from a customer Org, leading to performance degradation. This issue has been recurrent, with similar incidents in the past month. The jobs caused increased database wait ...
+https://salesforce-internal.slack.com/archives/CDQ3U66E5/p1759456646437379
+The immediate resolution involved suspending the long-running SOLR_VERSIONING_LUIGI_INDEXING_BATCH indexing MQ job impacting the JPN182s environment. This suspension led to an improvement in performance metrics. Additionally, app server capacity was temp
+-
+TBD - Fill out CARs table in Quip
+Proximate Cause: The main contributing factor of the incident was identified as long-running MQ jobs from a customer Org, leading to performance degradation. This issue has been recurrent, with similar incidents in the past month. The jobs caused increas
+Jeremy Miller
+P2(4)
+PRB-0028883(1)
+Core Database Performance
+SDB
+Under Investigation
+-
+feature not included
+PRB Retrospective | SEV-2 | 09/29/2025 | Sherlock_APT Degradation Alert for Falcon_Instance : AWS-PROD2-APSOUTH1, Functional_Domain: core1, Cell: ind90, Orgs_Impacted: Single_Org_Cell
+
+[THIS PRB IS MANAGED BY QUIP2GUS]
+feature not included
+9/28/2025
+W-19766820
+User Experience: Users experienced performance degradation while accessing services in the ind90 pod. Some functionalities were running at less than optimal performance, resulting in slow response times and potential timeouts. This impacted user workflow...
+[THIS PRB IS MANAGED BY QUIP2GUS]
+Any updates made in GUS will be overwritten! Update Quip doc: https://salesforce.quip.com/8KqcA4HfTqjK
+​
+On September 29, 2025, an incident was detected involving high Average Page Time (APT) in t
+The proximate cause of the incident was identified as a specific customer activity involving a wildcard search query that led to high CPU utilization and increased APT. This was exacerbated by an app release that coincided with the performance degradatio...
+https://salesforce.pagerduty.com/incidents/Q29QGYNGNJPGWR
+Immediate communication with the customer was initiated to mitigate the impact. The customer was advised to modify their query to reduce the load on the database. Monitoring of affected applications was intensified to detect any further anomalies.
+​
+-
+TBD - Fill out CARs table in Quip
+Proximate Cause: The proximate cause of the incident was identified as a specific customer activity involving a wildcard search query that led to high CPU utilization and increased APT. This was exacerbated by an app release that coincided with the perfo
+Site Reliability
+PRB-0028893(1)
+SDB App Efficiency (formerly Sayonara Porting)
+SDB
+New
+Performance degradation (internal service impact)
+feature not included
+Performance optimization changes in CL-45630581 (W-15336143) added predicates to exploit partial indexes on core.standard_entity_data table in the cObjectRelatedUrl.sql module. However, QDS team dropped these partial indexes (IESTANDARD_ENTITY_DATA_S1_S ...
+feature not included
+9/29/2025
+W-19719152
+This issue was identified during 258 release rollout before widespread customer impact.
+During release 258.15 to fix a performance degradation(W-15336143), a query /*cObjectRelatedUrl.sql(393662e):get_url_names:17*/  was optimized to exploit partial indexes on core.standard_entity_data by adding the predicate AND LENGTH(oru.paren
+Performance regression from index deprecation by QDS team which were added in previous releases to fix performance issue.
+-
+The fix involved reverting the optimization changes from W-15336143 and implementing a better approach: Changes made in  cObjectRelatedUrl.sql : Added VIA FOREIGN KEY clause : Added VIA
+The root cause of the issue was
+-
+-
+Merry Parshaniya
+PRB-0028909(1)
+dbAPS (Database Automated Patching Service)
+SDB
+Analysis Complete
+-
+feature not included
+PRB Retrospective | SEV-2 | 10/01/2025 | Customers unable to run test classes
+
+[THIS PRB IS MANAGED BY QUIP2GUS]
+feature not included
+10/1/2025
+W-19794617
+User Experience: Customers were unable to perform certain operations such as: record creation, deployment error, and user detail page access errors. | Impact Quantification: Q: What #/% of users/customers/requests got impacted (aggregated across all inf...
+[THIS PRB IS MANAGED BY QUIP2GUS]
+Any updates made in GUS will be overwritten! Update Quip doc: https://salesforce.quip.com/YMoPAaAqaE6C
+​
+- While triaging CAPE and CDSE identified few DB packages being invalid causing the issue.
+Caused after Change case was deployed to cs237 and cs239: https://gus.lightning.force.com/lightning/r/Case/500EE00001cToSrYAK/view.
+https://salesforce-internal.slack.com/archives/CDQ3U66E5/p1759326852000619
+Recreated the following objects in CS237 and CS239 which were in invalid state after database catalog update. DBMS_WORKLOAD_CAPTURE" "DBMS_WORKLOAD_CAPTURE_I" "DBMS_WORKLOAD_REPLAY" "DBMS_WORKLOAD_REPLAY_I" "DBMS_W
+1)  5 sys level objects went invalid during the application of the 19.25 catbundle. It appears that this occurred because of undetected failures in prior catbundle runs..
+TBD - Fill out CARs table in Quip
+Proximate Cause: Caused after Change case was deployed to cs237 and cs239: https://gus.lightning.force.com/lightning/r/Case/500EE00001cToSrYAK/view.
+​
+Key Questions for Retro (enter as Problem Statements below): 
+​
+Q: - Was there no verificat
+Site Reliability
+PRB-0028942(1)
+Core Database Performance
+SDB
+Under Investigation
+Performance degradation (general)
+feature not included
+PRB Retrospective | SEV-2 | 10/03/2025 | Sherlock_APT Degradation Alert for Falcon_Instance : AWS-PROD1-USEAST1, Functional_Domain: core1, Cell: usa1038, Orgs_Impacted: Single_Org_Cell
+
+[THIS PRB IS MANAGED BY QUIP2GUS]
+feature not included
+10/3/2025
+W-19813852
+User Experience: The incident resulted in performance degradation, with users experiencing intermittent slow performance and potential timeouts. The service remained accessible, but functionality was impaired due to the high APT.. | Impact Quantificatio...
+[THIS PRB IS MANAGED BY QUIP2GUS]
+Any updates made in GUS will be overwritten! Update Quip doc: https://salesforce.quip.com/CDmkAbosdLp6
+​
+Sherlock detected an APT Incident for Cell: usa1038, FI: AWS-PROD1-USEAST1. On October 3,
+The exact root cause of the incident remains unknown. However, high DB CPU usage, which exceeded the 90% threshold, likely contributed to the APT spike. This was observed across three nodes, indicating potential query optimization needs.
+https://salesforce.pagerduty.com/incidents/Q1I3S56G5YAX92
+The incident self-resolved, with no manual interventions required. Continuous monitoring was suggested to maintain system stability. A throttle rule was implemented for seven days to manage DB CPU spikes.
+​
+Q: Explain in detail the Time to Fix (i.e
+-
+TBD - Fill out CARs table in Quip
+Proximate Cause: The exact root cause of the incident remains unknown. However, high DB CPU usage, which exceeded the 90% threshold, likely contributed to the APT spike. This was observed across three nodes, indicating potential query optimization needs.
+Site Reliability
+

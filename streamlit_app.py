@@ -178,6 +178,42 @@ class QualityReportDashboard:
         report_files.sort(key=lambda x: x['date'], reverse=True)
         return report_files
     
+    def get_component_reports(self, component: str) -> List[Dict[str, Any]]:
+        """Get reports for a specific component."""
+        component_reports = []
+        component_dir = os.path.join(self.reports_dir, component)
+        
+        if not os.path.exists(component_dir):
+            return component_reports
+        
+        try:
+            for filename in os.listdir(component_dir):
+                if filename.startswith('quality_data_archive_') and filename.endswith('.json'):
+                    file_path = os.path.join(component_dir, filename)
+                    
+                    # Extract timestamp from filename
+                    timestamp_match = re.search(r'quality_data_archive_(\d{8}_\d{6})\.json', filename)
+                    if timestamp_match:
+                        timestamp_str = timestamp_match.group(1)
+                        try:
+                            timestamp = datetime.strptime(timestamp_str, '%Y%m%d_%H%M%S')
+                            
+                            component_reports.append({
+                                'filename': filename,
+                                'path': file_path,
+                                'timestamp': timestamp,
+                                'component': component,
+                                'size': os.path.getsize(file_path)
+                            })
+                        except ValueError:
+                            continue
+        except Exception as e:
+            st.error(f"Error reading component reports: {e}")
+        
+        # Sort by timestamp (newest first)
+        component_reports.sort(key=lambda x: x['timestamp'], reverse=True)
+        return component_reports
+    
     def parse_ci_data(self) -> List[Dict[str, Any]]:
         """Parse CI data from ci.txt file."""
         ci_file = "ci.txt"  # Changed back to ci.txt from ss.txt
@@ -3006,6 +3042,84 @@ class QualityReportDashboard:
                     except Exception as e:
                         st.error(f"❌ Error generating report: {e}")
 
+def render_component_dashboard(component: str):
+    """Render dashboard for a specific component."""
+    dashboard = QualityReportDashboard()
+    
+    # Check if there's a selected week with reports
+    selected_week_reports = getattr(st.session_state, 'selected_week_reports', {})
+    selected_week = getattr(st.session_state, 'selected_week', None)
+    
+    
+    # Check if the selected week has a report for this component
+    if component in selected_week_reports:
+        report_to_use = selected_week_reports[component]
+        st.subheader(f"📊 {component} Production Metrics")
+        st.info(f"📅 Showing data from {selected_week} ({report_to_use['timestamp'].strftime('%H:%M')})")
+    else:
+        # No report for this component in selected week
+        st.subheader(f"📊 {component} Production Metrics")
+        if selected_week:
+            st.info(f"📅 Selected week: {selected_week}")
+            st.warning(f"No {component} report available for the selected week.")
+        else:
+            st.info("No week selected.")
+        
+        # Check if there are any reports for this component at all
+        component_reports = dashboard.get_component_reports(component)
+        if component_reports:
+            st.info(f"💡 {component} has {len(component_reports)} reports available. Select a week from the sidebar that includes {component} data.")
+        else:
+            st.info(f"💡 No reports found for {component} component. Use `./run_report.sh <week> {component}` to generate reports.")
+        return
+    
+    try:
+        with open(report_to_use['path'], 'r') as f:
+            data = json.load(f)
+        
+        # Create metrics dashboard
+        dashboard.create_metrics_dashboard(data)
+        
+        st.markdown("---")
+        
+        # Component-specific analysis sections
+        st.subheader(f"📈 {component} Development Metrics")
+        
+        # PRB Analysis
+        st.markdown("### 🚨 Problem Reports Analysis")
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            dashboard.create_prb_severity_chart(data)
+        with col2:
+            dashboard.create_prb_insights(data)
+        
+        # Bug Analysis
+        st.markdown("### 🐛 Production Bug Analysis")
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            dashboard.create_bug_severity_chart(data)
+        with col2:
+            dashboard.create_bug_insights(data)
+        
+        # Coverage Analysis
+        st.markdown("### 📊 Code Coverage Analysis")
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            dashboard.create_coverage_comparison_chart(data)
+        with col2:
+            dashboard.create_coverage_insights(data)
+        
+        # CI Issues
+        st.markdown("### 🔧 CI Issues Analysis")
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            dashboard.create_ci_issues_chart(data)
+        with col2:
+            dashboard.create_ci_insights(data)
+            
+    except Exception as e:
+        st.error(f"Error loading {component} data: {e}")
+
 def main():
     """Main Streamlit application."""
     
@@ -3116,434 +3230,105 @@ def main():
     
     dashboard = QualityReportDashboard()
     
-    # Get available reports for sidebar
-    reports = dashboard.get_reports()
-    
-    # Sidebar for report selection and navigation
+    # Sidebar for report selection (MUST run before component tabs)
+    components = ['Engine', 'Store', 'Archival', 'SDD', 'msSDB', 'Core App Efficiency']
     st.sidebar.title("📋 Quality Reports")
     
-    if reports:
-        # All reports are now archive type
+    # Get all reports from all components and group by week
+    all_reports = []
+    
+    for component in components:
+        component_reports = dashboard.get_component_reports(component)
+        for report in component_reports:
+            report['component'] = component
+            all_reports.append(report)
+    
+    # Group reports by week (using date as key)
+    weeks = {}
+    for report in all_reports:
+        # Use date as week key (YYYY-MM-DD format)
+        week_key = report['timestamp'].strftime('%Y-%m-%d')
+        if week_key not in weeks:
+            weeks[week_key] = {
+                'date': report['timestamp'],
+                'reports': {}
+            }
+        weeks[week_key]['reports'][report['component']] = report
+    
+    # Sort weeks by date (newest first)
+    sorted_weeks = sorted(weeks.items(), key=lambda x: x[1]['date'], reverse=True)
+    
+    if sorted_weeks:
+        st.sidebar.markdown("### 📅 Reports by Week")
         
-        st.sidebar.markdown("### 📊 Past Reports")
-        selected_report = None
+        # Use session state to track selected week
+        if 'selected_week' not in st.session_state:
+            st.session_state.selected_week = sorted_weeks[0][0] if sorted_weeks else None
         
-        # Use session state to track selected report
-        if 'selected_report_path' not in st.session_state:
-            # Default to latest report
-            if reports:
-                st.session_state.selected_report_path = reports[0]['path']
-            else:
-                st.session_state.selected_report_path = None
+        # Initialize selected_week_reports if not exists
+        if 'selected_week_reports' not in st.session_state:
+            st.session_state.selected_week_reports = {}
         
-        # Show all reports
-        for i, report in enumerate(reports[:15]):  # Show latest 15
-            is_selected = st.session_state.selected_report_path == report['path']
-            # Create display name based on report period if available
-            if 'period' in report and report['period']:
-                # Extract dates from period display and format as MM/DD/YYYY-MM/DD/YYYY
-                try:
-                    # Parse period like "September 15-21, 2025" 
-                    period_parts = report['period'].replace(',', '').split()
-                    if len(period_parts) >= 3:
-                        month_name = period_parts[0]
-                        date_range = period_parts[1].split('-')
-                        year = period_parts[2]
-                        
-                        # Convert month name to number
-                        month_map = {
-                            'January': '01', 'February': '02', 'March': '03', 'April': '04',
-                            'May': '05', 'June': '06', 'July': '07', 'August': '08',
-                            'September': '09', 'October': '10', 'November': '11', 'December': '12'
-                        }
-                        month_num = month_map.get(month_name, '01')
-                        
-                        if len(date_range) == 2:
-                            start_day = date_range[0].zfill(2)
-                            end_day = date_range[1].zfill(2)
-                            display_name = f"{month_num}/{start_day}/{year}-{month_num}/{end_day}/{year}"
-                        else:
-                            display_name = f"{report['date'].strftime('%m/%d %H:%M')}"
-                    else:
-                        display_name = f"{report['date'].strftime('%m/%d %H:%M')}"
-                except:
-                    display_name = f"{report['date'].strftime('%m/%d %H:%M')}"
-            else:
-                display_name = f"{report['date'].strftime('%m/%d %H:%M')}"
+        selected_week_key = None
+        
+        # Show weeks
+        for i, (week_key, week_data) in enumerate(sorted_weeks[:15]):  # Show latest 15
+            is_selected = st.session_state.selected_week == week_key
+            
+            # Create display name with just the date
+            display_name = week_data['date'].strftime('%m/%d %H:%M')
+            component_count = len(week_data['reports'])
             
             if st.sidebar.button(
                 f"{'🟢' if is_selected else '📄'} {display_name}",
-                key=f"report_{i}",
-                help=f"Quality Report from {report['date'].strftime('%Y-%m-%d %H:%M')}",
+                key=f"week_{i}",
+                help=f"Week from {week_data['date'].strftime('%Y-%m-%d %H:%M')} ({component_count} components)",
                 type="primary" if is_selected else "secondary"
             ):
-                st.session_state.selected_report_path = report['path']
-                selected_report = report
+                st.session_state.selected_week = week_key
+                selected_week_key = week_key
         
-        # Find the currently selected report
-        if selected_report is None:
-            selected_report = next(
-                (r for r in reports if r['path'] == st.session_state.selected_report_path),
-                None
-            )
-        
-        # Ensure we have a fallback if selected report is not found
-        if selected_report is None and reports:
-            selected_report = reports[0]
-            st.session_state.selected_report_path = selected_report['path']
+        # Always update selected week's reports to ensure consistency
+        if st.session_state.selected_week and st.session_state.selected_week in weeks:
+            st.session_state.selected_week_reports = weeks[st.session_state.selected_week]['reports']
+        else:
+            st.session_state.selected_week_reports = {}
     else:
-        st.sidebar.warning("No reports found")
-        selected_report = None
+        st.sidebar.warning("📭 No reports found")
+        st.session_state.selected_week = None
+        st.session_state.selected_week_reports = {}
     
     st.sidebar.markdown("---")
     
-    # Main content area - always show the selected report
-    if selected_report:
-        # Load and display the selected report
-        try:
-            # Report header with key info
-            col1, col2 = st.columns([2, 1])
-            # Import get_report_dates function
-            from quality_report_generator import get_report_dates
-            dates = get_report_dates()
-            
-            with col1:
-                st.subheader(f"📄 Quality Report")
-            with col2:
-                st.write(f"**Date:** {selected_report['date'].strftime('%Y-%m-%d %H:%M')}")
-                if 'period' in selected_report:
-                    st.write(f"**Period:** {selected_report['period']}")
-                else:
-                    st.write(f"**Period:** {dates['period_full']}")
-            
-            # Load archive data from selected report
-            archive_data = dashboard.get_archive_data(selected_report['path'])
-            
-            # Load pre-generated LLM content if available in archive data
-            dashboard.llm_content = archive_data.get('llm_content', {}) if archive_data else {}
-            
-            # Show visual dashboard if archive data is available
-            if archive_data:
-                # Component Tabs
-                st.markdown("### 🏗️ SDB Service Components")
-                tab1, tab2, tab3, tab4 = st.tabs(["🔧 Engine", "📊 SDD", "🔄 mSDB", "⚡ Core App Efficiency"])
-                
-                with tab1:  # Engine Tab (Current Dashboard)
-                    st.markdown("#### 📊 Engine Quality Metrics")
-                    dashboard.create_metrics_dashboard(archive_data)
-                    
-                    # Engine-specific Development Metrics
-                    st.markdown("---")
-                    st.markdown("#### 💻 Engine Development Metrics")
-                    
-                    # Extract Engine-specific data (for now, use all data as Engine)
-                    engine_data = archive_data
-                    
-                    # Development KPIs for Engine
-                    col1, col2, col3 = st.columns(3)
-                    
-                    with col1:
-                        # Code Coverage
-                        coverage_data = engine_data.get('coverage_summary', {}).get('overall', {})
-                        line_coverage = coverage_data.get('line_coverage', 0)
-                        coverage_color = "🟢" if line_coverage >= 80 else ("🟡" if line_coverage >= 70 else "🔴")
-                        st.metric(
-                            label=f"{coverage_color} Code Coverage",
-                            value=f"{line_coverage:.1f}%",
-                            delta=f"Target: 80%"
-                        )
-                    
-                    with col2:
-                        # P0/P1 CI Issues
-                        ci_issues = engine_data.get('ci_issues', [])
-                        p0_p1_ci = len([issue for issue in ci_issues if issue.get('priority', '').startswith(('P0', 'P1'))])
-                        total_ci = len(ci_issues)
-                        ci_color = "🟢" if p0_p1_ci <= 5 else ("🟡" if p0_p1_ci <= 10 else "🔴")
-                        st.metric(
-                            label=f"{ci_color} P0/P1 CI Issues",
-                            value=f"{p0_p1_ci}",
-                            delta=f"of {total_ci} total"
-                        )
-                    
-                    with col3:
-                        # Code Changes
-                        git_stats = engine_data.get('git_stats', {})
-                        lines_changed = git_stats.get('lines_changed', 0)
-                        commits = git_stats.get('total_commits', 0)
-                        change_color = "🟢" if commits < 10 and lines_changed < 3000 else ("🟡" if commits < 25 and lines_changed < 8000 else "🔴")
-                        st.metric(
-                            label=f"{change_color} Code Changes",
-                            value=f"{lines_changed:,} lines",
-                            delta=f"{commits} commits"
-                        )
-                
-                with tab2:  # SDD Tab
-                    st.markdown("#### 📊 SDD Quality Metrics")
-                    st.info("🚧 SDD component metrics coming soon...")
-                    
-                    # Placeholder for SDD-specific metrics
-                    col1, col2, col3 = st.columns(3)
-                    with col1:
-                        st.metric("🟡 Code Coverage", "Coming Soon", "SDD specific")
-                    with col2:
-                        st.metric("🟡 P0/P1 CI Issues", "Coming Soon", "SDD specific")
-                    with col3:
-                        st.metric("🟡 Code Changes", "Coming Soon", "SDD specific")
-                
-                with tab3:  # mSDB Tab
-                    st.markdown("#### 📊 mSDB Quality Metrics")
-                    st.info("🚧 mSDB component metrics coming soon...")
-                    
-                    # Placeholder for mSDB-specific metrics
-                    col1, col2, col3 = st.columns(3)
-                    with col1:
-                        st.metric("🟡 Code Coverage", "Coming Soon", "mSDB specific")
-                    with col2:
-                        st.metric("🟡 P0/P1 CI Issues", "Coming Soon", "mSDB specific")
-                    with col3:
-                        st.metric("🟡 Code Changes", "Coming Soon", "mSDB specific")
-                
-                with tab4:  # Core App Efficiency Tab
-                    st.markdown("#### 📊 Core App Efficiency Quality Metrics")
-                    st.info("🚧 Core App Efficiency component metrics coming soon...")
-                    
-                    # Placeholder for Core App-specific metrics
-                    col1, col2, col3 = st.columns(3)
-                    with col1:
-                        st.metric("🟡 Code Coverage", "Coming Soon", "Core App specific")
-                    with col2:
-                        st.metric("🟡 P0/P1 CI Issues", "Coming Soon", "Core App specific")
-                    with col3:
-                        st.metric("🟡 Code Changes", "Coming Soon", "Core App specific")
-                
-                # Common Production Metrics (Outside tabs - applies to all components)
-                st.markdown("---")
-                st.markdown("### 📊 Common Production Metrics")
-                st.info("ℹ️ These metrics apply across all SDB service components")
-                
-                # Week-over-Week Trends across past reports
-                dashboard.create_weekly_trends(reports)
-                
-                # Risk Assessment Section
-                st.markdown("### 🎯 Risk Assessment")
-                col1, col2 = st.columns([1, 1])
-                with col1:
-                    dashboard.create_risk_chart(archive_data, "_main")
-                with col2:
-                    dashboard.create_risk_insights(archive_data)
-                
-                # Problem Reports Section  
-                st.markdown("### 🚨 [PRBs](https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE000001TXjB2AW)")
-                col1, col2 = st.columns([1, 1])
-                with col1:
-                    dashboard.create_prb_analysis(archive_data, "_main")
-                with col2:
-                    dashboard.create_prb_insights(archive_data)
-                
-                # Bug & Severity Section
-                st.markdown("### 🐛 [Production Bug Analysis](https://gus.lightning.force.com/lightning/r/Report/00OEE0000014M4b2AE/view)")
-                col1, col2 = st.columns([1, 1])
-                with col1:
-                    dashboard.create_bug_severity_chart(archive_data)
-                with col2:
-                    dashboard.create_bug_insights(archive_data)
-                
-                st.markdown("---")
-                
-                # Deployment Analysis Section
-                st.markdown("### 🚀 [Deployment Analysis](https://bdmpresto-superset-server.sfproxy.uip.aws-esvc1-useast2.aws.sfdc.cl/superset/sqllab?savedQueryId=25468)")
-                col1, col2 = st.columns([1, 1])
-                with col1:
-                    dashboard.create_deployment_stacked_bar(archive_data)
-                with col2:
-                    dashboard.create_version_pie_chart(archive_data)
-                
-                # Add deployment insights
-                dashboard.create_deployment_insights(archive_data)
-                
-                st.markdown("---")
-                
-                # Code Coverage Section
-                st.markdown("### 📊 [Code Coverage](https://sonarqube.sfcq.buildndeliver-s.aws-esvc1-useast2.aws.sfdc.cl/component_measures?id=sayonara.sayonaradb.sdb&metric=uncovered_lines&view=list)")
-                col1, col2 = st.columns([1, 1])
-                with col1:
-                    dashboard.create_coverage_comparison_chart(archive_data)
-                with col2:
-                    dashboard.create_coverage_insights(archive_data)
-                
-                st.markdown("---")
-                
-                # CI Issues Section
-                st.markdown("### 🔧 [CI Issues](https://gus.lightning.force.com/lightning/r/Report/00OEE000002YbOz2AK/view?queryScope=userFolders)")
-                col1, col2 = st.columns([1, 1])
-                with col1:
-                    dashboard.create_ci_issues_chart(archive_data)
-                with col2:
-                    st.markdown("#### 📊 CI Issues Insights")
-                    ci_data = archive_data.get('ci_issues', [])
-                    if ci_data:
-                        total_ci_issues = len(ci_data)
-                        # Calculate priority breakdown
-                        priority_counts = {}
-                        for issue in ci_data:
-                            priority = issue.get('priority', 'Unknown')
-                            priority_counts[priority] = priority_counts.get(priority, 0) + 1
-                        
-                        # Create priority breakdown string
-                        priority_breakdown = ", ".join([f"{p}:{count}" for p, count in sorted(priority_counts.items())])
-                        st.metric("Total CI Issues", f"{total_ci_issues} ({priority_breakdown})")
-                        
-                        teams = list(set(issue.get('team', 'Unknown') for issue in ci_data))
-                        st.metric("Teams Affected", len(teams))
-                        st.markdown("**Top Teams:**")
-                        team_counts = {}
-                        for issue in ci_data:
-                            team = issue.get('team', 'Unknown')
-                            team_counts[team] = team_counts.get(team, 0) + 1
-                        for team, count in sorted(team_counts.items(), key=lambda x: x[1], reverse=True)[:3]:
-                            st.write(f"• {team}: {count} issues")
-                    else:
-                        st.info("No CI issues data available")
-                
-                # Security Bugs Section  
-                st.markdown("### 🔒 [Security Bugs](https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE000002XKRp2AO)")
-                st.markdown("*Source: Coverity and 3PP Scan*")
-                col1, col2 = st.columns([1, 1])
-                with col1:
-                    dashboard.create_security_bugs_chart(archive_data)
-                with col2:
-                    st.markdown("#### 🛡️ Security Analysis")
-                    security_data = archive_data.get('security_issues', [])
-                    if security_data:
-                        total_security_bugs = len(security_data)
-                        # Calculate priority breakdown
-                        priority_counts = {}
-                        for bug in security_data:
-                            priority = bug.get('priority', 'Unknown')
-                            priority_counts[priority] = priority_counts.get(priority, 0) + 1
-                        
-                        # Create priority breakdown string
-                        priority_breakdown = ", ".join([f"{p}:{count}" for p, count in sorted(priority_counts.items())])
-                        st.metric("Total Security Bugs", f"{total_security_bugs} ({priority_breakdown})")
-                        
-                        teams = list(set(bug.get('team', bug.get('component', 'Unknown')) for bug in security_data))
-                        st.metric("Teams Affected", len(teams))
-                        st.markdown("**Security Bug Types:**")
-                        bug_types = {}
-                        for bug in security_data:
-                            subject = bug.get('subject', '')
-                            if 'RESOURCE_LEAK' in subject:
-                                bug_types['Resource Leak'] = bug_types.get('Resource Leak', 0) + 1
-                            elif 'OVERRUN' in subject:
-                                bug_types['Buffer Overrun'] = bug_types.get('Buffer Overrun', 0) + 1
-                            elif 'USE_AFTER_FREE' in subject:
-                                bug_types['Use After Free'] = bug_types.get('Use After Free', 0) + 1
-                            else:
-                                bug_types['Other'] = bug_types.get('Other', 0) + 1
-                        for bug_type, count in sorted(bug_types.items(), key=lambda x: x[1], reverse=True)[:3]:
-                            st.write(f"• {bug_type}: {count}")
-                    else:
-                        st.info("No security bugs data available")
-                
-                # Left Shift Bugs Section
-                st.markdown("### ⬅️ [Left Shift Bugs](https://gus.lightning.force.com/lightning/r/Report/00OEE000002Wjld2AC/view?queryScope=userFolders)")
-                col1, col2 = st.columns([1, 1])
-                with col1:
-                    dashboard.create_leftshift_bugs_chart(archive_data)
-                with col2:
-                    st.markdown("#### 📈 Left Shift Insights")
-                    leftshift_data = archive_data.get('leftshift_issues', [])
-                    if leftshift_data:
-                        total_leftshift_bugs = len(leftshift_data)
-                        # Calculate priority breakdown
-                        priority_counts = {}
-                        for bug in leftshift_data:
-                            priority = bug.get('priority', 'Unknown')
-                            priority_counts[priority] = priority_counts.get(priority, 0) + 1
-                        
-                        # Create priority breakdown string
-                        priority_breakdown = ", ".join([f"{p}:{count}" for p, count in sorted(priority_counts.items())])
-                        st.metric("Total Left Shift Bugs", f"{total_leftshift_bugs} ({priority_breakdown})")
-                        
-                        teams = list(set(bug.get('team', 'Unknown') for bug in leftshift_data))
-                        st.metric("Teams Affected", len(teams))
-                        st.markdown("**Recent Activity:**")
-                        for bug in leftshift_data[:3]:  # Show top 3 recent bugs
-                            subject = bug.get('subject', 'Unknown Issue')[:50] + "..."
-                            team = bug.get('team', 'Unknown Team')
-                            st.write(f"• {team}: {subject}")
-                    else:
-                        st.info("No left shift bugs data available")
-                
-                st.markdown("---")
-                
-                # Code Changes Analysis Section
-                st.markdown("### 📊 Code Changes Analysis")
-                dashboard.create_code_changes_analysis(archive_data)
-                
-                st.markdown("---")
-                
-                # Trend Analysis Section
-                st.markdown("### 📈 Quality Trends")
-                col1, col2 = st.columns([1, 1])
-                with col1:
-                    dashboard.create_trend_analysis(archive_data)
-                with col2:
-                    dashboard.create_trend_insights(archive_data)
-                
-            else:
-                st.error("❌ No archive data found - dashboard cannot display metrics")
-                st.info("Available files in reports directory:")
-                try:
-                    reports_files = [f for f in os.listdir('./reports') if f.endswith('.json')]
-                    for f in reports_files:
-                        st.write(f"  • {f}")
-                except:
-                    st.write("Could not list files")
-            
-        except Exception as e:
-            st.error(f"Error loading report: {e}")
+    # Show component report counts
+    st.sidebar.markdown("### 📊 Available Reports")
+    component_icons = {'Engine': '🔧', 'Store': '📦', 'Archival': '🗄️', 'SDD': '💾', 'msSDB': '🔄', 'Core App Efficiency': '⚡'}
     
-    elif not reports:
-        st.warning("📭 No reports found.")
-        
-        # Debug information
-        with st.expander("🔍 Debug Information"):
-            st.write("**Current working directory:**", os.getcwd())
-            st.write("**Script directory:**", os.path.dirname(os.path.abspath(__file__)))
-            st.write("**Reports directory:**", dashboard.reports_dir)
-            st.write("**Archive directory:**", dashboard.archive_dir)
-            
-            st.write("**Reports directory exists:**", os.path.exists(dashboard.reports_dir))
-            st.write("**Archive directory exists:**", os.path.exists(dashboard.archive_dir))
-            
-            if os.path.exists(dashboard.reports_dir):
-                st.write("**Files in reports directory:**")
-                try:
-                    files = os.listdir(dashboard.reports_dir)
-                    for f in files:
-                        st.write(f"  • {f}")
-                except Exception as e:
-                    st.write(f"Error listing files: {e}")
-            
-            if os.path.exists(dashboard.archive_dir):
-                st.write("**Files in archive directory:**")
-                try:
-                    files = os.listdir(dashboard.archive_dir)
-                    for f in files:
-                        st.write(f"  • {f}")
-                except Exception as e:
-                    st.write(f"Error listing files: {e}")
-            
-            # Check for JSON files specifically
-            st.write("**Looking for pattern:** quality_data_archive_*.json")
-            for search_dir in [dashboard.reports_dir, dashboard.archive_dir]:
-                if os.path.exists(search_dir):
-                    pattern = os.path.join(search_dir, "quality_data_archive_*.json")
-                    files = glob.glob(pattern)
-                    st.write(f"**Found {len(files)} files in {search_dir}:**")
-                    for f in files:
-                        st.write(f"  • {os.path.basename(f)}")
+    for component in components:
+        component_reports = dashboard.get_component_reports(component)
+        count = len(component_reports)
+        icon = component_icons.get(component, '📊')
+        if count > 0:
+            st.sidebar.write(f"{icon} **{component}**: {count} reports")
+        else:
+            st.sidebar.write(f"{icon} {component}: No reports")
+    
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### 🔄 Actions")
+    st.sidebar.info("📊 Select a report above, then click component tabs to view data")
+    st.sidebar.info("💡 Use `./run_report.sh <week> <component>` to generate new reports")
+    
+    # Component tabs (AFTER sidebar logic runs)
+    component_icons = {'Engine': '🔧', 'Store': '📦', 'Archival': '🗄️', 'SDD': '💾', 'msSDB': '🔄', 'Core App Efficiency': '⚡'}
+    
+    # Create main tabs for components only
+    tab_labels = [f"{component_icons.get(comp, '📊')} {comp}" for comp in components]
+    component_tabs = st.tabs(tab_labels)
+    
+    # Component tabs
+    for i, component in enumerate(components):
+        with component_tabs[i]:
+            render_component_dashboard(component)
     
     # KPI Legend Section
     st.markdown("---")

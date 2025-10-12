@@ -2532,26 +2532,40 @@ def main():
     parser.add_argument('--skip-confirmation', action='store_true', help='Skip data readiness confirmation prompt')
     parser.add_argument('--report-end-date', help='Custom report end date (YYYY-MM-DD). Report will cover the week ending on the Sunday before this date.')
     parser.add_argument('--week', help='Calendar week (e.g., cw37, cw38). Automatically sets subdirectory path and report-end-date for historical weeks.')
+    parser.add_argument('--component', default='Engine', choices=['Engine', 'Store', 'Archival', 'SDD', 'msSDB', 'Core App Efficiency'], help='Component to generate report for (default: Engine)')
     
     args = parser.parse_args()
     
-    # Handle calendar week argument
+    # Handle calendar week and component arguments
     if args.week:
         week_dir = f"weeks/{args.week}"
+        component_dir = os.path.join(week_dir, args.component)
+        
         if not os.path.exists(week_dir):
             print(f"❌ Week directory not found: {week_dir}")
             return 1
         
-        # Set all file paths to use the week subdirectory
-        args.risk_file = os.path.join(week_dir, os.path.basename(args.risk_file))
-        args.prb_file = os.path.join(week_dir, os.path.basename(args.prb_file))
-        args.bugs_file = os.path.join(week_dir, os.path.basename(args.bugs_file))
-        args.deployment_csv = os.path.join(week_dir, os.path.basename(args.deployment_csv))
-        args.coverage_txt = os.path.join(week_dir, os.path.basename(args.coverage_txt))
-        args.ci_file = os.path.join(week_dir, os.path.basename(args.ci_file))
-        args.leftshift_file = os.path.join(week_dir, os.path.basename(args.leftshift_file))
-        args.abs_file = os.path.join(week_dir, os.path.basename(args.abs_file))
-        args.security_file = os.path.join(week_dir, os.path.basename(args.security_file))
+        if not os.path.exists(component_dir):
+            print(f"❌ Component directory not found: {component_dir}")
+            print(f"💡 Available components in {week_dir}:")
+            try:
+                for item in os.listdir(week_dir):
+                    if os.path.isdir(os.path.join(week_dir, item)):
+                        print(f"   - {item}")
+            except:
+                pass
+            return 1
+        
+        # Set all file paths to use the week/component subdirectory
+        args.risk_file = os.path.join(component_dir, os.path.basename(args.risk_file))
+        args.prb_file = os.path.join(component_dir, os.path.basename(args.prb_file))
+        args.bugs_file = os.path.join(component_dir, os.path.basename(args.bugs_file))
+        args.deployment_csv = os.path.join(component_dir, os.path.basename(args.deployment_csv))
+        args.coverage_txt = os.path.join(component_dir, os.path.basename(args.coverage_txt))
+        args.ci_file = os.path.join(component_dir, os.path.basename(args.ci_file))
+        args.leftshift_file = os.path.join(component_dir, os.path.basename(args.leftshift_file))
+        args.abs_file = os.path.join(component_dir, os.path.basename(args.abs_file))
+        args.security_file = os.path.join(component_dir, os.path.basename(args.security_file))
         
         # Set report-end-date for historical weeks
         current_week = 38  # This week is cw38
@@ -2565,7 +2579,12 @@ def main():
             # For other weeks, you might need to calculate the date
             print(f"📅 Using week {args.week} (no automatic date calculation implemented)")
         
-        print(f"📁 Using data from directory: {week_dir}")
+        print(f"📁 Using data from directory: {component_dir}")
+        
+        # Update output directory to be component-specific
+        args.output_dir = os.path.join("reports", args.component)
+        os.makedirs(args.output_dir, exist_ok=True)
+        print(f"📂 Reports will be saved to: {args.output_dir}")
     
     # Initialize data collector
     collector = QualityDataCollector(args.config)
@@ -2601,8 +2620,8 @@ def main():
     # Load security issues from ss.txt (use proper path when week is specified)
     ss_file = "ss.txt"
     if args.week:
-        week_dir = f"weeks/{args.week}"
-        ss_file = os.path.join(week_dir, "ss.txt")
+        component_dir = os.path.join(f"weeks/{args.week}", args.component)
+        ss_file = os.path.join(component_dir, "ss.txt")
     collector.load_ss_security_issues(ss_file)
     
     # Parse custom report end date if provided
