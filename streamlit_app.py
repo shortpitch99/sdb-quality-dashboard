@@ -47,6 +47,64 @@ class QualityReportDashboard:
         os.makedirs(self.reports_dir, exist_ok=True)
         os.makedirs(self.archive_dir, exist_ok=True)
     
+    def display_data_timestamp(self, data: Dict[str, Any]) -> None:
+        """Display the report date range and collection timestamp."""
+        generated_at = data.get('generated_at')
+        
+        if generated_at:
+            try:
+                # Parse the ISO timestamp
+                from datetime import datetime, timedelta
+                dt = datetime.fromisoformat(generated_at.replace('Z', '+00:00'))
+                
+                # Calculate the previous week range (Monday to Sunday)
+                # Quality reports typically cover the previous week's data
+                days_since_monday = dt.weekday()  # 0=Monday, 6=Sunday
+                current_week_start = dt - timedelta(days=days_since_monday)
+                # Get the previous week
+                week_start = current_week_start - timedelta(days=7)
+                week_end = week_start + timedelta(days=6)
+                
+                # Format dates
+                report_period = f"{week_start.strftime('%b %d')} - {week_end.strftime('%b %d, %Y')}"
+                collection_time = dt.strftime('%m/%d %H:%M')
+                
+                # Display report period banner
+                st.markdown(f"""
+                <div style="text-align: center; padding: 12px; margin-bottom: 20px; 
+                           background-color: #f8f9fa; border-radius: 8px; 
+                           border-left: 4px solid #28a745;">
+                    <p style="margin: 0; font-size: 1rem; color: #333; font-weight: 500;">
+                        📅 <strong>Quality Report:</strong> Week of {report_period}
+                    </p>
+                    <p style="margin: 5px 0 0 0; font-size: 0.8rem; color: #666;">
+                        Data collected: {collection_time}
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+            except Exception as e:
+                # Fallback if timestamp parsing fails
+                st.markdown(f"""
+                <div style="text-align: center; padding: 10px; margin-bottom: 20px; 
+                           background-color: #f0f2f6; border-radius: 8px; 
+                           border-left: 4px solid #0066cc;">
+                    <p style="margin: 0; font-size: 0.9rem; color: #666;">
+                        📅 Quality Report - Data collected: <strong>{generated_at}</strong>
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            # No timestamp available
+            st.markdown(f"""
+            <div style="text-align: center; padding: 10px; margin-bottom: 20px; 
+                       background-color: #f0f2f6; border-radius: 8px; 
+                       border-left: 4px solid #666;">
+                <p style="margin: 0; font-size: 0.9rem; color: #666;">
+                    📅 Quality Report - Collection timestamp not available
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+    
     def get_reports(self) -> List[Dict[str, Any]]:
         """Get all available JSON archive files sorted by date (newest first)."""
         report_files = []
@@ -3081,7 +3139,6 @@ def render_component_dashboard(component: str):
     if component in selected_week_reports:
         report_to_use = selected_week_reports[component]
         st.subheader(f"📊 {component} Production Metrics")
-        st.info(f"📅 Showing data from {selected_week} ({report_to_use['timestamp'].strftime('%H:%M')})")
     else:
         # No report for this component in selected week
         st.subheader(f"📊 {component} Production Metrics")
@@ -3105,6 +3162,9 @@ def render_component_dashboard(component: str):
         
         # Load LLM content from the report data
         dashboard.llm_content = data.get('llm_content', {})
+        
+        # Display data collection timestamp
+        dashboard.display_data_timestamp(data)
         
         # Create metrics dashboard
         dashboard.create_metrics_dashboard(data)
@@ -3541,7 +3601,7 @@ def main():
         - **🔘 PENDING**: PRB-related followup items
         - Coming soon - will track post-PRB action items
         """)
-
+    
     # Footer
     st.markdown("---")
     st.markdown(
