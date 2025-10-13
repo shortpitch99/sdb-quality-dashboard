@@ -47,6 +47,49 @@ class QualityReportDashboard:
         os.makedirs(self.reports_dir, exist_ok=True)
         os.makedirs(self.archive_dir, exist_ok=True)
     
+    def display_banner_with_timestamp(self, selected_week_reports: Dict) -> None:
+        """Display the main banner with timestamp information from selected reports."""
+        timestamp_text = "Quality Metrics & Analytics"
+        
+        # Get timestamp from any available report
+        if selected_week_reports:
+            for component_report in selected_week_reports.values():
+                if 'path' in component_report:
+                    try:
+                        with open(component_report['path'], 'r') as f:
+                            data = json.load(f)
+                        generated_at = data.get('generated_at')
+                        
+                        if generated_at:
+                            # Parse timestamp and calculate week range
+                            from datetime import datetime, timedelta
+                            dt = datetime.fromisoformat(generated_at.replace('Z', '+00:00'))
+                            
+                            # Calculate the previous week range (Monday to Sunday)
+                            days_since_monday = dt.weekday()  # 0=Monday, 6=Sunday
+                            current_week_start = dt - timedelta(days=days_since_monday)
+                            # Get the previous week
+                            week_start = current_week_start - timedelta(days=7)
+                            week_end = week_start + timedelta(days=6)
+                            
+                            # Format dates
+                            report_period = f"Week of {week_start.strftime('%b %d')} - {week_end.strftime('%b %d, %Y')}"
+                            collection_time = dt.strftime('%m/%d %H:%M')
+                            
+                            timestamp_text = f"Quality Report: {report_period}<br><small style='font-size: 0.8rem; color: #666;'>Data collected: {collection_time}</small>"
+                            break
+                    except Exception:
+                        continue
+        
+        # Display banner
+        st.markdown(f"""
+        <div style="background: #f5f5f5; color: black; text-align: center; padding: 8px 20px; border-radius: 8px; margin: 10px auto 15px auto; max-width: 1040px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border-top: 3px solid #333333;">
+            <h1 style="margin: 0; font-size: 2.2rem; font-weight: 700; color: black; text-shadow: none; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">SDB Quality Dashboard</h1>
+            <div style="width: 140px; height: 2px; background: linear-gradient(90deg, #4CAF50, #2196F3, #FF9800); margin: 8px auto;"></div>
+            <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #333333;">{timestamp_text}</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
     def display_data_timestamp(self, data: Dict[str, Any]) -> None:
         """Display the report date range and collection timestamp."""
         generated_at = data.get('generated_at')
@@ -3163,9 +3206,6 @@ def render_component_dashboard(component: str):
         # Load LLM content from the report data
         dashboard.llm_content = data.get('llm_content', {})
         
-        # Display data collection timestamp
-        dashboard.display_data_timestamp(data)
-        
         # Create metrics dashboard
         dashboard.create_metrics_dashboard(data)
         
@@ -3445,14 +3485,8 @@ def main():
     elif os.path.exists("assets/SDB_galaxy_banner.jpg"):
         st.image("assets/SDB_galaxy_banner.jpg", width="stretch")
     else:
-        # Clean professional banner
-        st.markdown("""
-        <div style="background: #f5f5f5; color: black; text-align: center; padding: 15px 25px; border-radius: 8px; margin: 20px auto 30px auto; max-width: 1040px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border-top: 3px solid #333333;">
-            <h1 style="margin: 0; font-size: 2.5rem; font-weight: 700; color: black; text-shadow: none; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">SDB Quality Dashboard</h1>
-            <div style="width: 140px; height: 2px; background: linear-gradient(90deg, #4CAF50, #2196F3, #FF9800); margin: 15px auto;"></div>
-            <p style="margin: 8px 0 0 0; font-size: 1rem; color: #333333;">Quality Metrics & Analytics</p>
-        </div>
-        """, unsafe_allow_html=True)
+        # Dynamic banner will be displayed after report selection
+        pass
     
     st.markdown("---")
     
@@ -3545,6 +3579,9 @@ def main():
     st.sidebar.markdown("### 🔄 Actions")
     st.sidebar.info("📊 Select a report above, then click component tabs to view data")
     st.sidebar.info("💡 Use `./run_report.sh <week> <component>` to generate new reports")
+    
+    # Display dynamic banner with timestamp information
+    dashboard.display_banner_with_timestamp(st.session_state.selected_week_reports)
     
     # Component tabs (AFTER sidebar logic runs)
     component_icons = {'Engine': '🔧', 'Store': '📦', 'Archival': '🗄️', 'SDD': '💾', 'msSDB': '🔄', 'Core App Efficiency': '⚡'}
