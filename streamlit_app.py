@@ -582,6 +582,15 @@ class QualityReportDashboard:
             transform: translateY(-1px);
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
+        .metric-card-clickable {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .metric-card-clickable:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border-color: #007bff;
+        }
         .metric-value {
             font-size: 2.2rem;
             font-weight: 700;
@@ -632,62 +641,70 @@ class QualityReportDashboard:
         """, unsafe_allow_html=True)
         
         # Production Metrics (Top Row)
-        st.markdown("#### 🏭 Production Metrics")
+        st.markdown('<h4 id="production-metrics">🏭 Production Metrics</h4>', unsafe_allow_html=True)
         col1, col2, col3, col4, col5_prod = st.columns(5)
         
         with col1:
             # Feature Rollout Risk color logic: green if 0, yellow if 1-2, red if >2
             risk_delta_class = "metric-delta-green" if at_risk_count == 0 else ("metric-delta-yellow" if at_risk_count <= 2 else "metric-delta-red")
             st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-label">🚀 Feature Rollout Risk</div>
-                <div class="metric-value">{at_risk_count}</div>
-                <div class="metric-total">of {total_risks} total</div>
-                <div class="metric-delta {risk_delta_class}">
-                    {"GREEN" if at_risk_count == 0 else ("YELLOW" if at_risk_count <= 2 else "RED")}
+            <a href="#risk-assessment" style="text-decoration: none; color: inherit;">
+                <div class="metric-card metric-card-clickable">
+                    <div class="metric-label">🚀 Feature Rollout Risk</div>
+                    <div class="metric-value">{at_risk_count}</div>
+                    <div class="metric-total">of {total_risks} total</div>
+                    <div class="metric-delta {risk_delta_class}">
+                        {"GREEN" if at_risk_count == 0 else ("YELLOW" if at_risk_count <= 2 else "RED")}
+                    </div>
                 </div>
-            </div>
+            </a>
             """, unsafe_allow_html=True)
         
         with col2:
             total_prbs = len(data.get('prbs', []))
             prb_delta_class = "metric-delta-green" if prb_status == "GREEN" else ("metric-delta-yellow" if prb_status in ["ELEVATED", "YELLOW"] else "metric-delta-red")
             st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-label">🚨 Sev 0/1 PRBs</div>
-                <div class="metric-value">{critical_prbs}</div>
-                <div class="metric-total">of {total_prbs} total</div>
-                <div class="metric-delta {prb_delta_class}">
-                    {prb_status}
+            <a href="#problem-reports-analysis" style="text-decoration: none; color: inherit;">
+                <div class="metric-card metric-card-clickable">
+                    <div class="metric-label">🚨 Sev 0/1 PRBs</div>
+                    <div class="metric-value">{critical_prbs}</div>
+                    <div class="metric-total">of {total_prbs} total</div>
+                    <div class="metric-delta {prb_delta_class}">
+                        {prb_status}
+                    </div>
                 </div>
-            </div>
+            </a>
             """, unsafe_allow_html=True)
         
         with col3:
             total_bugs = len(data.get('bugs', []))
             prod_delta_class = "metric-delta-green" if prod_bug_status == "GREEN" else ("metric-delta-yellow" if prod_bug_status == "YELLOW" else "metric-delta-red")
             st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-label">🐛 P0/P1 Prod Bugs</div>
-                <div class="metric-value">{critical_prod_bugs}</div>
-                <div class="metric-total">of {total_bugs} total</div>
-                <div class="metric-delta {prod_delta_class}">
-                    {prod_bug_status}
+            <a href="#production-bug-analysis" style="text-decoration: none; color: inherit;">
+                <div class="metric-card metric-card-clickable">
+                    <div class="metric-label">🐛 P0/P1 Prod Bugs</div>
+                    <div class="metric-value">{critical_prod_bugs}</div>
+                    <div class="metric-total">of {total_bugs} total</div>
+                    <div class="metric-delta {prod_delta_class}">
+                        {prod_bug_status}
+                    </div>
                 </div>
-            </div>
+            </a>
             """, unsafe_allow_html=True)
         
         with col4:
             second_line = f"2nd: {second_version} ({second_percentage:.1f}%)" if second_version != "N/A" else ""
             st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-label">🚀 Prod Deployment</div>
-                <div class="metric-value">{dominant_version}</div>
-                <div class="metric-total">Dominant in fleet ({dominant_percentage:.1f}%)</div>
-                <div class="metric-delta">
-                    {second_line}
+            <a href="#deployment-analysis" style="text-decoration: none; color: inherit;">
+                <div class="metric-card metric-card-clickable">
+                    <div class="metric-label">🚀 Prod Deployment</div>
+                    <div class="metric-value">{dominant_version}</div>
+                    <div class="metric-total">Dominant in fleet ({dominant_percentage:.1f}%)</div>
+                    <div class="metric-delta">
+                        {second_line}
+                    </div>
                 </div>
-            </div>
+            </a>
             """, unsafe_allow_html=True)
         
         with col5_prod:
@@ -710,14 +727,16 @@ class QualityReportDashboard:
             # Coverage color logic: green if >= 80%, yellow if >= 70%, red if < 70%
             coverage_delta_class = "metric-delta-green" if avg_coverage >= 80 else ("metric-delta-yellow" if avg_coverage >= 70 else "metric-delta-red")
             st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-label">📊 Overall Line Coverage</div>
-                <div class="metric-value">{avg_coverage:.1f}%</div>
-                <div class="metric-total">Overall Coverage 67.8%</div>
-                <div class="metric-delta {coverage_delta_class}">
-                    Target: 80%
+            <a href="#code-coverage-analysis" style="text-decoration: none; color: inherit;">
+                <div class="metric-card metric-card-clickable">
+                    <div class="metric-label">📊 Overall Line Coverage</div>
+                    <div class="metric-value">{avg_coverage:.1f}%</div>
+                    <div class="metric-total">Overall Coverage 67.8%</div>
+                    <div class="metric-delta {coverage_delta_class}">
+                        Target: 80%
+                    </div>
                 </div>
-            </div>
+            </a>
             """, unsafe_allow_html=True)
             
         with col6:
@@ -725,42 +744,48 @@ class QualityReportDashboard:
             ci_p0_p1_count = ci_p0_bugs + ci_p1_bugs
             ci_delta_class = "metric-delta-green" if ci_bug_status == "GREEN" else ("metric-delta-yellow" if ci_bug_status == "YELLOW" else "metric-delta-red")
             st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-label">🔧 P0/P1 CI Issues</div>
-                <div class="metric-value">{ci_p0_p1_count}</div>
-                <div class="metric-total">{total_ci_issues} issues</div>
-                <div class="metric-delta {ci_delta_class}">
-                    {ci_bug_status}
+            <a href="#ci-issues-analysis" style="text-decoration: none; color: inherit;">
+                <div class="metric-card metric-card-clickable">
+                    <div class="metric-label">🔧 P0/P1 CI Issues</div>
+                    <div class="metric-value">{ci_p0_p1_count}</div>
+                    <div class="metric-total">{total_ci_issues} issues</div>
+                    <div class="metric-delta {ci_delta_class}">
+                        {ci_bug_status}
+                    </div>
                 </div>
-            </div>
+            </a>
             """, unsafe_allow_html=True)
             
         with col7:
             total_security_bugs = len(data.get('security_issues', []))
             sec_delta_class = "metric-delta-green" if sec_bug_status == "GREEN" else ("metric-delta-yellow" if sec_bug_status == "YELLOW" else "metric-delta-red")
             st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-label">🔒 P0/P1 Security Bugs</div>
-                <div class="metric-value">{critical_sec_bugs}</div>
-                <div class="metric-total">of {total_security_bugs} total</div>
-                <div class="metric-delta {sec_delta_class}">
-                    {sec_bug_status}
+            <a href="#security-analysis" style="text-decoration: none; color: inherit;">
+                <div class="metric-card metric-card-clickable">
+                    <div class="metric-label">🔒 P0/P1 Security Bugs</div>
+                    <div class="metric-value">{critical_sec_bugs}</div>
+                    <div class="metric-total">of {total_security_bugs} total</div>
+                    <div class="metric-delta {sec_delta_class}">
+                        {sec_bug_status}
+                    </div>
                 </div>
-            </div>
+            </a>
             """, unsafe_allow_html=True)
             
         with col8:
             total_leftshift_bugs = len(data.get('leftshift_issues', []))
             ls_delta_class = "metric-delta-green" if ls_bug_status == "GREEN" else ("metric-delta-yellow" if ls_bug_status == "YELLOW" else "metric-delta-red")
             st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-label">⬅️ P0/P1 Left Shift</div>
-                <div class="metric-value">{ls_p0_p1_count}</div>
-                <div class="metric-total">{total_leftshift_bugs} bugs</div>
-                <div class="metric-delta {ls_delta_class}">
-                    {ls_bug_status}
+            <a href="#left-shift-bugs" style="text-decoration: none; color: inherit;">
+                <div class="metric-card metric-card-clickable">
+                    <div class="metric-label">⬅️ P0/P1 Left Shift</div>
+                    <div class="metric-value">{ls_p0_p1_count}</div>
+                    <div class="metric-total">{total_leftshift_bugs} bugs</div>
+                    <div class="metric-delta {ls_delta_class}">
+                        {ls_bug_status}
+                    </div>
                 </div>
-            </div>
+            </a>
             """, unsafe_allow_html=True)
             
         with col9:
@@ -803,14 +828,16 @@ class QualityReportDashboard:
                 change_sign = ""
             
             st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-label">📈 Code Changes</div>
-                <div class="metric-value">{change_sign}{percentage_change:.1f}%</div>
-                <div class="metric-total">{current_week_changes:,} lines changed</div>
-                <div class="metric-delta {change_delta_class}">
-                    {change_status}
+            <a href="#code-changes-analysis" style="text-decoration: none; color: inherit;">
+                <div class="metric-card metric-card-clickable">
+                    <div class="metric-label">📈 Code Changes</div>
+                    <div class="metric-value">{change_sign}{percentage_change:.1f}%</div>
+                    <div class="metric-total">{current_week_changes:,} lines changed</div>
+                    <div class="metric-delta {change_delta_class}">
+                        {change_status}
+                    </div>
                 </div>
-            </div>
+            </a>
             """, unsafe_allow_html=True)
         
         # Additional Development Metrics (Second Row)
@@ -3098,7 +3125,8 @@ def render_component_dashboard(component: str):
         st.subheader(f"📈 {component} Development Metrics")
         
         # PRB Analysis
-        st.markdown("### 🚨 Problem Reports Analysis")
+        st.markdown('<h3 id="problem-reports-analysis">🚨 Problem Reports Analysis</h3>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         col1, col2 = st.columns([1, 1])
         with col1:
             dashboard.create_prb_analysis(data, f"_{component}")
@@ -3106,7 +3134,8 @@ def render_component_dashboard(component: str):
             dashboard.create_prb_insights(data)
         
         # Bug Analysis
-        st.markdown("### 🐛 Production Bug Analysis")
+        st.markdown('<h3 id="production-bug-analysis">🐛 Production Bug Analysis</h3>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         col1, col2 = st.columns([1, 1])
         with col1:
             dashboard.create_bug_severity_chart(data)
@@ -3114,7 +3143,8 @@ def render_component_dashboard(component: str):
             dashboard.create_bug_insights(data)
         
         # Coverage Analysis
-        st.markdown("### 📊 Code Coverage Analysis")
+        st.markdown('<h3 id="code-coverage-analysis">📊 Code Coverage Analysis</h3>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         col1, col2 = st.columns([1, 1])
         with col1:
             dashboard.create_coverage_comparison_chart(data)
@@ -3122,7 +3152,8 @@ def render_component_dashboard(component: str):
             dashboard.create_coverage_insights(data)
         
         # CI Issues
-        st.markdown("### 🔧 CI Issues Analysis")
+        st.markdown('<h3 id="ci-issues-analysis">🔧 CI Issues Analysis</h3>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         col1, col2 = st.columns([1, 1])
         with col1:
             dashboard.create_ci_issues_chart(data)
@@ -3155,7 +3186,8 @@ def render_component_dashboard(component: str):
         
         # Security Analysis
         st.markdown("---")
-        st.markdown("### 🔒 [Security Bugs](https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE000002XKRp2AO)")
+        st.markdown('<h3 id="security-analysis">🔒 <a href="https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE000002XKRp2AO" target="_blank">Security Bugs</a></h3>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         st.markdown("*Source: Coverity and 3PP Scan*")
         col1, col2 = st.columns([1, 1])
         with col1:
@@ -3196,7 +3228,8 @@ def render_component_dashboard(component: str):
 
         # Left Shift Analysis
         st.markdown("---")
-        st.markdown("### ⬅️ [Left Shift Bugs](https://gus.lightning.force.com/lightning/r/Report/00OEE000002Wjld2AC/view?queryScope=userFolders)")
+        st.markdown('<h3 id="left-shift-bugs">⬅️ <a href="https://gus.lightning.force.com/lightning/r/Report/00OEE000002Wjld2AC/view?queryScope=userFolders" target="_blank">Left Shift Bugs</a></h3>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         col1, col2 = st.columns([1, 1])
         with col1:
             dashboard.create_leftshift_bugs_chart(data)
@@ -3227,7 +3260,8 @@ def render_component_dashboard(component: str):
 
         # Deployment Analysis
         st.markdown("---")
-        st.markdown("### 🚀 [Deployment Analysis](https://bdmpresto-superset-server.sfproxy.uip.aws-esvc1-useast2.aws.sfdc.cl/superset/sqllab?savedQueryId=25468)")
+        st.markdown('<h3 id="deployment-analysis">🚀 <a href="https://bdmpresto-superset-server.sfproxy.uip.aws-esvc1-useast2.aws.sfdc.cl/superset/sqllab?savedQueryId=25468" target="_blank">Deployment Analysis</a></h3>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         col1, col2 = st.columns([1, 1])
         with col1:
             dashboard.create_deployment_stacked_bar(data)
@@ -3239,7 +3273,8 @@ def render_component_dashboard(component: str):
 
         # Risk Assessment
         st.markdown("---")
-        st.markdown("### 🎯 Risk Assessment")
+        st.markdown('<h3 id="risk-assessment">🎯 Risk Assessment</h3>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         col1, col2 = st.columns([1, 1])
         with col1:
             dashboard.create_risk_chart(data, f"_{component}")
@@ -3248,7 +3283,8 @@ def render_component_dashboard(component: str):
 
         # Code Changes Analysis
         st.markdown("---")
-        st.markdown("### 📊 Code Changes Analysis")
+        st.markdown('<h3 id="code-changes-analysis">📊 Code Changes Analysis</h3>', unsafe_allow_html=True)
+        st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         dashboard.create_code_changes_analysis(data)
 
         # Trend Analysis
