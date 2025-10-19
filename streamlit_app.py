@@ -309,7 +309,7 @@ class QualityReportDashboard:
                             })
                         except ValueError:
                             continue
-        except Exception as e:
+            except Exception as e:
             st.error(f"Error reading component reports: {e}")
         
         # Sort by timestamp (newest first)
@@ -737,7 +737,7 @@ class QualityReportDashboard:
             color: #495057;
             font-weight: 400;
             margin-top: 0.2rem;
-        }    
+        }
         </style>
         """, unsafe_allow_html=True)
         
@@ -752,12 +752,12 @@ class QualityReportDashboard:
             <a href="#risk-assessment" style="text-decoration: none; color: inherit;">
                 <div class="metric-card metric-card-clickable">
                     <div class="metric-label">🚀 Feature Rollout Risk</div>
-                    <div class="metric-value">{at_risk_count}</div>
+                <div class="metric-value">{at_risk_count}</div>
                     <div class="metric-total">of {total_risks} total</div>
                     <div class="metric-delta {risk_delta_class}">
                         {"GREEN" if at_risk_count == 0 else ("YELLOW" if at_risk_count <= 2 else "RED")}
-                    </div>
                 </div>
+            </div>
             </a>
             """, unsafe_allow_html=True)
         
@@ -767,13 +767,13 @@ class QualityReportDashboard:
             st.markdown(f"""
             <a href="#problem-reports-analysis" style="text-decoration: none; color: inherit;">
                 <div class="metric-card metric-card-clickable">
-                    <div class="metric-label">🚨 Sev 0/1 PRBs</div>
-                    <div class="metric-value">{critical_prbs}</div>
+                <div class="metric-label">🚨 Sev 0/1 PRBs</div>
+                <div class="metric-value">{critical_prbs}</div>
                     <div class="metric-total">of {total_prbs} total</div>
                     <div class="metric-delta {prb_delta_class}">
-                        {prb_status}
-                    </div>
+                    {prb_status}
                 </div>
+            </div>
             </a>
             """, unsafe_allow_html=True)
         
@@ -784,24 +784,24 @@ class QualityReportDashboard:
             <a href="#production-bug-analysis" style="text-decoration: none; color: inherit;">
                 <div class="metric-card metric-card-clickable">
                     <div class="metric-label">🐛 P0/P1 Prod Bugs</div>
-                    <div class="metric-value">{critical_prod_bugs}</div>
+                <div class="metric-value">{critical_prod_bugs}</div>
                     <div class="metric-total">of {total_bugs} total</div>
                     <div class="metric-delta {prod_delta_class}">
                         {prod_bug_status}
-                    </div>
                 </div>
+            </div>
             </a>
             """, unsafe_allow_html=True)
         
         with col4:
-            second_line = f"2nd: {second_version} ({second_percentage:.1f}%)" if second_version != "N/A" else ""
+            second_line = f"2nd: {second_version} ({second_percentage:.1f}%)" if second_version != "N/A" else "Single version"
             st.markdown(f"""
             <a href="#deployment-analysis" style="text-decoration: none; color: inherit;">
                 <div class="metric-card metric-card-clickable">
                     <div class="metric-label">🚀 Prod Deployment</div>
-                    <div class="metric-value">{dominant_version}</div>
+                <div class="metric-value">{dominant_version}</div>
                     <div class="metric-total">Dominant in fleet ({dominant_percentage:.1f}%)</div>
-                    <div class="metric-delta">
+                <div class="metric-delta">
                         {second_line}
                     </div>
                 </div>
@@ -824,19 +824,19 @@ class QualityReportDashboard:
         st.markdown("#### 💻 Development Metrics")
         col5, col6, col7, col8, col9 = st.columns(5)
         
-        with col5:
+        with col5:            
             # Coverage color logic: green if >= 80%, yellow if >= 70%, red if < 70%
             coverage_delta_class = "metric-delta-green" if avg_coverage >= 80 else ("metric-delta-yellow" if avg_coverage >= 70 else "metric-delta-red")
             st.markdown(f"""
             <a href="#code-coverage-analysis" style="text-decoration: none; color: inherit;">
                 <div class="metric-card metric-card-clickable">
-                    <div class="metric-label">📊 Overall Line Coverage</div>
-                    <div class="metric-value">{avg_coverage:.1f}%</div>
+                <div class="metric-label">📊 Overall Line Coverage</div>
+                <div class="metric-value">{avg_coverage:.1f}%</div>
                     <div class="metric-total">Overall Coverage 67.8%</div>
                     <div class="metric-delta {coverage_delta_class}">
-                        Target: 80%
-                    </div>
+                    Target: 80%
                 </div>
+            </div>
             </a>
             """, unsafe_allow_html=True)
             
@@ -852,8 +852,8 @@ class QualityReportDashboard:
                     <div class="metric-total">{total_ci_issues} issues</div>
                     <div class="metric-delta {ci_delta_class}">
                         {ci_bug_status}
-                    </div>
                 </div>
+            </div>
             </a>
             """, unsafe_allow_html=True)
             
@@ -864,12 +864,12 @@ class QualityReportDashboard:
             <a href="#security-analysis" style="text-decoration: none; color: inherit;">
                 <div class="metric-card metric-card-clickable">
                     <div class="metric-label">🔒 P0/P1 Security Bugs</div>
-                    <div class="metric-value">{critical_sec_bugs}</div>
+                <div class="metric-value">{critical_sec_bugs}</div>
                     <div class="metric-total">of {total_security_bugs} total</div>
                     <div class="metric-delta {sec_delta_class}">
                         {sec_bug_status}
-                    </div>
                 </div>
+            </div>
             </a>
             """, unsafe_allow_html=True)
             
@@ -1732,59 +1732,59 @@ class QualityReportDashboard:
         col1, col2 = st.columns(2)
         
         with col1:
-            # Count risks by status
-            risk_counts = {}
-            for risk in risks:
-                status = risk.get('status', 'Unknown')
-                risk_counts[status] = risk_counts.get(status, 0) + 1
-            
-            # Create DataFrame for better control over colors
-            risk_df = pd.DataFrame([
-                {'Status': status, 'Count': count} 
-                for status, count in risk_counts.items()
-            ])
-            
-            # Define explicit color mapping
-            def get_risk_color(status):
-                color_map = {
-                    'Green': '#28a745',      # Bright green ✅ On track
-                    'Yellow': '#ffc107',     # Bright yellow ⚠️ At risk  
-                    'Red': '#dc3545',        # Bright red 🚨 Critical
-                    'At Risk': '#dc3545',   # Bright red 🚨 Critical
-                    'Critical': '#dc3545',  # Bright red 🚨 Critical
-                    'High': '#dc3545',      # Bright red 🚨 Critical
-                    'Unknown': '#6c757d'    # Gray ❓ Unknown
-                }
-                return color_map.get(status, '#6c757d')
-            
-            # Apply colors to dataframe
-            risk_df['Color'] = risk_df['Status'].apply(get_risk_color)
-            
-            # Create pie chart with explicit colors
-            fig = px.pie(
-                risk_df,
-                values='Count',
-                names='Status', 
-                title="Risk Distribution by Status",
-                color='Status',
-                color_discrete_map={
-                    'Green': '#28a745',      # Bright green ✅
-                    'Yellow': '#ffc107',     # Bright yellow ⚠️
-                    'Red': '#dc3545',        # Bright red 🚨
-                    'At Risk': '#dc3545',   # Bright red 🚨
-                    'Critical': '#dc3545',  # Bright red 🚨
-                    'High': '#dc3545',      # Bright red 🚨
-                    'Unknown': '#6c757d'    # Gray ❓
-                }
+        # Count risks by status
+        risk_counts = {}
+        for risk in risks:
+            status = risk.get('status', 'Unknown')
+            risk_counts[status] = risk_counts.get(status, 0) + 1
+        
+        # Create DataFrame for better control over colors
+        risk_df = pd.DataFrame([
+            {'Status': status, 'Count': count} 
+            for status, count in risk_counts.items()
+        ])
+        
+        # Define explicit color mapping
+        def get_risk_color(status):
+            color_map = {
+                'Green': '#28a745',      # Bright green ✅ On track
+                'Yellow': '#ffc107',     # Bright yellow ⚠️ At risk  
+                'Red': '#dc3545',        # Bright red 🚨 Critical
+                'At Risk': '#dc3545',   # Bright red 🚨 Critical
+                'Critical': '#dc3545',  # Bright red 🚨 Critical
+                'High': '#dc3545',      # Bright red 🚨 Critical
+                'Unknown': '#6c757d'    # Gray ❓ Unknown
+            }
+            return color_map.get(status, '#6c757d')
+        
+        # Apply colors to dataframe
+        risk_df['Color'] = risk_df['Status'].apply(get_risk_color)
+        
+        # Create pie chart with explicit colors
+        fig = px.pie(
+            risk_df,
+            values='Count',
+            names='Status', 
+            title="Risk Distribution by Status",
+            color='Status',
+            color_discrete_map={
+                'Green': '#28a745',      # Bright green ✅
+                'Yellow': '#ffc107',     # Bright yellow ⚠️
+                'Red': '#dc3545',        # Bright red 🚨
+                'At Risk': '#dc3545',   # Bright red 🚨
+                'Critical': '#dc3545',  # Bright red 🚨
+                'High': '#dc3545',      # Bright red 🚨
+                'Unknown': '#6c757d'    # Gray ❓
+            }
+        )
+        
+        # Force the colors by updating traces
+        fig.update_traces(
+            marker=dict(
+                colors=[get_risk_color(status) for status in risk_df['Status']]
             )
-            
-            # Force the colors by updating traces
-            fig.update_traces(
-                marker=dict(
-                    colors=[get_risk_color(status) for status in risk_df['Status']]
-                )
-            )
-            
+        )
+        
             st.plotly_chart(fig, use_container_width=True, key=f"risk_distribution_chart{key_suffix}")
         
         with col2:
@@ -2180,7 +2180,7 @@ class QualityReportDashboard:
                 y=values,
                 marker_color=priority_colors.get(priority, '#6c757d'),
                 hovertemplate=f'<b>%{{x}}</b><br>{priority}: %{{y}} issues<extra></extra>'
-            ))
+        ))
         
         fig.update_layout(
             title="CI Issues by Team (Stacked by Priority)",
@@ -2403,7 +2403,7 @@ class QualityReportDashboard:
                     'Total Line Coverage %': total_line_coverage
                 })
                 
-            except Exception as e:
+        except Exception as e:
                 print(f"Error processing report {rf.get('path', 'unknown')}: {e}")
                 continue
 
@@ -2552,7 +2552,7 @@ class QualityReportDashboard:
                 priority = risk.get('priority', 'Unknown')
                 st.write(f"{color} **{feature}**")
                 st.caption(f"Priority: {priority}")
-        else:
+            else:
             st.write("All features are on track! 🎉")
 
     def generate_prb_narrative(self, prb: dict) -> str:
@@ -2612,7 +2612,7 @@ class QualityReportDashboard:
         # All PRBs regardless of status (focus on volume for the week)
         critical_prbs_total = len(p0_prbs) + len(p1_prbs)  # Sev 0 + Sev 1
         
-        st.markdown("#### 📊 PRB Severity Breakdown (All PRBs This Week)")
+        st.markdown("#### 📊 [PRB Severity Breakdown (All PRBs This Week)](https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE000001TXjB2AW)")
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             # Sev 0 - always red if any exist
@@ -2815,7 +2815,7 @@ class QualityReportDashboard:
         else:
             status = "🟢 GREEN"
         
-        st.markdown("#### 📊 Production Bug Summary") 
+        st.markdown("#### 📊 [Production Bug Summary](https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE0000014M4b2AE)") 
         col1, col2, col3 = st.columns(3)
         with col1:
             st.metric("🔴 P0/P1 Bugs", critical_count)
@@ -3243,7 +3243,7 @@ def render_component_dashboard(component: str):
             dashboard.create_bug_insights(data)
         
         # Coverage Analysis
-        st.markdown('<h3 id="code-coverage-analysis">📊 Code Coverage Analysis</h3>', unsafe_allow_html=True)
+        st.markdown('<h3 id="code-coverage-analysis">📊 <a href="https://sonarqube.sfcq.buildndeliver-s.aws-esvc1-useast2.aws.sfdc.cl/component_measures?id=sayonara.sayonaradb.sdb&metric=uncovered_lines&view=list" target="_blank" style="color: inherit; text-decoration: none;">Code Coverage Analysis</a></h3>', unsafe_allow_html=True)
         st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         col1, col2 = st.columns([1, 1])
         with col1:
@@ -3258,7 +3258,7 @@ def render_component_dashboard(component: str):
         with col1:
             dashboard.create_ci_issues_chart(data)
         with col2:
-            st.markdown("#### 📊 CI Issues Insights")
+            st.markdown("#### 📊 [CI Issues Insights](https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE000002WjvJ2AS)")
             ci_data = data.get('ci_issues', [])
             if ci_data:
                 total_ci_issues = len(ci_data)
@@ -3286,7 +3286,7 @@ def render_component_dashboard(component: str):
         
         # Security Analysis
         st.markdown("---")
-        st.markdown('<h3 id="security-analysis">🔒 <a href="https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE000002XKRp2AO" target="_blank">Security Bugs</a></h3>', unsafe_allow_html=True)
+        st.markdown('<h3 id="security-analysis">🔒 <a href="https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=lightningdashboard&wave__assetId=01ZEE000001BaVp2AK" target="_blank">Security Bugs</a></h3>', unsafe_allow_html=True)
         st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         st.markdown("*Source: Coverity and 3PP Scan*")
         col1, col2 = st.columns([1, 1])
@@ -3328,7 +3328,7 @@ def render_component_dashboard(component: str):
 
         # Left Shift Analysis
         st.markdown("---")
-        st.markdown('<h3 id="left-shift-bugs">⬅️ <a href="https://gus.lightning.force.com/lightning/r/Report/00OEE000002Wjld2AC/view?queryScope=userFolders" target="_blank">Left Shift Bugs</a></h3>', unsafe_allow_html=True)
+        st.markdown('<h3 id="left-shift-bugs">⬅️ <a href="https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=lightningdashboard&wave__assetId=01ZEE000001BaVp2AK" target="_blank">Left Shift Bugs</a></h3>', unsafe_allow_html=True)
         st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         col1, col2 = st.columns([1, 1])
         with col1:
@@ -3553,7 +3553,7 @@ def main():
         # Always update selected week's reports to ensure consistency
         if st.session_state.selected_week and st.session_state.selected_week in weeks:
             st.session_state.selected_week_reports = weeks[st.session_state.selected_week]['reports']
-        else:
+            else:
             st.session_state.selected_week_reports = {}
     else:
         st.sidebar.warning("📭 No reports found")
@@ -3596,12 +3596,12 @@ def main():
             render_component_dashboard(component)
     
     # KPI Legend Section
-    st.markdown("---")
+                st.markdown("---")
     st.markdown("### 📊 KPI Color Definitions")
     
-    col1, col2 = st.columns(2)
-    
-    with col1:
+                col1, col2 = st.columns(2)
+                
+                with col1:
         st.markdown("""
         #### 🐛 **Bug Metrics (Production, CI, Security, Left Shift)**
         - **🟢 GREEN**: Low risk - minimal critical issues
@@ -3614,8 +3614,8 @@ def main():
         - **Security Issues**: Green ≤16, Yellow 17-32, Red >32
         - **Left Shift**: Green ≤25, Yellow 26-50, Red >50
         """)
-    
-    with col2:
+                
+                with col2:
         st.markdown("""
         #### 🚨 **PRB Metrics**
         - **🟢 GREEN**: ≤2 critical PRBs

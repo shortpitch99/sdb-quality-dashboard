@@ -934,7 +934,7 @@ Next week: Planning production rollout to P0-P3 stages pending final validation 
         
         try:
             with open(csv_file, 'r') as f:
-                reader = csv.DictReader(f)
+                reader = csv.DictReader(f, delimiter='\t')
                 for row in reader:
                     # Parse SuperSet export format: stagger, version, SUM(count)
                     deployment_record = {

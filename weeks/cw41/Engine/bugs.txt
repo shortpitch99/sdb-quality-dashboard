@@ -1,0 +1,152 @@
+Priority Select all rows for Drill Down.
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Created Date
+Sorted by Created Date, oldest-to-newestAscending
+Select row for Drill Down.
+P2(9)
+Sayonara Data Management(1)
+9/28/2025(1)
+Subtotal
+Subtotal
+Sayonara Foundation Services(5)
+8/12/2025(1)
+Subtotal
+9/28/2025(1)
+Subtotal
+9/29/2025(1)
+Subtotal
+10/13/2025(2)
+Subtotal
+Subtotal
+Sayonara TxP(2)
+10/16/2025(2)
+Subtotal
+Subtotal
+SDB Query Proc Execution(1)
+10/17/2025(1)
+Subtotal
+Subtotal
+Subtotal
+Total(9)
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Created Date
+Sorted by Created Date, oldest-to-newestAscending
+Work ID
+Subject
+Readme Notes
+Assigned To: Full Name
+Status
+Customer
+Found In Build Name
+Sprint: Name
+P2(9)
+Sayonara Data Management(1)
+9/28/2025(1)
+W-19766958
+[EA][PROD][PROD_ERROR][jpn182s] New Tenant ERS installation is currently not allowed as the current ...
+9/30: RCA in progress.
+Terry Chong
+New
+SDBFalcon jpn182s
+sdb.258.11
+-
+Subtotal
+Subtotal
+Sayonara Foundation Services(5)
+8/12/2025(1)
+W-19317263
+[EA][PROD][INTERNAL_ERROR][usa376] We need an in-progress transaction to read the catalogs
+10/14: PR18260 was merged
+
+09/23 - Code is in Review stage.
+
+09/09 - Jacob has already fixed this as part of Sequences V2. Once he is back from PTO (9b), he willl cherry-pick the fix into Sequences V1.
+
+08/14/2025 Couple of follow-ups have been identifie...
+Jacob Park
+Ready for Review
+SDBFalcon usa376
+sdb.258.1
+2025.10a-Sayonara Foundation Services
+Subtotal
+9/28/2025(1)
+W-19765560
+[EA][PROD][INTERNAL_ERROR][usa6s] index "ak3auth_session" has an entry with no corresponding base ro...
+10/14 - @Michael Abebe reproduced the issue; and also opened up several follow up items after discussion with the triaging team. W-19786238 was opened to solve the root cause of the problem. PR is under review.
+9/30: Michael might have reproduced the pro...
+Michael Abebe
+Triaged
+SDBFalcon usa6s
+sdb.260.1
+-
+Subtotal
+9/29/2025(1)
+W-19769313
+[EA][PROD][TRAP][usa6s] AllocSetAlloc,palloc_internal,Array_init,ExtentIdList_init,read_extentset
+9/30: Just transferred to Sagar
+Sagar Ranadive
+Triaged
+SDBFalcon usa6s
+sdb.260.1
+2025.10b-Sayonara Foundation Services
+Subtotal
+10/13/2025(2)
+W-19881426
+[DEU60] log extent got deleted which is not yet applied on one of the log tailer.
+10/14 - @Shyam Antony will investigate if there is a feedback issue in WSCluster.
+Bryan Pendleton
+New
+Falcon deu60
+258.11
+2025.10b-Sayonara Foundation Services
+W-19881988
+[EA][PROD][TRAP][usa570] raise,abort,errfinish,RemoteKeyspaceFilterAdd,RemoteKeyspaceFilterDeserialize
+10/14 - A very slow APEX job query holding up the EI for more than 10 mins. The query accessed 25m tombstones and had a lot of physical IOs. The problem was resolved after the merge. The core perf team will add a custom index to improve the query via W-1...
+Atish Agrawal
+New
+SDBFalcon usa570
+sdb.258.11
+-
+Subtotal
+Subtotal
+Sayonara TxP(2)
+10/16/2025(2)
+W-19969553
+[EA][PROD][PROD_ERROR][usa196s] Redo recovery was terminated prior to applying all log records. This...
+-
+Smit Raj
+New
+SDBFalcon usa196s
+sdb.260.4
+-
+W-19970850
+[EA][PROD][PROD_ERROR][usa258s] Redo recovery was terminated prior to applying all log records. This...
+-
+Smit Raj
+New
+SDBFalcon usa258s
+sdb.258.15
+-
+Subtotal
+Subtotal
+SDB Query Proc Execution(1)
+10/17/2025(1)
+W-19981374
+[EA][PROD][PROD_ERROR][usa250s] upper bound of FOR loop cannot be null
+-
+SDB QP Execution User
+New
+SDBFalcon usa250s
+sdb.258.15
+-
+Subtotal
+Subtotal
+Subtotal
+Total(9)
+

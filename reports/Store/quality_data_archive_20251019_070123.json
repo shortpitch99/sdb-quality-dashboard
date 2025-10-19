@@ -1,0 +1,440 @@
+{
+  "risks": [
+    {
+      "feature": "Collision Detection in Store",
+      "status": "Green",
+      "priority": "High",
+      "description": "Beginning to rollout in GUS sandboxes. This is needed for rolling out Fast Restore. This is very early in the rollout process.",
+      "last_updated": "2024-01-15"
+    }
+  ],
+  "prbs": [],
+  "bugs": [],
+  "critical_issues": [],
+  "deployments": [
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    },
+    {
+      "stagger": "",
+      "version": "",
+      "count": 0,
+      "stage": "",
+      "cells": 0
+    }
+  ],
+  "deployment_summary": "Weekly Deployment Summary - Week of September 15, 2025\n\nThis week's deployment activities proceeded smoothly across all stagger groups. \nSDB version 258.11 was successfully deployed to sandbox environments (SB0-SB2) \nwith no major issues reported.\n\nKey highlights:\n- Version 258.11 rolled out to 150 sandbox cells\n- Zero failed deployments\n- Average deployment time: 12 minutes\n- All post-deployment validations passed\n\nNext week: Planning production rollout to P0-P3 stages pending final validation results.",
+  "coverage": [],
+  "new_code_coverage": [
+    {
+      "component": "SDB Engine",
+      "new_code_coverage": 92.9,
+      "overall_coverage": 82.8,
+      "new_code_line_coverage": 93.4,
+      "overall_line_coverage": 84.5,
+      "lines_to_cover": 121,
+      "uncovered_lines": 8,
+      "overall_lines_to_cover": 46033,
+      "overall_uncovered_lines": 7142
+    }
+  ],
+  "ci_issues": [
+    {
+      "work_id": "W-19654204",
+      "team": "SDBStore",
+      "priority": "P1",
+      "subject": "Bookie decomm tests running in SDBChaos are failing",
+      "status": "New",
+      "build_version": "sdb.260.5",
+      "created_date": "2025-09-16",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19866389",
+      "team": "SDBStore",
+      "priority": "P2",
+      "subject": "BKProxyArchivalRestoreTest.UNKNOWN: InvocationTargetException:",
+      "status": "New",
+      "build_version": "sdb.260.10",
+      "created_date": "2025-10-10",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19866385",
+      "team": "SDBStore",
+      "priority": "P2",
+      "subject": "BKProxyClientCloudStoreTest.UNKNOWN: InvocationTargetException:",
+      "status": "New",
+      "build_version": "sdb.260.10",
+      "created_date": "2025-10-10",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19866382",
+      "team": "SDBStore",
+      "priority": "P2",
+      "subject": "BKProxyStorePropertiesCheckerTest.UNKNOWN: InvocationTargetException:",
+      "status": "New",
+      "build_version": "sdb.260.10",
+      "created_date": "2025-10-10",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19866380",
+      "team": "SDBStore",
+      "priority": "P2",
+      "subject": "BKProxyArchivalStoreTest.UNKNOWN: InvocationTargetException:",
+      "status": "New",
+      "build_version": "sdb.260.10",
+      "created_date": "2025-10-10",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19364382",
+      "team": "SDBStore",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-WS-schemaupgrade-stress-RHEL9.schemaupgrade-stress: Exception: error executing teardown sayonaradb.test",
+      "status": "In Progress",
+      "build_version": "sdb.260",
+      "created_date": "2025-08-18",
+      "issue_type": "CI"
+    }
+  ],
+  "leftshift_issues": [],
+  "abs_issues": [],
+  "security_issues": [],
+  "git_stats": {
+    "reporting_period_start": "2025-10-06",
+    "reporting_period_end": "2025-10-12",
+    "total_commits": 27,
+    "lines_added": 9640,
+    "lines_deleted": 8339,
+    "lines_changed": 17979,
+    "files_changed": 189,
+    "authors": [
+      "Ankit Sharma",
+      "Arundhati Tambe",
+      "Atish Agrawal",
+      "Jun Chen",
+      "Mark Mears",
+      "Matt Woicik",
+      "Michael Abebe",
+      "Sagar Ranadive",
+      "Sai Prasad Mysary",
+      "Shao Yuan Ho",
+      "Shreyas Belur Sampath",
+      "Suhas Dantkale",
+      "tok-sfci124",
+      "Yi Xia",
+      "ZHIHAN GUO"
+    ],
+    "most_changed_files": [
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/server/optimizer/AdaptiveQueryPlansTest.java",
+        "lines_added": 5,
+        "lines_deleted": 2793,
+        "total_changes": 2798
+      },
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/server/ws/WSLogTailingUniqueConstraintTest.java",
+        "lines_added": 810,
+        "lines_deleted": 1031,
+        "total_changes": 1841
+      },
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/server/ws/WSLogTailingAsyncWritesTest.java",
+        "lines_added": 1534,
+        "lines_deleted": 21,
+        "total_changes": 1555
+      },
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/functional/plan_constraints/PlanConstraintsTest.java",
+        "lines_added": 1,
+        "lines_deleted": 810,
+        "total_changes": 811
+      },
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/server/cache/plan/SharedPlanCacheTest.java",
+        "lines_added": 3,
+        "lines_deleted": 624,
+        "total_changes": 627
+      },
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/server/log_recovery/EarlyExitRollbackPromotionTest.java",
+        "lines_added": 579,
+        "lines_deleted": 2,
+        "total_changes": 581
+      },
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/util/WorkloadUtils.java",
+        "lines_added": 572,
+        "lines_deleted": 0,
+        "total_changes": 572
+      },
+      {
+        "file": "postgresql/src/backend/ws/async/async.c",
+        "lines_added": 479,
+        "lines_deleted": 71,
+        "total_changes": 550
+      },
+      {
+        "file": "postgresql/src/backend/ws/async/test/async_basic_test.c",
+        "lines_added": 326,
+        "lines_deleted": 187,
+        "total_changes": 513
+      },
+      {
+        "file": "postgresql/contrib/adaptive_query_plans/adaptive_query_plans.c",
+        "lines_added": 1,
+        "lines_deleted": 486,
+        "total_changes": 487
+      }
+    ],
+    "commit_frequency": 3.857142857142857,
+    "code_churn_risk": "High"
+  },
+  "generated_at": "2025-10-19T07:01:23.140397",
+  "coverage_summary": {
+    "new_code": {
+      "coverage": 92.9,
+      "line_coverage": 93.4,
+      "condition_coverage": 91.2,
+      "lines_to_cover": 121,
+      "uncovered_lines": 8,
+      "conditions_to_cover": 34,
+      "uncovered_conditions": 3
+    },
+    "overall": {
+      "coverage": 82.8,
+      "line_coverage": 84.5,
+      "condition_coverage": 76.0,
+      "lines_to_cover": 46033,
+      "uncovered_lines": 7142,
+      "conditions_to_cover": 11684,
+      "uncovered_conditions": 2804
+    }
+  },
+  "metadata": {
+    "generated_at": "2025-10-19T07:01:41.790831",
+    "report_period_start": "2025-10-06",
+    "report_period_end": "2025-10-12",
+    "report_period_display": "October 06-12, 2025",
+    "generator_version": "2.0",
+    "data_sources": {
+      "risks": 1,
+      "prbs": 0,
+      "bugs": 0,
+      "deployments": 29,
+      "has_llm_content": true,
+      "ci_total": 6,
+      "ci_p0_p1": 1,
+      "security_total": 0,
+      "security_p0_p1": 0,
+      "leftshift_total": 0,
+      "leftshift_p0_p1": 0,
+      "coverage_overall": 82.8,
+      "coverage_overall_line": 84.5,
+      "coverage_new_code": 92.9,
+      "coverage_new_code_line": 93.4
+    }
+  },
+  "llm_content": {
+    "trend_analysis": "## Quality Trends Analysis\n\n### Overall System Health: **EXCELLENT**\n\n**Key Findings:**\n- **Zero defects** across critical categories (PRBs, bugs, security issues)\n- Only **1 active risk** item requiring attention\n- Strong quality posture with minimal technical debt\n\n### Trend Insights:\n\n**Positive Indicators:**\n- Clean defect profile suggests robust development practices\n- Absence of security issues indicates effective security controls\n- Low risk count demonstrates proactive risk management\n\n**Areas of Focus:**\n- Monitor the single identified risk for potential escalation\n- Maintain current quality practices to sustain zero-defect state\n- Consider root cause analysis of the risk item to prevent similar issues\n\n### Recommendations:\n1. **Continue current practices** - whatever processes are in place are working effectively\n2. **Risk mitigation** - Address the single risk item promptly to maintain clean status\n3. **Preventive monitoring** - Establish early warning indicators to catch issues before they become defects\n\n**Quality Score: 9.5/10** - Exceptional performance with minimal exposure from the single risk item.",
+    "risk_analysis": "### Deployment Risk Assessment - SDB Version 258.11\n\n#### Executive Summary\n\nThe deployment of SDB version 258.11 to sandbox environments demonstrates strong stability indicators with zero failures across 150 cells. However, the upcoming production rollout requires careful consideration of several risk factors and validation gaps.\n\n#### Deployment Stability Analysis\n\n##### Current Performance Metrics\n- **Success Rate**: 100% (150/150 sandbox deployments)\n- **Deployment Duration**: 12 minutes average (within acceptable range)\n- **Validation Status**: All post-deployment checks passed\n- **Environment Coverage**: Complete sandbox tier (SB0-SB2)\n\n##### Stability Risk Factors\n- **Low Risk**: Consistent deployment timing indicates stable automation\n- **Low Risk**: Zero failure rate suggests robust deployment pipeline\n- **Medium Risk**: Limited to sandbox environments only - production behavior may differ\n\n#### Code Change Impact Assessment\n\n##### Missing Critical Information\nThe deployment summary lacks essential details for comprehensive risk assessment:\n\n- **Change Scope**: No information on modified components or services\n- **Feature Impact**: Unknown whether changes affect user-facing functionality\n- **Database Changes**: No mention of schema modifications or data migrations\n- **Configuration Updates**: Missing details on environment-specific changes\n- **Dependency Updates**: No visibility into third-party library changes\n\n##### Recommended Pre-Production Validation\n\n###### Technical Validation Requirements\n1. **Performance Testing**\n   - Load testing on production-equivalent infrastructure\n   - Memory and CPU utilization analysis\n   - Database query performance validation\n\n2. **Integration Testing**\n   - Cross-service communication verification\n   - External API compatibility checks\n   - End-to-end workflow validation\n\n3. **Security Assessment**\n   - Vulnerability scanning of new code\n   - Authentication/authorization testing\n   - Data privacy compliance verification\n\n#### Production Rollout Risk Mitigation\n\n##### Staging Strategy Recommendations\n- **Gradual Rollout**: Implement P0 \u2192 P1 \u2192 P2 \u2192 P3 progression with validation gates\n- **Monitoring Enhancement**: Deploy additional observability before production release\n- **Rollback Preparation**: Ensure rapid rollback capability at each stage\n\n##### Critical Success Factors\n1. **Real-time Monitoring**: Establish baseline metrics before deployment\n2. **Automated Validation**: Implement comprehensive health checks\n3. **Communication Plan**: Define escalation procedures for production issues\n\n#### Overall Risk Rating\n\n**Medium Risk** - While sandbox deployment success is encouraging, the lack of detailed change information and limited production validation creates moderate risk for the upcoming production rollout.\n\n##### Recommendation\nProceed with production deployment only after:\n1. Completing comprehensive change impact documentation\n2. Executing full regression testing suite\n3. Establishing enhanced monitoring and alerting\n4. Confirming rollback procedures are tested and ready",
+    "prb_narratives": {},
+    "prb_analyses": {}
+  }
+}

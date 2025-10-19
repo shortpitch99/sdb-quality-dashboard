@@ -1,0 +1,5 @@
+Feature: Collision Detection in Store
+Status: Green
+Priority: High
+Description: Beginning to rollout in GUS sandboxes. This is needed for rolling out Fast Restore. This is very early in the rollout process.
+Updated: 2024-01-15

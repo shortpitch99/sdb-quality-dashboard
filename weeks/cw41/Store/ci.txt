@@ -1,0 +1,103 @@
+Scrum Team Name Select all rows for Drill Down.
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Select row for Drill Down.
+SDBStore(6)
+P1(1)
+Subtotal
+P2(5)
+Subtotal
+Subtotal
+Total(6)
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Work: Work ID
+Subject
+Status
+Assigned To
+Work: Created Date
+Sorted by Work: Created Date, newest-to-oldestDescending
+Sprint
+Type
+Found in Build
+Scheduled Build
+Customer
+Work: Created By
+SDBStore(6)
+P1(1)
+W-19654204
+Bookie decomm tests running in SDBChaos are failing
+New
+SDBStore Work Queue
+9/16/2025
+-
+Bug
+sdb.260.5
+-
+-
+Jisha Paul
+Subtotal
+P2(5)
+W-19866389
+BKProxyArchivalRestoreTest.UNKNOWN: InvocationTargetException:
+New
+Sushanth Rai
+10/10/2025
+2025.10a-SDBStore
+Bug
+sdb.260.10
+-
+-
+SFCI API USER
+W-19866385
+BKProxyClientCloudStoreTest.UNKNOWN: InvocationTargetException:
+New
+Sushanth Rai
+10/10/2025
+2025.10a-SDBStore
+Bug
+sdb.260.10
+-
+-
+SFCI API USER
+W-19866382
+BKProxyStorePropertiesCheckerTest.UNKNOWN: InvocationTargetException:
+New
+Sushanth Rai
+10/10/2025
+2025.10a-SDBStore
+Bug
+sdb.260.10
+-
+-
+SFCI API USER
+W-19866380
+BKProxyArchivalStoreTest.UNKNOWN: InvocationTargetException:
+New
+Sushanth Rai
+10/10/2025
+2025.10a-SDBStore
+Bug
+sdb.260.10
+-
+-
+SFCI API USER
+W-19364382
+SDB-JUnitStress-WS-schemaupgrade-stress-RHEL9.schemaupgrade-stress: Exception: error executing teardown sayonaradb.test
+In Progress
+Shyam Vanga
+8/18/2025
+-
+Bug
+sdb.260
+-
+-
+SFCI API USER
+Subtotal
+Subtotal
+Total(6)
+

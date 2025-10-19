@@ -1,0 +1,99 @@
+Created Date Time Select all rows for Drill Down.
+Created Date Time
+Sorted by Created Date Time, oldest-to-newestAscending
+Problem Priority
+Sorted by Problem Priority, ascending picklist orderAscending
+Problem Number
+Sorted by Problem Number, A-to-ZAscending
+Select row for Drill Down.
+10/12/2025 - 10/18/2025(2)
+P2(2)
+PRB-0029018(1)
+PRB-0029043(1)
+Created Date Time
+Sorted by Created Date Time, oldest-to-newestAscending
+Problem Priority
+Sorted by Problem Priority, ascending picklist orderAscending
+Problem Number
+Sorted by Problem Number, A-to-ZAscending
+Team: Team Name
+Cloud
+Problem State
+Customer Impact
+External RCA Requested
+Problem Description
+Repeat Incident
+Created Date
+Initial Work Issue: Work ID
+Customer Experience
+What Happened?
+Proximate Cause (Why did it happen)?
+How did we find out about the issue?
+How was it Resolved?
+Root Cause
+Next Steps
+Retro Summary
+Owner: Full Name
+10/12/2025 - 10/18/2025(2)
+P2(2)
+PRB-0029018(1)
+Query Dataplane Services
+SDB
+Under Investigation
+Performance degradation (general)
+feature not included
+PRB Retrospective | SEV-2 | 10/11/2025 | Concurrent Apex Errors following 258 Release
+
+[THIS PRB IS MANAGED BY QUIP2GUS]
+feature not included
+10/12/2025
+W-19875850
+User Experience: The incident resulted in a severe performance degradation where users experienced significant delays and errors in integration API calls. This disruption affected the ability of customers on NA247 and FRA100 to perform essential operatio...
+[THIS PRB IS MANAGED BY QUIP2GUS]
+Any updates made in GUS will be overwritten! Update Quip doc: https://salesforce.quip.com/19QEAIHQbeQb
+​
+On October 11, 2025, a significant incident affected up to 90% of integration API calls for
+The proximate cause of the incident was identified as a change related to a boolean in release 258, which led to concurrent apex errors affecting a significant percentage of integration API calls. This change inadvertently impacted the system's ability t...
+https://salesforce-internal.slack.com/archives/CDQ3U66E5/p1760222452910499
+Immediate actions included filing EBFs to run database select scripts and assess the impact scope. The concurrent request limits for apex and API were increased, and changes were made to DB skinny tables via Retro EBF to mitigate the issue. A CP call was
+-
+TBD - Fill out CARs table in Quip
+Proximate Cause: The proximate cause of the incident was identified as a change related to a boolean in release 258, which led to concurrent apex errors affecting a significant percentage of integration API calls. This change inadvertently impacted the s
+Site Reliability
+PRB-0029043(1)
+CRM Database Sustaining Engineering
+SDB
+Under Investigation
+Performance degradation (general)
+feature not included
+PRB Retrospective | SEV-2 | 10/14/2025 | USA714 - high memstore usage
+
+[THIS PRB IS MANAGED BY QUIP2GUS]
+feature not included
+10/14/2025
+W-19892246
+User Experience: Performance degradation. | Impact Quantification: Q: What #/% of users/customers/requests got impacted (aggregated across all infra units)?. A: .
+[THIS PRB IS MANAGED BY QUIP2GUS]
+Any updates made in GUS will be overwritten! Update Quip doc: https://salesforce.quip.com/gaqBADSRA53p
+​
+The incident was opened to investigate high memstore usage on usa714. An org migration fro
+Org migration that led to high memstore usage
+https://salesforce-internal.slack.com/archives/CDQ3U66E5/p1760443521427419
+Setting the concurrency to 5, reducing the threads for the org migration from 40 to 4, and suspending job sharing
+​
+Q: Explain in detail the Time to Fix (i.e key events from detection to resolution)
+A: 
+​
+Q: Was a known mitigation for this
+-
+TBD - Fill out CARs table in Quip
+Proximate Cause: Unknown
+​
+Key Questions for Retro (enter as Problem Statements below): 
+​
+Q: What was the root cause of the incident? How can we prevent this in the future? Tracer was not used 
+A: 
+​
+Q: If caught by Alert but missed
+Site Reliability
+
