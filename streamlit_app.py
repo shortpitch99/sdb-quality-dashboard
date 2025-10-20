@@ -310,7 +310,7 @@ class QualityReportDashboard:
                         except ValueError:
                             continue
             except Exception as e:
-            st.error(f"Error reading component reports: {e}")
+                st.error(f"Error reading component reports: {e}")
         
         # Sort by timestamp (newest first)
         component_reports.sort(key=lambda x: x['timestamp'], reverse=True)
