@@ -2553,7 +2553,7 @@ class QualityReportDashboard:
                 st.write(f"{color} **{feature}**")
                 st.caption(f"Priority: {priority}")
             else:
-            st.write("All features are on track! 🎉")
+                st.write("All features are on track! 🎉")
 
     def generate_prb_narrative(self, prb: dict) -> str:
         """Get pre-generated PRB narrative from LLM content or show unavailable message."""
@@ -3553,7 +3553,7 @@ def main():
         # Always update selected week's reports to ensure consistency
         if st.session_state.selected_week and st.session_state.selected_week in weeks:
             st.session_state.selected_week_reports = weeks[st.session_state.selected_week]['reports']
-            else:
+        else:
             st.session_state.selected_week_reports = {}
     else:
         st.sidebar.warning("📭 No reports found")
@@ -3596,12 +3596,12 @@ def main():
             render_component_dashboard(component)
     
     # KPI Legend Section
-                st.markdown("---")
+    st.markdown("---")
     st.markdown("### 📊 KPI Color Definitions")
     
-                col1, col2 = st.columns(2)
-                
-                with col1:
+    col1, col2 = st.columns(2)
+    
+    with col1:
         st.markdown("""
         #### 🐛 **Bug Metrics (Production, CI, Security, Left Shift)**
         - **🟢 GREEN**: Low risk - minimal critical issues
@@ -3614,8 +3614,8 @@ def main():
         - **Security Issues**: Green ≤16, Yellow 17-32, Red >32
         - **Left Shift**: Green ≤25, Yellow 26-50, Red >50
         """)
-                
-                with col2:
+    
+    with col2:
         st.markdown("""
         #### 🚨 **PRB Metrics**
         - **🟢 GREEN**: ≤2 critical PRBs
