@@ -1732,59 +1732,59 @@ class QualityReportDashboard:
         col1, col2 = st.columns(2)
         
         with col1:
-        # Count risks by status
-        risk_counts = {}
-        for risk in risks:
-            status = risk.get('status', 'Unknown')
-            risk_counts[status] = risk_counts.get(status, 0) + 1
-        
-        # Create DataFrame for better control over colors
-        risk_df = pd.DataFrame([
-            {'Status': status, 'Count': count} 
-            for status, count in risk_counts.items()
-        ])
-        
-        # Define explicit color mapping
-        def get_risk_color(status):
-            color_map = {
-                'Green': '#28a745',      # Bright green ✅ On track
-                'Yellow': '#ffc107',     # Bright yellow ⚠️ At risk  
-                'Red': '#dc3545',        # Bright red 🚨 Critical
-                'At Risk': '#dc3545',   # Bright red 🚨 Critical
-                'Critical': '#dc3545',  # Bright red 🚨 Critical
-                'High': '#dc3545',      # Bright red 🚨 Critical
-                'Unknown': '#6c757d'    # Gray ❓ Unknown
-            }
-            return color_map.get(status, '#6c757d')
-        
-        # Apply colors to dataframe
-        risk_df['Color'] = risk_df['Status'].apply(get_risk_color)
-        
-        # Create pie chart with explicit colors
-        fig = px.pie(
-            risk_df,
-            values='Count',
-            names='Status', 
-            title="Risk Distribution by Status",
-            color='Status',
-            color_discrete_map={
-                'Green': '#28a745',      # Bright green ✅
-                'Yellow': '#ffc107',     # Bright yellow ⚠️
-                'Red': '#dc3545',        # Bright red 🚨
-                'At Risk': '#dc3545',   # Bright red 🚨
-                'Critical': '#dc3545',  # Bright red 🚨
-                'High': '#dc3545',      # Bright red 🚨
-                'Unknown': '#6c757d'    # Gray ❓
-            }
-        )
-        
-        # Force the colors by updating traces
-        fig.update_traces(
-            marker=dict(
-                colors=[get_risk_color(status) for status in risk_df['Status']]
+            # Count risks by status
+            risk_counts = {}
+            for risk in risks:
+                status = risk.get('status', 'Unknown')
+                risk_counts[status] = risk_counts.get(status, 0) + 1
+            
+            # Create DataFrame for better control over colors
+            risk_df = pd.DataFrame([
+                {'Status': status, 'Count': count} 
+                for status, count in risk_counts.items()
+            ])
+            
+            # Define explicit color mapping
+            def get_risk_color(status):
+                color_map = {
+                    'Green': '#28a745',      # Bright green ✅ On track
+                    'Yellow': '#ffc107',     # Bright yellow ⚠️ At risk  
+                    'Red': '#dc3545',        # Bright red 🚨 Critical
+                    'At Risk': '#dc3545',   # Bright red 🚨 Critical
+                    'Critical': '#dc3545',  # Bright red 🚨 Critical
+                    'High': '#dc3545',      # Bright red 🚨 Critical
+                    'Unknown': '#6c757d'    # Gray ❓ Unknown
+                }
+                return color_map.get(status, '#6c757d')
+            
+            # Apply colors to dataframe
+            risk_df['Color'] = risk_df['Status'].apply(get_risk_color)
+            
+            # Create pie chart with explicit colors
+            fig = px.pie(
+                risk_df,
+                values='Count',
+                names='Status', 
+                title="Risk Distribution by Status",
+                color='Status',
+                color_discrete_map={
+                    'Green': '#28a745',      # Bright green ✅
+                    'Yellow': '#ffc107',     # Bright yellow ⚠️
+                    'Red': '#dc3545',        # Bright red 🚨
+                    'At Risk': '#dc3545',   # Bright red 🚨
+                    'Critical': '#dc3545',  # Bright red 🚨
+                    'High': '#dc3545',      # Bright red 🚨
+                    'Unknown': '#6c757d'    # Gray ❓
+                }
             )
-        )
-        
+            
+            # Force the colors by updating traces
+            fig.update_traces(
+                marker=dict(
+                    colors=[get_risk_color(status) for status in risk_df['Status']]
+                )
+            )
+            
             st.plotly_chart(fig, use_container_width=True, key=f"risk_distribution_chart{key_suffix}")
         
         with col2:
