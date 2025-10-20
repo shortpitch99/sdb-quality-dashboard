@@ -2403,7 +2403,7 @@ class QualityReportDashboard:
                     'Total Line Coverage %': total_line_coverage
                 })
                 
-        except Exception as e:
+            except Exception as e:
                 print(f"Error processing report {rf.get('path', 'unknown')}: {e}")
                 continue
 
