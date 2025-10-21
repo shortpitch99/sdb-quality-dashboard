@@ -2596,12 +2596,41 @@ class QualityReportDashboard:
         # No LLM content available
         return f"**Exhaustive Analysis:** Content not available - requires LLM generation during report creation for {prb_id}"
     
+    def deduplicate_prbs(self, prbs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Remove duplicate PRBs based on content similarity."""
+        if not prbs:
+            return prbs
+        
+        unique_prbs = []
+        seen_incidents = set()
+        
+        for prb in prbs:
+            # Create a signature for the incident based on key fields
+            what_happened = prb.get('what_happened', '').strip()
+            created_date = prb.get('created_date', '')
+            team = prb.get('team', '')
+            
+            # Create a unique signature for this incident
+            incident_signature = f"{what_happened}|{created_date}|{team}"
+            
+            if incident_signature not in seen_incidents:
+                unique_prbs.append(prb)
+                seen_incidents.add(incident_signature)
+            else:
+                # This is a duplicate - add a note to the logs but don't display
+                print(f"Duplicate PRB detected and removed: {prb.get('id', 'Unknown')} (matches existing incident)")
+        
+        return unique_prbs
+    
     def create_prb_insights(self, data: Dict[str, Any]):
         """Create enhanced PRB insights panel with AI-generated narratives."""
         prbs = data.get('prbs', [])
         if not prbs:
             st.info("No PRB data available")
             return
+        
+        # Remove duplicate PRBs based on content similarity
+        prbs = self.deduplicate_prbs(prbs)
         
         # Analyze PRBs by severity (regardless of status - focus on all Sev 0/1 PRBs)
         p0_prbs = [p for p in prbs if 'P0' in str(p.get('priority', '')) or 'Sev0' in str(p.get('priority', ''))]
