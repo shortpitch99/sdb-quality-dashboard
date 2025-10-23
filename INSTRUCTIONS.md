@@ -12,6 +12,10 @@
 - **Source**: [Salesforce PRB Report](https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE000001TXjB2AW)
 - **Action**: Run the report → Use "Copy to clipboard" feature → Create `prb.txt` file
 
+### 2.1. All open work items for all Problem Reports (`prb.txt`)
+- **Source**: [Salesforce PRB Report](https://gus.lightning.force.com/lightning/r/Report/00OEE000002ZnZN2A0/view?queryScope=userFolders)
+- **Action**: Run the report → Use "Copy to clipboard" feature → Create `prb.txt` file
+
 ### 3. Production Fleet Bugs (`bugs.txt`)
 - **Source**: [Salesforce Fleet Bugs Report](https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE0000014M4b2AE)
 - **Action**: Run the report → Use "Copy to clipboard" feature → Create `bugs.txt` file
@@ -30,7 +34,7 @@
 - **Action**: Run the report → Use "Copy to clipboard" feature → Create `ci.txt` file
 
 ### 7. LeftShift Issues (`leftshift.txt`)
-- **Source**: [Salesforce LeftShift Report](https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE000002WjvJ2AS) ✅ **CONFIRMED**
+- **Source**: [Salesforce LeftShift Report](https://gus.lightning.force.com/lightning/r/Report/00OEE000002Wjld2AC/view) ✅ **CONFIRMED**
 - **Action**: Run the report → Use "Copy to clipboard" feature → Create `leftshift.txt` file
 
 ### 8. ABS Issues (`abs.txt`)

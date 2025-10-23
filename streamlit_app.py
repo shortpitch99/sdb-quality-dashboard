@@ -316,63 +316,18 @@ class QualityReportDashboard:
         component_reports.sort(key=lambda x: x['timestamp'], reverse=True)
         return component_reports
     
+    def get_deployment_data(self, data: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Get deployment data from either deployments or stagger_deployments key."""
+        deployments = data.get('deployments', [])
+        if not deployments:
+            # Fallback to stagger_deployments format if available
+            deployments = data.get('stagger_deployments', [])
+        return deployments
+
     def parse_ci_data(self) -> List[Dict[str, Any]]:
-        """Parse CI data from ci.txt file."""
-        ci_file = "ci.txt"  # Changed back to ci.txt from ss.txt
-        ci_data = []
-        
-        if not os.path.exists(ci_file):
-            st.warning(f"CI file {ci_file} not found")
-            return ci_data
-            
-        try:
-            with open(ci_file, 'r') as f:
-                lines = f.readlines()
-                
-            current_team = None
-            current_priority = None
-            
-            for line in lines:
-                line = line.strip()
-                
-                if not line:  # Skip empty lines
-                    continue
-                
-                # Skip header/formatting lines - enhanced to include drill down
-                if any(skip_word in line.lower() for skip_word in ['sorted by', 'select row', 'drill down', 'work:', 'subtotal', 'total(']):
-                    continue
-                
-                # Parse team names (e.g., "Sayonara Data Management(7)")
-                # Must contain team keywords AND have format "TeamName(number)" not "description(number issues)"
-                if (line and '(' in line and line.endswith(')') and not line.startswith('P') and not line.startswith('W-') 
-                    and not 'issues)' in line and not '/' in line and not '-' in line):
-                    if any(team_keyword in line for team_keyword in ['Sayonara', 'SDB']):
-                        current_team = line.split('(')[0].strip()
-                        continue
-                
-                # Parse priority (e.g., "P2(7)")
-                if line.startswith('P') and '(' in line and line.endswith(')'):
-                    current_priority = line.split('(')[0].strip()
-                    continue
-                
-                # Parse individual issues with Work ID
-                if line.startswith('W-'):
-                    work_id = line
-                    ci_issue = {
-                        'team': current_team or 'Unknown Team',
-                        'priority': current_priority or 'P2', 
-                        'work_id': work_id,
-                        'subject': 'CI Issue',
-                        'type': 'CI Issue'
-                    }
-                    ci_data.append(ci_issue)
-            
-            return ci_data
-                        
-        except Exception as e:
-            st.error(f"Error parsing CI data: {e}")
-            
-        return ci_data
+        """CI data is now loaded from archived reports, not from ci.txt file."""
+        # This function is kept for compatibility but CI data should come from archived reports
+        return []
     
     def parse_security_data(self) -> List[Dict[str, Any]]:
         """Parse security bugs data from ss.txt file."""
@@ -540,22 +495,34 @@ class QualityReportDashboard:
             if current_coverage > 0 and previous_coverage > 0:
                 changes['coverage'] = calc_pct_change(current_coverage, previous_coverage)
             
-            # CI Bug Score
-            current_ci_bugs = self.parse_ci_data() if hasattr(self, 'parse_ci_data') else []
+            # CI Bug Score - use data from archived report
+            current_ci_bugs = current_data.get('ci_issues', [])
             current_ci_score = sum(4 if 'P0' in str(bug.get('priority', '')) or 'P1' in str(bug.get('priority', '')) else 1 for bug in current_ci_bugs)
             
             # Load previous CI data (simplified for demo)
             changes['ci_score'] = "±0%"  # Placeholder - would need previous CI data file
             
-            # Security Bugs
-            current_sec_bugs = self.parse_security_data() if hasattr(self, 'parse_security_data') else []
+            # Security Bugs - use data from archived report
+            current_sec_bugs = current_data.get('security_issues', [])
             current_sec_score = sum(4 if 'P0' in str(bug.get('priority', '')) or 'P1' in str(bug.get('priority', '')) else 1 for bug in current_sec_bugs)
             changes['sec_score'] = "±0%"  # Placeholder
             
-            # Left Shift
-            current_ls_bugs = self.parse_leftshift_data()
+            # Left Shift - use data from archived report
+            current_ls_bugs = current_data.get('leftshift_issues', [])
             current_ls_score = sum(4 if 'P0' in str(bug.get('priority', '')) or 'P1' in str(bug.get('priority', '')) else 1 for bug in current_ls_bugs)
             changes['ls_score'] = "±0%"  # Placeholder
+            
+            # Bug Backlog (critical bugs and total bugs)
+            current_bugs = current_data.get('bugs', [])
+            current_critical_backlog = len([b for b in current_bugs if 'P0' in str(b.get('severity', '')) or 'P1' in str(b.get('severity', ''))])
+            current_total_backlog = len(current_bugs)
+            
+            previous_bugs = previous_data.get('bugs', [])
+            previous_critical_backlog = len([b for b in previous_bugs if 'P0' in str(b.get('severity', '')) or 'P1' in str(b.get('severity', ''))])
+            previous_total_backlog = len(previous_bugs)
+            
+            changes['critical_backlog'] = calc_pct_change(current_critical_backlog, previous_critical_backlog)
+            changes['total_backlog'] = calc_pct_change(current_total_backlog, previous_total_backlog)
             
         except Exception as e:
             # If we can't calculate changes, return empty dict
@@ -638,7 +605,7 @@ class QualityReportDashboard:
             avg_coverage = sum(c.get('line_coverage', 0) for c in coverage) / len(coverage) if coverage else 0
         
         # Calculate CI metrics with scoring system
-        ci_issues = data.get('ci', [])
+        ci_issues = data.get('ci_issues', [])
         ci_p0_bugs = len([b for b in ci_issues if 'P0' in str(b.get('severity', '') + str(b.get('priority', ''))).upper()])
         ci_p1_bugs = len([b for b in ci_issues if 'P1' in str(b.get('severity', '') + str(b.get('priority', ''))).upper()])
         ci_p2_plus_bugs = len([b for b in ci_issues if any(p in str(b.get('severity', '') + str(b.get('priority', ''))).upper() for p in ['P2', 'P3', 'P4'])])
@@ -702,7 +669,7 @@ class QualityReportDashboard:
             changes = {}
         
         # Calculate CI P0/P1 counts for display
-        ci_issues = data.get('ci', [])
+        ci_issues = data.get('ci_issues', [])
         ci_p0_bugs = len([b for b in ci_issues if 'P0' in str(b.get('severity', '') + str(b.get('priority', ''))).upper()])
         ci_p1_bugs = len([b for b in ci_issues if 'P1' in str(b.get('severity', '') + str(b.get('priority', ''))).upper()])
         ci_p0_p1_count = ci_p0_bugs + ci_p1_bugs
@@ -714,7 +681,7 @@ class QualityReportDashboard:
         ls_p0_p1_count = ls_p0_bugs + ls_p1_bugs
         
         # Calculate deployment metrics
-        deployments = data.get('deployments', [])
+        deployments = self.get_deployment_data(data)
         deployment_status, deployment_summary = self.calculate_deployment_status(data)
         
         # Calculate dominant SDB version from deployment.csv data
@@ -837,7 +804,7 @@ class QualityReportDashboard:
             # Format the value with week-over-week change
             at_risk_display = f"{at_risk_count}"
             if changes.get('at_risk'):
-                at_risk_display += f" <span style='font-size: 0.7rem; color: #666;'>({changes['at_risk']})</span>"
+                at_risk_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['at_risk']})</span>"
             
             st.markdown(f"""
             <a href="#risk-assessment" style="text-decoration: none; color: inherit;">
@@ -859,7 +826,7 @@ class QualityReportDashboard:
             # Format the value with week-over-week change
             critical_prbs_display = f"{critical_prbs}"
             if changes.get('critical_prbs'):
-                critical_prbs_display += f" <span style='font-size: 0.7rem; color: #666;'>({changes['critical_prbs']})</span>"
+                critical_prbs_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['critical_prbs']})</span>"
             
             st.markdown(f"""
             <a href="#problem-reports-analysis" style="text-decoration: none; color: inherit;">
@@ -881,7 +848,7 @@ class QualityReportDashboard:
             # Format the value with week-over-week change
             critical_prod_bugs_display = f"{critical_prod_bugs}"
             if changes.get('prod_bugs'):
-                critical_prod_bugs_display += f" <span style='font-size: 0.7rem; color: #666;'>({changes['prod_bugs']})</span>"
+                critical_prod_bugs_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['prod_bugs']})</span>"
             
             st.markdown(f"""
             <a href="#production-bug-analysis" style="text-decoration: none; color: inherit;">
@@ -934,7 +901,7 @@ class QualityReportDashboard:
             # Format the value with week-over-week change
             coverage_display = f"{avg_coverage:.1f}%"
             if changes.get('coverage'):
-                coverage_display += f" <span style='font-size: 0.7rem; color: #666;'>({changes['coverage']})</span>"
+                coverage_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['coverage']})</span>"
             
             st.markdown(f"""
             <a href="#code-coverage-analysis" style="text-decoration: none; color: inherit;">
@@ -957,7 +924,7 @@ class QualityReportDashboard:
             # Format the value with week-over-week change
             ci_p0_p1_display = f"{ci_p0_p1_count}"
             if changes.get('ci_score'):
-                ci_p0_p1_display += f" <span style='font-size: 0.7rem; color: #666;'>({changes['ci_score']})</span>"
+                ci_p0_p1_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['ci_score']})</span>"
             
             st.markdown(f"""
             <a href="#ci-issues-analysis" style="text-decoration: none; color: inherit;">
@@ -979,7 +946,7 @@ class QualityReportDashboard:
             # Format the value with week-over-week change
             critical_sec_bugs_display = f"{critical_sec_bugs}"
             if changes.get('sec_score'):
-                critical_sec_bugs_display += f" <span style='font-size: 0.7rem; color: #666;'>({changes['sec_score']})</span>"
+                critical_sec_bugs_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['sec_score']})</span>"
             
             st.markdown(f"""
             <a href="#security-analysis" style="text-decoration: none; color: inherit;">
@@ -1001,7 +968,7 @@ class QualityReportDashboard:
             # Format the value with week-over-week change
             ls_p0_p1_display = f"{ls_p0_p1_count}"
             if changes.get('ls_score'):
-                ls_p0_p1_display += f" <span style='font-size: 0.7rem; color: #666;'>({changes['ls_score']})</span>"
+                ls_p0_p1_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['ls_score']})</span>"
             
             st.markdown(f"""
             <a href="#left-shift-bugs" style="text-decoration: none; color: inherit;">
@@ -1073,14 +1040,27 @@ class QualityReportDashboard:
         col10, col11, col12, col13, col14 = st.columns(5)
         
         with col10:
-            # All-time Bug Backlog
+            # All-time Bug Backlog - use real data
+            bugs = data.get('bugs', [])
+            critical_backlog_bugs = len([b for b in bugs if 'P0' in str(b.get('severity', '')) or 'P1' in str(b.get('severity', ''))])
+            total_backlog_bugs = len(bugs)
+            
+            # Format the value with week-over-week change
+            critical_backlog_display = f"{critical_backlog_bugs}"
+            if changes.get('critical_backlog'):
+                critical_backlog_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['critical_backlog']})</span>"
+            
+            # Determine color based on critical bugs
+            backlog_delta_class = "metric-delta-green" if critical_backlog_bugs == 0 else ("metric-delta-yellow" if critical_backlog_bugs <= 5 else "metric-delta-red")
+            backlog_status = "CLEAN" if critical_backlog_bugs == 0 else ("BACKLOG" if critical_backlog_bugs <= 5 else "HIGH BACKLOG")
+            
             st.markdown(f"""
             <div class="metric-card">
                 <div class="metric-label">🐛 All-time Bug Backlog</div>
-                <div class="metric-value">18</div>
-                <div class="metric-total">138 bugs</div>
-                <div class="metric-delta metric-delta-yellow">
-                    BACKLOG
+                <div class="metric-value">{critical_backlog_display}</div>
+                <div class="metric-total">{total_backlog_bugs} bugs</div>
+                <div class="metric-delta {backlog_delta_class}">
+                    {backlog_status}
                 </div>
             </div>
             """, unsafe_allow_html=True)
@@ -1499,7 +1479,7 @@ class QualityReportDashboard:
     def calculate_deployment_status(self, data: Dict[str, Any]) -> tuple:
         """Calculate deployment status using enhanced LLM analysis of deployment.txt."""
         deployment_summary = data.get('deployment_summary', '')
-        deployments = data.get('deployments', [])
+        deployments = self.get_deployment_data(data)
         
         if not deployment_summary and not deployments:
             return "YELLOW", "No deployment data available"
@@ -1559,7 +1539,7 @@ class QualityReportDashboard:
     
     def create_deployment_stacked_bar(self, data: Dict[str, Any]):
         """Create stacked bar chart showing staggers with version stacks from deployment.csv."""
-        deployments = data.get('deployments', [])
+        deployments = self.get_deployment_data(data)
         if not deployments:
             st.info("📊 No deployment.csv data available for stacked bar chart")
             return
@@ -1644,7 +1624,7 @@ class QualityReportDashboard:
     
     def create_version_pie_chart(self, data: Dict[str, Any]):
         """Create pie chart of SDB versions from deployment.csv data."""
-        deployments = data.get('deployments', [])
+        deployments = self.get_deployment_data(data)
         if not deployments:
             st.info("📊 No deployment.csv data available for version chart")
             return
@@ -1688,7 +1668,7 @@ class QualityReportDashboard:
     
     def create_deployment_insights(self, data: Dict[str, Any]):
         """Create enhanced deployment insights using only deployment.csv metrics and deployment.txt LLM analysis."""
-        deployments = data.get('deployments', [])
+        deployments = self.get_deployment_data(data)
         deployment_summary = data.get('deployment_summary', '')
         
         if not deployments and not deployment_summary:
@@ -3167,11 +3147,11 @@ class QualityReportDashboard:
                 avg_coverage = sum(coverages) / len(coverages)
         
         # CI Issues - P0/P1 count
-        ci_issues = data.get('ci', [])
+        ci_issues = data.get('ci_issues', [])
         ci_p0_p1 = len([b for b in ci_issues if 'P0' in str(b.get('severity', '') + str(b.get('priority', ''))).upper() or 'P1' in str(b.get('severity', '') + str(b.get('priority', ''))).upper()])
         
         # Security Bugs - P0/P1 count
-        security_bugs = data.get('security', [])
+        security_bugs = data.get('security_issues', [])
         sec_p0_p1 = len([b for b in security_bugs if 'P0' in str(b.get('severity', '') + str(b.get('priority', ''))).upper() or 'P1' in str(b.get('severity', '') + str(b.get('priority', ''))).upper()])
         
         # Left Shift - P0/P1 count

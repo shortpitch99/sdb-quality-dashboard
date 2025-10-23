@@ -1,0 +1,430 @@
+Scrum Team Name Select all rows for Drill Down.
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Select row for Drill Down.
+Sayonara Data Management(7)
+P2(7)
+Subtotal
+Subtotal
+Select row for Drill Down.
+Sayonara Foundation Services(7)
+P2(7)
+Subtotal
+Subtotal
+Select row for Drill Down.
+Sayonara TxP(10)
+P2(10)
+Subtotal
+Subtotal
+Select row for Drill Down.
+SDB Catalog Services(1)
+P2(1)
+Subtotal
+Subtotal
+Select row for Drill Down.
+SDB Engine Health and Diagnostics(5)
+P2(5)
+Subtotal
+Subtotal
+Select row for Drill Down.
+SDB Query Proc Optimizer(2)
+P2(2)
+Subtotal
+Subtotal
+Total(32)
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Work: Work ID
+Subject
+Status
+Assigned To
+Work: Created Date
+Sorted by Work: Created Date, newest-to-oldestDescending
+Sprint
+Type
+Found in Build
+Scheduled Build
+Customer
+Work: Created By
+Sayonara Data Management(7)
+P2(7)
+W-20021781
+RecordLineageTest2.testLineageInPersistence_TombstoneErrorScenarioMultipleErrors[0]: PSQLException: ERROR: relation "t1_large" already exist
+New
+SDB Data Management Work Queue
+10/22/2025
+-
+Bug
+sdb.260.12
+-
+-
+SFCI API USER
+W-20013264
+RecordLineageTest2.testlsmChecker[0]: RuntimeException: JUnit barfed with multiple errors, this
+In Progress
+Ankit Sharma
+10/22/2025
+2025.11a-Sayonara Data Management
+Bug
+sdb.260.12
+-
+-
+SFCI API USER
+W-20002038
+Fix PruneXcnLag Argus Alert
+Fixed
+SDB Data Management Work Queue
+10/21/2025
+2025.10b-Sayonara Data Management
+Bug
+sdb.260
+-
+-
+Thomas Fanghaenel
+W-19978605
+PhysicalRelationIDTest.testCollisionOfAutomaticPhyIds: PSQLException: ERROR: The snapshot we are trying to cac
+Triaged
+Vaibhav Arora
+10/17/2025
+-
+Bug
+sdb.260.11
+-
+-
+SFCI API USER
+W-19860706
+SDB-JUnitStress-sandbox-stress-TLE-key-deriv-RHEL9.sandbox-stress: 1,[::1], port=62780, expectedState=UP]: Last Error: dbsay`20251009182106.748208`
+Triaged
+Dhanashree Kashid
+10/9/2025
+-
+Bug
+sdb.260.10
+-
+-
+SFCI API USER
+W-19726659
+MergeMergeConflictTest.testTombstoneOverlapMergeConflictRatio: PSQLException: An I/O error occurred while sending to t
+Triaged
+Vaibhav Arora
+9/24/2025
+-
+Bug
+sdb.260.8
+-
+-
+SFCI API USER
+W-19624375
+SDB-JUnitStress-sandbox-stress-RHEL9.sandbox-stress: AssertionError: Index inconsistency found for relation:
+Waiting
+Theo Vanderkooy
+9/12/2025
+-
+Bug
+sdb.260.7
+-
+-
+SFCI API USER
+Subtotal
+Subtotal
+Sayonara Foundation Services(7)
+P2(7)
+W-20007279
+AutonomousXactOptTest.A23_testPositiveMemstoreFlushStallWithAdvancingMaxAsyncGroupCommittedXcn: TestTimedOutException: test timed out after 900 seconds
+New
+Jacob Park
+10/21/2025
+-
+Bug
+sdb.260.11
+-
+-
+SFCI API USER
+W-20006733
+TLEMixedVersionsTest.testTLECrossVersionMigrations: PSQLException: ERROR: function sdb_createtenantkeyintes
+New
+Sagar Ranadive
+10/21/2025
+-
+Bug
+sdb.260.11
+-
+-
+SFCI API USER
+W-19867650
+CatsrvCellLock timeout computation can be inaccurate
+New
+Sagar Ranadive
+10/10/2025
+2025.11a-Sayonara Foundation Services
+Bug
+sdb.260.3
+-
+-
+Bryan Pendleton
+W-19866713
+WSLogTailingAsyncWritesTest.testErrorNotCaughtByFuncExceptionBlock: AssertionFailedError: Expected transaction to be aborted
+Fixed
+Zhihan Guo
+10/10/2025
+2025.10b-Sayonara Foundation Services
+Bug
+sdb.260.10
+-
+-
+SFCI API USER
+W-19769313
+[EA][PROD][TRAP][usa6s] AllocSetAlloc,palloc_internal,Array_init,ExtentIdList_init,read_extentset
+In Progress
+Sagar Ranadive
+9/29/2025
+2025.10b-Sayonara Foundation Services
+Bug
+sdb.260.1
+-
+SDBFalcon usa6s
+API user SDB Analytics
+W-19765560
+[EA][PROD][INTERNAL_ERROR][usa6s] index "ak3auth_session" has an entry with no corresponding base ro...
+Waiting
+Michael Abebe
+9/28/2025
+-
+Bug
+sdb.260.1
+-
+SDBFalcon usa6s
+API user SDB Analytics
+W-19467055
+VersionAgnosticExpirationTest.testW5080539: PSQLException: ERROR: Unrecognized storage error on rea
+New
+Sagar Ranadive
+8/31/2025
+2025.10b-Sayonara Foundation Services
+Bug
+sdb.260.5
+-
+-
+SFCI API USER
+Subtotal
+Subtotal
+Sayonara TxP(10)
+P2(10)
+W-20020752
+MemstoreReproProblematicRecordChain.case2_committedUpdateFollowedByGrantedKeyShareLock: TestTimedOutException: test timed out after 900 seconds
+New
+SDB TxP Work Queue
+10/22/2025
+-
+Bug
+sdb.260.12
+-
+-
+SFCI API USER
+W-20013468
+SDB-Engine-SSL-xJUS-RHEL9 Switchboard test produced core files
+New
+SDB TxP Work Queue
+10/22/2025
+-
+Bug
+sdb.260
+-
+-
+Audrey Fang
+W-19987432
+SequencePendingGroupCommit.testFlushAndPendingGroupCommitFSQdisabled[0]: PSQLException: An I/O error occurred while sending to t
+Ready for Review
+Jun Chen
+10/19/2025
+2025.10b Sayonara TxP
+Bug
+sdb.260.12
+-
+-
+SFCI API USER
+W-19969553
+[EA][PROD][PROD_ERROR][usa196s] Redo recovery was terminated prior to applying all log records. This...
+New
+Smit Raj
+10/16/2025
+-
+Bug
+sdb.260.4
+-
+SDBFalcon usa196s
+API user SDB Analytics
+W-19875629
+HAPromotionScenariosTest.testDropIndexConcurentlyWithPromo: TestTimedOutException: test timed out after 900 seconds
+New
+Smit Raj
+10/11/2025
+-
+Bug
+sdb.260.11
+-
+-
+SFCI API USER
+W-19872337
+SDB-JUnitStress-dml-uptime-standby-arb-RHEL9-FSStage.dml-uptime-standby-arb: PSQLException: This connection has been closed.
+New
+Jun Chen
+10/10/2025
+2025.10b Sayonara TxP
+Bug
+sdb.260.10
+-
+-
+SFCI API USER
+W-19871554
+[WS Autobuild][VM Stall] index "akorganization_status" has an entry with no corresponding base row in table "organization"
+New
+Smit Raj
+10/10/2025
+-
+Bug
+sdb.260.9
+-
+-
+Jacob Park
+W-19766091
+SDB-JUnitStress-dml-uptime-fast-purgeflush-nightly-RHEL9.dml-uptime-fast-purgeflush: 1,[::1], port=62202, expectedState=UP]: Last Error: dbsay`20250928151601.557880`
+Waiting
+Dipesh Pandit
+9/28/2025
+2025.10b-Sayonara TxP India
+Bug
+sdb.260.9
+-
+-
+SFCI API USER
+W-19465357
+FSQDaemonTest.test_with_paused_fsq_daemon: TestTimedOutException: test timed out after 900 seconds
+New
+Kaushal Mittal
+8/30/2025
+-
+Bug
+sdb.260.5
+-
+-
+SFCI API USER
+W-19307267
+SDB-JUnitStress-RSWS-seq-stress-dbFaults-RHEL9.seq-stress: found trap on node[name=0, expectedState=RUNNING]: Last Error: dbsay`20250811162049.483639`
+New
+Dipesh Pandit
+8/11/2025
+-
+Bug
+sdb.260
+-
+-
+SFCI API USER
+Subtotal
+Subtotal
+SDB Catalog Services(1)
+P2(1)
+W-19886119
+SDB-JUnitStress-WS-schemaupgrade-stress-RHEL9-FSStage.schemaupgrade-stress: RuntimeException: Found trap/error file '/sdb/sdblogs//ser
+New
+Mikhail Lychagin
+10/13/2025
+-
+Bug
+sdb.260.11
+-
+-
+SFCI API USER
+Subtotal
+Subtotal
+SDB Engine Health and Diagnostics(5)
+P2(5)
+W-19994951
+CondSQLTraceTest.testStaticSQLFuncCPUStatsHasPlanningTime: AssertionFailedError: Verify CPU of inner of a static function
+New
+SDB EHD Development
+10/20/2025
+-
+Bug
+sdb.260.12
+-
+-
+SFCI API USER
+W-19988598
+CondSQLTraceTest.testCancelledMergeJoinQueryInstrumentation: AssertionFailedError: LSM Bufmgr Pinned Blocks should be great
+New
+SDB EHD Development
+10/19/2025
+-
+Bug
+sdb.260.11
+-
+-
+SFCI API USER
+W-19987763
+FlightRecorderTest.testGlobalEventStatsAndCondSQLTrace: ExecutionException: sayonaradb.test.util.SysCmdException: Co
+New
+SDB EHD Development
+10/19/2025
+-
+Bug
+sdb.260.11
+-
+-
+SFCI API USER
+W-19830161
+SDB-JUnitStress-HA-dml-check-cancel-RHEL9.dml-check-cancel: PSQLException: The connection attempt failed.
+New
+Shrikant Salunke
+10/6/2025
+-
+Bug
+sdb.260.10
+-
+-
+SFCI API USER
+W-19761586
+MultiNodeLastLevelMergeTest.lastLevelStackTest1: JSONException: Unterminated string at 603 [character 0
+New
+Sai Prasad Mysary
+9/26/2025
+2025.11b-SDB Engine Health and Diagnostics
+Bug
+sdb.260.9
+-
+-
+SFCI API USER
+Subtotal
+Subtotal
+SDB Query Proc Optimizer(2)
+P2(2)
+W-20023437
+AnalyzeTest.testAnalyzeWithManySupersededRecords: TestTimedOutException: test timed out after 900 seconds
+New
+SDB QP Optimizer User
+10/23/2025
+-
+Bug
+sdb.260.12
+-
+-
+SFCI API USER
+W-19988176
+AnalyzeTest.testAnalyzeWithManySupersededRecords: TestTimedOutException: test timed out after 900 seconds
+Fixed
+Calvin Wang
+10/19/2025
+2025.10b-SDB Query Proc Optimizer
+Bug
+sdb.260.12
+-
+-
+SFCI API USER
+Subtotal
+Subtotal
+Total(32)
+
