@@ -2005,8 +2005,8 @@ class QualityReportGenerator:
         print("🤖 Generating LLM content for dashboard...")
         
         if not self.llm_api_key or not self.headers:
-            print("⚠️ No LLM Gateway key provided. Dashboard will show 'content not available' messages.")
-            return {}
+            print("⚠️ No LLM Gateway key provided. Using fallback content for dashboard sections.")
+            return self._generate_fallback_content(data)
         
         llm_content = {}
         
@@ -2083,6 +2083,50 @@ class QualityReportGenerator:
             return {}
         
         return llm_content
+
+    def _generate_fallback_content(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate fallback content when LLM is not available."""
+        print("📝 Generating fallback content without LLM...")
+        
+        fallback_content = {}
+        
+        # Generate basic PRB narratives without LLM
+        prbs = data.get('prbs', [])
+        prb_narratives = {}
+        prb_analyses = {}
+        
+        for prb in prbs:
+            prb_id = prb.get('id', 'Unknown') if isinstance(prb, dict) else getattr(prb, 'id', 'Unknown')
+            prb_title = prb.get('title', '') if isinstance(prb, dict) else getattr(prb, 'title', '')
+            prb_priority = prb.get('priority', '') if isinstance(prb, dict) else getattr(prb, 'priority', '')
+            
+            # Basic narrative without LLM
+            prb_narratives[prb_id] = f"PRB {prb_id} ({prb_priority}): {prb_title[:100]}..."
+            
+            # Basic analysis without LLM  
+            prb_analyses[prb_id] = f"This is a {prb_priority} priority incident requiring attention. Detailed analysis requires LLM integration."
+        
+        # Generate basic summaries
+        p2_p3_prbs = [prb for prb in prbs if 
+                      (isinstance(prb, dict) and prb.get('priority', '').lower() in ['p2', 'p3', 'medium', 'low']) or
+                      (hasattr(prb, 'priority') and prb.priority.lower() in ['p2', 'p3', 'medium', 'low'])]
+        
+        if p2_p3_prbs:
+            fallback_content['lower_priority_summary'] = f"Found {len(p2_p3_prbs)} lower priority incidents. Detailed analysis requires LLM integration."
+        
+        # Basic trend analysis
+        bug_count = len(data.get('bugs', []))
+        prb_count = len(prbs)
+        fallback_content['trend_analysis'] = f"Current period shows {prb_count} PRBs and {bug_count} production bugs. Trend analysis requires LLM integration for deeper insights."
+        
+        # Basic risk analysis
+        fallback_content['risk_analysis'] = "Risk analysis based on code changes and deployment patterns requires LLM integration for comprehensive assessment."
+        
+        fallback_content['prb_narratives'] = prb_narratives
+        fallback_content['prb_analyses'] = prb_analyses
+        
+        print("✅ Fallback content generated successfully")
+        return fallback_content
 
     def _call_llm_for_prb_narrative(self, prb_dict: Dict[str, Any]) -> str:
         """Generate PRB narrative using LLM."""
@@ -2664,9 +2708,18 @@ def main():
         collector.save_archive_data(archive_file, custom_end_date)
         print("✅ LLM content generated and added to archive data")
     except Exception as e:
-        print(f"⚠️ LLM content generation skipped: {e}")
-        print("   Dashboard will show 'content not available' messages for LLM sections")
-        collector.data['llm_content'] = {}
+        print(f"⚠️ LLM content generation issue: {e}")
+        print("   Using fallback content for dashboard sections")
+        # Try to generate fallback content
+        try:
+            llm_generator = QualityReportGenerator()
+            fallback_content = llm_generator._generate_fallback_content(collector.data)
+            collector.data['llm_content'] = fallback_content
+            collector.save_archive_data(archive_file, custom_end_date)
+            print("✅ Fallback content generated successfully")
+        except Exception as fallback_error:
+            print(f"⚠️ Fallback content generation failed: {fallback_error}")
+            collector.data['llm_content'] = {}
     
     # Confirm data readiness
     if not args.skip_confirmation:
