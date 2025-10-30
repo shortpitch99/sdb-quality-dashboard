@@ -1,0 +1,76 @@
+Priority Select all rows for Drill Down.
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Created Date
+Sorted by Created Date, oldest-to-newestAscending
+Select row for Drill Down.
+P2(3)
+Sayonara Foundation Services(2)
+9/29/2025(1)
+Subtotal
+10/13/2025(1)
+Subtotal
+Subtotal
+Sayonara TxP(1)
+10/22/2025(1)
+Subtotal
+Subtotal
+Subtotal
+Total(3)
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Created Date
+Sorted by Created Date, oldest-to-newestAscending
+Work ID
+Subject
+Readme Notes
+Assigned To: Full Name
+Status
+Customer
+Found In Build Name
+Sprint: Name
+P2(3)
+Sayonara Foundation Services(2)
+9/29/2025(1)
+W-19769313
+[EA][PROD][TRAP][usa6s] AllocSetAlloc,palloc_internal,Array_init,ExtentIdList_init,read_extentset
+10/28 - Sagar will add some diagnostics and timebox the investigation.
+
+9/30: Just transferred to Sagar
+Sagar Ranadive
+In Progress
+SDBFalcon usa6s
+sdb.260.1
+2025.10b-Sayonara Foundation Services
+Subtotal
+10/13/2025(1)
+W-19881426
+[DEU60] log extent got deleted which is not yet applied on one of the log tailer.
+10/28 - Bug transferred to Sagar. The fix will need some coordination with the Archival team.
+10/20: Bryan reproduced the problem locally. 7+ year old bug in a Storage Catalog support routine used by the Archival Service. Waiting on approvals to confir...
+Sagar Ranadive
+Triaged
+Falcon deu60
+258.11
+2025.11a-Sayonara Foundation Services
+Subtotal
+Subtotal
+Sayonara TxP(1)
+10/22/2025(1)
+W-20015716
+[EA][PROD][INTERNAL_ERROR][bra38] Error detected by redo phase. Extent linking validation failure f...
+10/28: bkproxy got affected due to ENA issue
+Jun Chen
+Triaged
+SDBFalcon bra38
+sdb.258.11
+-
+Subtotal
+Subtotal
+Subtotal
+Total(3)
+

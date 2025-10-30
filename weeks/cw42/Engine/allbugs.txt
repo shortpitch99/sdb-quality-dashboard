@@ -1,0 +1,281 @@
+Priority Select all rows for Drill Down.
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Bucket
+Breakdown
+Sorted by Breakdown, A-to-ZAscending
+Work ID
+Priority Select all rows for Drill Down.
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Bucket
+Breakdown
+Sorted by Breakdown, A-to-ZAscending
+Work ID
+Select row for Drill Down.
+P0(1)
+SDBStore(1)
+<=30 days(1)
+W-19896237
+Subtotal
+Subtotal
+Subtotal
+Select row for Drill Down.
+P1(20)
+Sayonara TxP(2)
+<=30 days(2)
+W-19997612
+W-19997613
+Subtotal
+Subtotal
+SDBStore(18)
+<=30 days(9)
+W-19816234
+W-19816238
+W-19832818
+W-19886879
+W-19816284
+W-19895938
+W-19833039
+W-19833000
+W-19833035
+Subtotal
+1 - 3 months(6)
+W-19566169
+W-19566141
+W-19566235
+W-19588885
+W-19350460
+W-19654204
+Subtotal
+6 - 12 months(3)
+W-17880307
+W-18070923
+W-18070925
+Subtotal
+Subtotal
+Subtotal
+Select row for Drill Down.
+P2(145)
+Sayonara Data Management(25)
+<=30 days(12)
+W-20002038
+W-20006903
+W-20021781
+W-19726659
+W-19867118
+W-20025680
+W-19978605
+W-20001991
+W-20026325
+W-20025679
+W-20013264
+W-19860706
+Subtotal
+1 - 3 months(4)
+W-19139721
+W-19627604
+W-19401383
+W-19624375
+Subtotal
+3 - 6 months(2)
+W-18941943
+W-18821215
+Subtotal
+6 - 12 months(4)
+W-17811486
+W-18329165
+W-18247782
+W-17580069
+Subtotal
+1 - 2 years(3)
+W-15605652
+W-14852675
+W-15663253
+Subtotal
+Subtotal
+Sayonara Foundation Services(19)
+<=30 days(10)
+W-19818629
+W-19769313
+W-19866713
+W-20007279
+W-19867650
+W-20006733
+W-19765560
+W-19881426
+W-19881988
+W-20026319
+Subtotal
+1 - 3 months(5)
+W-19629257
+W-19419309
+W-19467055
+W-19141967
+W-19693432
+Subtotal
+6 - 12 months(1)
+W-18146439
+Subtotal
+1 - 2 years(1)
+W-14520068
+Subtotal
+> 2 years(2)
+W-13181392
+W-11576594
+Subtotal
+Subtotal
+Sayonara TxP(25)
+<=30 days(12)
+W-19872337
+W-19995969
+W-19969553
+W-19970850
+W-20020752
+W-20013468
+W-19871554
+W-19875629
+W-19766091
+W-19987432
+W-20026322
+W-20025686
+Subtotal
+1 - 3 months(9)
+W-19690428
+W-19708710
+W-19479658
+W-19629559
+W-19597285
+W-19140190
+W-19307267
+W-19465357
+W-19398827
+Subtotal
+3 - 6 months(1)
+W-18994384
+Subtotal
+1 - 2 years(1)
+W-14904156
+Subtotal
+> 2 years(2)
+W-11622040
+W-7566639
+Subtotal
+Subtotal
+SDB Catalog Services(2)
+<=30 days(2)
+W-19886119
+W-20026323
+Subtotal
+Subtotal
+SDB Engine Health and Diagnostics(14)
+<=30 days(5)
+W-19761586
+W-19987763
+W-19830161
+W-19994951
+W-19988598
+Subtotal
+1 - 3 months(3)
+W-19164552
+W-19386673
+W-19692318
+Subtotal
+3 - 6 months(1)
+W-18846947
+Subtotal
+6 - 12 months(4)
+W-17978306
+W-17386439
+W-17386378
+W-18040318
+Subtotal
+1 - 2 years(1)
+W-16100582
+Subtotal
+Subtotal
+SDB Query Proc Execution(3)
+<=30 days(3)
+W-20023732
+W-20015707
+W-20015716
+Subtotal
+Subtotal
+SDB Query Proc Optimizer(3)
+<=30 days(3)
+W-19315268
+W-20023437
+W-19988176
+Subtotal
+Subtotal
+SDBStore(54)
+<=30 days(45)
+W-19872792
+W-19816228
+W-19816225
+W-19816236
+W-19816232
+W-19816233
+W-19816231
+W-19816244
+W-19816245
+W-19816242
+W-19816243
+W-19816247
+W-19816249
+W-20020960
+W-19866385
+W-19816254
+W-19816253
+W-19816252
+W-19816260
+W-19816271
+W-19816270
+W-19816269
+W-19816268
+W-19816267
+W-19992281
+W-19866380
+W-19979833
+W-20008253
+W-19866389
+W-19886880
+W-19816275
+W-19816283
+W-19816282
+W-19816281
+W-19816280
+W-19816288
+W-19816285
+W-19866382
+W-20021119
+W-20021105
+W-19987697
+W-19895939
+W-20013637
+W-19833597
+W-19833021
+Subtotal
+1 - 3 months(7)
+W-19391577
+W-19616450
+W-19134331
+W-19134332
+W-19364382
+W-19694051
+W-19672082
+Subtotal
+3 - 6 months(1)
+W-19081141
+Subtotal
+6 - 12 months(1)
+W-18294870
+Subtotal
+Subtotal
+Subtotal
+Total(166)
+

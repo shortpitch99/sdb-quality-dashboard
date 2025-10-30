@@ -1,0 +1,103 @@
+Scrum Team Name Select all rows for Drill Down.
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Work: Work ID
+Found in Build
+Assigned To
+Status
+Subject
+Select row for Drill Down.
+Sayonara Data Management(5)
+W-14324477
+sdb.248.25
+Anup Ghatage
+New
+ARRAY_VS_SINGLETON - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/contrib/pgvector/src/ivfinsert.c (1 issues)
+W-14324465
+sdb.248.25
+Anup Ghatage
+New
+ARRAY_VS_SINGLETON - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/contrib/pgvector/src/ivfbuild.c (2 issues)
+W-17618488
+None
+Thomas Fanghaenel
+New
+RESOURCE_LEAK - /src/bin/psql/startup.c (3 issues)
+W-19112936
+None
+Thomas Fanghaenel
+New
+UNINIT - /src/bin/zktool/zktool.c (1 issues)
+W-19139597
+None
+Thomas Fanghaenel
+New
+OVERRUN - /src/backend/utils/adt/correlationid.c (1 issues)
+Subtotal
+Select row for Drill Down.
+Sayonara TxP(3)
+W-13140867
+sdb.246.9
+Kaushal Mittal
+New
+OVERRUN - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/src/backend/replication/pg_workflow_extra.c (1 issues)
+W-17618489
+None
+SDB TxP Work Queue
+New
+RESOURCE_LEAK - /src/bin/pg_basebackup/pg_receivewal.c (1 issues)
+W-17618497
+None
+SDB TxP Work Queue
+New
+RESOURCE_LEAK - /src/bin/pg_basebackup/pg_basebackup.c (1 issues)
+Subtotal
+Select row for Drill Down.
+SDB Catalog Services(1)
+W-19112938
+None
+David Gershuni
+New
+RESOURCE_LEAK - /src/bin/pg_dump/dumputils.c (1 issues)
+Subtotal
+Select row for Drill Down.
+SDB GIN Index(3)
+W-19647997
+None
+Muthukumaran Raveendiran
+In Progress
+OVERRUN - /src/backend/utils/adt/jsonpath_gram.c (1 issues)
+W-19647996
+None
+Muthukumaran Raveendiran
+In Progress
+UNINIT - /src/backend/utils/adt/jsonpath_gram.c (2 issues)
+W-19647998
+None
+Muthukumaran Raveendiran
+In Progress
+ARRAY_VS_SINGLETON - /src/backend/utils/adt/jsonpath_gram.c (1 issues)
+Subtotal
+Select row for Drill Down.
+SDB Query Proc Execution(2)
+W-19867220
+None
+Abhijith Anilkumar
+New
+UNINIT - /src/backend/commands/trigger.c (1 issues)
+W-17618495
+None
+Raj Kumar Goel
+In Progress
+USE_AFTER_FREE - /src/backend/utils/mmgr/aset.c (1 issues)
+Subtotal
+Select row for Drill Down.
+SDB Query Proc Optimizer(1)
+W-19112935
+None
+Elena Milkai
+New
+NO_EFFECT - /src/backend/optimizer/plan/planner.c (1 issues)
+Subtotal
+Total(15)
+

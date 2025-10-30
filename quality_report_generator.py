@@ -194,6 +194,8 @@ class QualityDataCollector:
             'leftshift_issues': [],
             'abs_issues': [],
             'security_issues': [],
+            'all_bugs': [],
+            'prb_bugs': [],
             'git_stats': {},
             'generated_at': datetime.now().isoformat()
         }

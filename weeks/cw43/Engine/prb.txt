@@ -1,0 +1,133 @@
+Created Date Time Select all rows for Drill Down.
+Created Date Time
+Sorted by Created Date Time, oldest-to-newestAscending
+Problem Priority
+Sorted by Problem Priority, ascending picklist orderAscending
+Problem Number
+Sorted by Problem Number, A-to-ZAscending
+Select row for Drill Down.
+10/19/2025 - 10/25/2025(3)
+P2(3)
+PRB-0029092(1)
+PRB-0029124(1)
+PRB-0029133(1)
+Created Date Time
+Sorted by Created Date Time, oldest-to-newestAscending
+Problem Priority
+Sorted by Problem Priority, ascending picklist orderAscending
+Problem Number
+Sorted by Problem Number, A-to-ZAscending
+Team: Team Name
+Cloud
+Problem State
+Customer Impact
+External RCA Requested
+Problem Description
+Repeat Incident
+Created Date
+Initial Work Issue: Work ID
+Customer Experience
+What Happened?
+Proximate Cause (Why did it happen)?
+How did we find out about the issue?
+How was it Resolved?
+Root Cause
+Next Steps
+Retro Summary
+Owner: Full Name
+10/19/2025 - 10/25/2025(3)
+P2(3)
+PRB-0029092(1)
+Sayonara TxP
+SDB
+Under Investigation
+-
+feature not included
+PRB Retrospective | SEV-2 | 10/20/2025 | (Warden AIOps) High DB CPU on node 2 causing MQ Wait Time Degradation, Cell:usa686, FI: AWS-PROD5-USWEST2 , Orgs_Impacted: multiorgimpact
+
+[THIS PRB IS MANAGED BY QUIP2GUS]
+feature not included
+10/20/2025
+W-19997567
+User Experience: The incident resulted in performance degradation, specifically impacting asynchronous processes such as Web-to-Case and dashboard refreshes. Users experienced delays in updates and actions, affecting workflows reliant on these processes....
+[THIS PRB IS MANAGED BY QUIP2GUS]
+Any updates made in GUS will be overwritten! Update Quip doc: https://salesforce.quip.com/PGu5AgO22bbC
+​
+High DB CPU utilization and high DB memstore usage contributed to MQ wait latency impact on
+The incident bridge team identified two key contributing factors to high resource consumption: Bulk API V2 (Delete) and Buffalo Batch Copy (Mass Org Migration) async jobs.
+https://salesforce-internal.slack.com/archives/C02J7CM51N3/p1760973785558719
+Immediate actions included suspending the Bulk API V2 (Delete) job for Coursera, Inc., and recycling Kubernetes pods to terminate inflight jobs. Additionally, the thread usage limitation for the Buffalo Batch Copy (MOM) jobs was reduced to one thread fro
+1) A bug in RYOW Dark Launch code paths caused large sized partial transaction rollbacks to be processed inline on a redo-applier, instead of being sent to an async redo worker for asynchronous processing. This led to the fullness of redo commit queue an
+1) Stop the BULLK DELETE transaction and resume it once it is broken down into smaller transactions.
+2) Disable RYOW dark launch in . usa686. via SC override.
+3) Disable RYOW Dark Launch via code change, and backport this to all existing branc
+Proximate Cause: The incident bridge team identified two key contributing factors to high resource consumption: Bulk API V2 (Delete) and Buffalo Batch Copy (Mass Org Migration) async jobs.
+​
+Key Questions for Retro (enter as Problem Statements belo
+Site Reliability
+PRB-0029124(1)
+CRM Database Sustaining Engineering
+SDB
+Under Investigation
+-
+feature not included
+PRB Retrospective | SEV-2 | 10/23/2025 | ASYNC - MEMSTORE_FULLNESS causing MQ latency on USA672S
+
+[THIS PRB IS MANAGED BY QUIP2GUS]
+feature not included
+10/23/2025
+W-20030374
+User Experience: Async performance degradation. | Impact Quantification: Q: What #/% of users/customers/requests got impacted (aggregated across all infra units)?. A: .
+[THIS PRB IS MANAGED BY QUIP2GUS]
+Any updates made in GUS will be overwritten! Update Quip doc: https://salesforce.quip.com/jrwgARPnOkYm
+​
+USA672S was experiencing MQ latency due to memstore fullness. It breached SLA from 21:30-22
+ASYNCHRONOUS_PARALLEL_SHARING_OWD_UPDATE mq type was causing processing delays.
+https://salesforce-internal.slack.com/archives/CDQ3U66E5/p1761253764860189
+Reduced concurrency for the offending MQ messages and rolling restart.
+​
+Q: Explain in detail the Time to Fix (i.e key events from detection to resolution)
+A: 
+​
+Q: Was a known mitigation for this incident? If yes, please describe it and c
+-
+TBD - Fill out CARs table in Quip
+Proximate Cause: ASYNCHRONOUS_PARALLEL_SHARING_OWD_UPDATE mq type was causing processing delays.
+​
+Key Questions for Retro (enter as Problem Statements below): 
+​
+Q: - Are there any monitoring improvements that could be made? - Should automat
+Site Reliability
+PRB-0029133(1)
+CRM Database Sustaining Engineering
+SDB
+Under Investigation
+-
+feature not included
+PRB Retrospective | SEV-2 | 10/24/2025 | Memstore is 90% used on the log tailors - USA940s
+
+[THIS PRB IS MANAGED BY QUIP2GUS]
+feature not included
+10/24/2025
+W-20033963
+User Experience: No Impact to the customer. | Impact Quantification: Q: What #/% of users/customers/requests got impacted (aggregated across all infra units)?. A: .
+[THIS PRB IS MANAGED BY QUIP2GUS]
+Any updates made in GUS will be overwritten! Update Quip doc: https://salesforce.quip.com/PwbuAb9vUu70
+​
+Memstore is 90% used on the log tailors - USA940s Case created using .case by @Uma Shankar
+Unknown
+https://salesforce-internal.slack.com/archives/CDQ3U66E5/p1761305056667039
+MQ Suspension paced On COPY_CHUNK_IMPORT
+​
+Q: Explain in detail the Time to Fix (i.e key events from detection to resolution)
+A: 
+​
+Q: Was a known mitigation for this incident? If yes, please describe it and can it be automated?  
+A: 
+-
+TBD - Fill out CARs table in Quip
+Proximate Cause: As DB Team observed - Memstore is 90% used on the log tailors - USA940s, which was contributed by Sandbox copy job. As a preventive action, we have placed a Suspension on MQ type - COPY_CHUNK_IMPORT for 8 hours.
+​
+Key Questions for
+Site Reliability
+

@@ -41,7 +41,7 @@
 - **Source**: [Salesforce ABS Report](https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE000002WjvJ2AS) ✅ **CONFIRMED**
 - **Action**: Run the report → Use "Copy to clipboard" feature → Create `abs.txt` file
 
-### 9. Security Issues (`security.txt`)
+### 9. Security Issues (`ss.txt`)
 - **Source**: [Salesforce Security Dashboard](https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=lightningdashboard&wave__assetId=01ZEE000001BaVp2AK) ✅ **CONFIRMED**
 - **Action**: Run the dashboard → Use "Copy to clipboard" feature → Create `security.txt` file
 
