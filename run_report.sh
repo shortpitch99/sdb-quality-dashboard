@@ -3,26 +3,33 @@
 # SDB Quality Report Generator
 # This script generates a comprehensive quality report for SDB components
 #
-# Usage: ./run_report.sh [week] [component]
+# Usage: ./run_report.sh [week] [component] [api?]
 # Examples:
 #   ./run_report.sh cw40 Engine
-#   ./run_report.sh cw40 Store
-#   ./run_report.sh cw40 Archival
+#   ./run_report.sh cw40 Store api            # use Salesforce Reports API (no local PRB/bugs/ci/leftshift/security files)
+#   ./run_report.sh cw40 Archival --use-salesforce-reports
 #
 # Components: Engine, Store, Archival, SDD, msSDB, "Core App Efficiency"
 #
-# DATA SOURCE URLs - ALL CONFIRMED:
-# - PRB Report:    https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE000001TXjB2AW
-# - Fleet Bugs:    https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE0000014M4b2AE
-# - CI Issues:     https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE000002WjvJ2AS
-# - LeftShift:     https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE000002WjvJ2AS
-# - ABS Issues:    https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE000002WjvJ2AS
-# - Security:      https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=lightningdashboard&wave__assetId=01ZEE000001BaVp2AK
+# DATA SOURCE URLs (Reports API when enabled):
+# - PRB Report:      00OEE000001TXjB2AW
+# - Fleet Bugs:      00OEE0000014M4b2AE
+# - CI Issues:       00OEE000002WjvJ2AS
+# - LeftShift:       00OEE000002Wjld2AC
+# - ABS Issues:      00OEE000002bDht2AE
+# - Security:        00OB0000002qWjvMAE
 # - SonarQube:     https://sonarqube.sfcq.buildndeliver-s.aws-esvc1-useast2.aws.sfdc.cl/component_measures?id=sayonara.sayonaradb.sdb&metric=uncovered_lines&view=list
 
 # Parse arguments
 WEEK="$1"
 COMPONENT="$2"
+API_FLAG_RAW="$3"
+
+# Enable Reports API if third arg is provided (api/--use-salesforce-reports/true/1) or env USE_SF_REPORTS=1
+USE_SF_REPORTS=0
+if [ "$API_FLAG_RAW" = "api" ] || [ "$API_FLAG_RAW" = "--use-salesforce-reports" ] || [ "$API_FLAG_RAW" = "true" ] || [ "$API_FLAG_RAW" = "1" ] || [ "$USE_SF_REPORTS" = "1" ]; then
+  USE_SF_REPORTS=1
+fi
 
 # Check if both parameters are provided
 if [ -z "$WEEK" ] || [ -z "$COMPONENT" ]; then
@@ -46,6 +53,11 @@ echo "🚀 Starting SDB Quality Report Generation..."
 echo "📅 Week: $WEEK"
 echo "📊 Component: $COMPONENT"
 echo "==============================================="
+if [ "$USE_SF_REPORTS" = "1" ]; then
+  echo "🛰️  Mode: Salesforce Reports API (no local PRB/bugs/CI/leftshift/security files required)"
+else
+  echo "📄 Mode: Local text files for PRB/bugs/CI/leftshift/security"
+fi
 
 # Check if virtual environment exists
 if [ ! -d "venv" ]; then
@@ -72,12 +84,14 @@ if [ ! -f "$data_dir/risks.txt" ]; then
     missing_files+=("risks.txt")
 fi
 
-if [ ! -f "$data_dir/prb.txt" ]; then
-    missing_files+=("prb.txt")
-fi
-
-if [ ! -f "$data_dir/bugs.txt" ]; then
-    missing_files+=("bugs.txt")
+# Only require these when NOT using the Reports API
+if [ "$USE_SF_REPORTS" != "1" ]; then
+  if [ ! -f "$data_dir/prb.txt" ]; then
+      missing_files+=("prb.txt")
+  fi
+  if [ ! -f "$data_dir/bugs.txt" ]; then
+      missing_files+=("bugs.txt")
+  fi
 fi
 
 if [ ! -f "$data_dir/deployment.csv" ]; then
@@ -88,16 +102,16 @@ if [ ! -f "$data_dir/coverage.txt" ]; then
     missing_files+=("coverage.txt")
 fi
 
-if [ ! -f "$data_dir/ci.txt" ]; then
-    missing_files+=("ci.txt")
-fi
-
-if [ ! -f "$data_dir/leftshift.txt" ]; then
-    missing_files+=("leftshift.txt")
-fi
-
-if [ ! -f "$data_dir/ss.txt" ]; then
-    missing_files+=("ss.txt")
+if [ "$USE_SF_REPORTS" != "1" ]; then
+  if [ ! -f "$data_dir/ci.txt" ]; then
+      missing_files+=("ci.txt")
+  fi
+  if [ ! -f "$data_dir/leftshift.txt" ]; then
+      missing_files+=("leftshift.txt")
+  fi
+  if [ ! -f "$data_dir/ss.txt" ]; then
+      missing_files+=("ss.txt")
+  fi
 fi
 
 # Check if git repository exists
@@ -145,12 +159,20 @@ echo "📊 Generating comprehensive quality report..."
 # Generate report with mandatory week and component parameters
 echo "📅 Using calendar week: $WEEK"
 echo "🔧 Using component: $COMPONENT"
-python3 quality_report_generator.py \
-  --week "$WEEK" \
-  --component "$COMPONENT" \
-  --git-repo-path /Users/rchowdhuri/SDB \
-  --report-type comprehensive \
+GEN_CMD=(
+  python3 quality_report_generator.py
+  --week "$WEEK"
+  --component "$COMPONENT"
+  --git-repo-path /Users/rchowdhuri/SDB
+  --report-type comprehensive
   --skip-confirmation
+)
+
+if [ "$USE_SF_REPORTS" = "1" ]; then
+  GEN_CMD+=(--use-salesforce-reports)
+fi
+
+"${GEN_CMD[@]}"
 
 if [ $? -eq 0 ]; then
     echo ""

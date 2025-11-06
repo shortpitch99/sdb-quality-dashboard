@@ -219,6 +219,184 @@ class QualityDataCollector:
                 default_config.update(user_config)
         
         return default_config
+
+    # ---------- Salesforce Reports API integration ----------
+    def _load_sh_cli(self):
+        """Try to load 'sf' (new CLI) first, then 'sfdx'. Return (callable, mode). Lazy-import to avoid hard dep."""
+        try:
+            from sh import sf as sf_bin  # type: ignore
+            return sf_bin, "sf"
+        except Exception:
+            pass
+        try:
+            from sh import sfdx as sfdx_bin  # type: ignore
+            return sfdx_bin, "sfdx"
+        except Exception:
+            return None, None
+
+    def _get_sf_session(self, use_gus_cli: bool) -> Optional[Dict[str, str]]:
+        """Return {'access_token','instance_url'} from env or via sf/sfdx CLI if requested."""
+        # Preferred: env vars (compatible with existing .env usage)
+        instance_url = os.getenv("SF_INSTANCE_URL", "").strip()
+        access_token = os.getenv("SF_ACCESS_TOKEN", "").strip()
+        if instance_url and access_token and not use_gus_cli:
+            return {"access_token": access_token, "instance_url": instance_url}
+
+        if not use_gus_cli:
+            return None
+
+        cli, mode = self._load_sh_cli()
+        if not cli:
+            print("Salesforce CLI (sf/sfdx) not available; cannot use --use-salesforce-reports without env SF_* vars")
+            return None
+        try:
+            if mode == "sf":
+                result = cli("org", "display", "--json", _tty_out=False)
+            else:
+                result = cli("force:org:display", "--json", _tty_out=False)
+            auth_info = json.loads(str(result))
+            if auth_info.get("status") == 0:
+                data = auth_info["result"]
+                return {"access_token": data["accessToken"], "instance_url": data["instanceUrl"]}
+        except Exception:
+            pass
+        # Interactive login fallback
+        try:
+            if mode == "sf":
+                result = cli("org", "login", "web", "--json", _tty_out=False)
+            else:
+                result = cli("force:auth:web:login", "--json", _tty_out=False)
+            auth_info = json.loads(str(result))
+            if auth_info.get("status") == 0:
+                data = auth_info["result"]
+                return {"access_token": data["accessToken"], "instance_url": data["instanceUrl"]}
+        except Exception as e:
+            print(f"Salesforce CLI auth failed: {e}")
+        return None
+
+    def _fetch_report(self, report_id: str, session: Dict[str, str], api_version: str) -> Optional[Dict[str, Any]]:
+        """Call Salesforce Reports API to execute report synchronously with details."""
+        if not report_id:
+            return None
+        url = f"{session['instance_url'].rstrip('/')}/services/data/{api_version}/analytics/reports/{report_id}"
+        try:
+            resp = requests.get(url, headers={
+                "Authorization": f"Bearer {session['access_token']}",
+                "Accept": "application/json",
+            }, params={"includeDetails": "true"}, timeout=60)
+            if 200 <= resp.status_code < 300:
+                return resp.json()
+            print(f"Reports API error {resp.status_code}: {resp.text[:300]}")
+        except Exception as e:
+            print(f"Reports API exception: {e}")
+        return None
+
+    def _get_rows_from_report(self, report_json: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Flatten report detail rows into list of dicts mapping column API to value."""
+        if not report_json:
+            return []
+        # Some reports return factMap with keys like 'T!T' and '0!0'
+        fact_map = report_json.get('factMap', {})
+        rows: List[Dict[str, Any]] = []
+        for key, fact in fact_map.items():
+            for dr in fact.get('rows', []) or []:
+                data_row = {}
+                for ce in dr.get('dataCells', []) or []:
+                    if 'fieldName' in ce:
+                        data_row[ce['fieldName']] = ce.get('value')
+                    elif 'label' in ce and 'value' in ce:
+                        # Some cells may not carry fieldName; skip or store label
+                        pass
+                # Append groupings as well if needed
+                rows.append(data_row)
+        return rows
+
+    # ---------- Report-specific loaders (API) ----------
+    def load_prb_from_report(self, report_id: str, session: Dict[str, str], api_version: str = "v62.0") -> List[PRBItem]:
+        data = self._fetch_report(report_id, session, api_version)
+        if not data:
+            print("Failed to fetch PRB report; falling back to file if available")
+            return []
+        rows = self._get_rows_from_report(data)
+        prbs: List[PRBItem] = []
+        for r in rows:
+            prb_id = str(r.get('SM_Problem__c.Name') or r.get('SM_Problem__c.Id') or '')
+            if not prb_id:
+                continue
+            priority_raw = str(r.get('SM_Problem__c.Problem_Priority__c') or '')
+            priority = {
+                'P0': 'P0-Critical', 'P1': 'P1-High', 'P2': 'P2-Medium', 'P3': 'P3-Low', 'P4': 'P4-Minimal'
+            }.get(priority_raw, priority_raw or 'P2-Medium')
+            status = str(r.get('SM_Problem__c.Problem_State__c') or 'Open')
+            created = r.get('SM_Problem__c.CreatedDate')
+            created_date = ''
+            if created:
+                try:
+                    created_date = datetime.fromisoformat(str(created).replace('Z','+00:00')).strftime('%Y-%m-%d')
+                except Exception:
+                    created_date = str(created)
+            team = str(r.get('SM_Problem__c.Scrum_Team__c.Name') or r.get('SM_Problem__c.Cloud__c') or 'Unknown')
+            customer_impact = str(r.get('SM_Problem__c.Customer_Impact__c') or r.get('SM_Problem__c.Customer_Experience__c') or 'Unknown')
+            what_happened = str(r.get('SM_Problem__c.What_Happened__c') or '')
+            proximate_cause = str(r.get('SM_Problem__c.Proximate_Cause__c') or '')
+            how_resolved = str(r.get('SM_Problem__c.How_was_it_Resolved__c') or '')
+
+            title = f"{prb_id}: {customer_impact}" if customer_impact and customer_impact != 'Unknown' else f"{prb_id}: {status} - {team}"
+            prbs.append(PRBItem(
+                id=prb_id,
+                title=title,
+                priority=priority,
+                status=status,
+                description=f"Team: {team} | Impact: {customer_impact}",
+                created_date=created_date or datetime.now().strftime('%Y-%m-%d'),
+                what_happened=what_happened,
+                customer_experience=str(r.get('SM_Problem__c.Customer_Experience__c') or ''),
+                proximate_cause=proximate_cause,
+                how_resolved=how_resolved,
+                team=team,
+                customer_impact=customer_impact
+            ))
+        # de-dup by id
+        uniq: Dict[str, PRBItem] = {}
+        for p in prbs:
+            uniq[p.id] = p
+        self.data['prbs'] = [vars(p) for p in uniq.values()]
+        return list(uniq.values())
+
+    def load_work_items_from_report(self, report_id: str, session: Dict[str, str], issue_type: str, api_version: str = "v62.0") -> List[Dict[str, Any]]:
+        data = self._fetch_report(report_id, session, api_version)
+        if not data:
+            print(f"Failed to fetch {issue_type} report; falling back to file if available")
+            return []
+        rows = self._get_rows_from_report(data)
+        items: List[Dict[str, Any]] = []
+        for r in rows:
+            work_id = str(r.get('ADM_Work__c.Name') or r.get('Work__c.Name') or r.get('Work.Name') or r.get('Work: Work ID') or r.get('Work__c.Id') or '')
+            if not work_id and 'W-' in str(r):
+                continue
+            team = str(r.get('ADM_Work__c.Scrum_Team_Name__c') or r.get('Scrum_Team_Name__c') or r.get('Scrum Team Name') or 'Unknown')
+            subject = str(r.get('ADM_Work__c.Subject__c') or r.get('Subject') or '')
+            status = str(r.get('ADM_Work__c.Status__c') or r.get('Status') or '')
+            priority = str(r.get('ADM_Work__c.Priority__c') or r.get('Priority') or 'P2')
+            created = r.get('ADM_Work__c.CreatedDate') or r.get('Work: Created Date')
+            created_date = ''
+            if created:
+                try:
+                    created_date = datetime.fromisoformat(str(created).replace('Z','+00:00')).strftime('%Y-%m-%d')
+                except Exception:
+                    created_date = str(created)
+            build_version = str(r.get('ADM_Work__c.Found_in_Build_Name__c') or r.get('Found in Build') or r.get('Found in Build Name') or '')
+            items.append({
+                'work_id': work_id,
+                'team': team,
+                'priority': priority if priority.startswith('P') else 'P2',
+                'subject': subject[:200],
+                'status': status,
+                'build_version': build_version,
+                'created_date': created_date or datetime.now().strftime('%Y-%m-%d'),
+                'issue_type': issue_type
+            })
+        return items
     
     def load_risk_data(self, risk_file: str) -> List[RiskItem]:
         """Load risk/feature tracking data from text file."""
@@ -2748,6 +2926,15 @@ def main():
     parser.add_argument('--report-end-date', help='Custom report end date (YYYY-MM-DD). Report will cover the week ending on the Sunday before this date.')
     parser.add_argument('--week', help='Calendar week (e.g., cw37, cw38). Automatically sets subdirectory path and report-end-date for historical weeks.')
     parser.add_argument('--component', default='Engine', choices=['Engine', 'Store', 'Archival', 'SDD', 'msSDB', 'Core App Efficiency'], help='Component to generate report for (default: Engine)')
+    # New: Salesforce Reports API integration flags and defaults
+    parser.add_argument('--use-salesforce-reports', action='store_true', help='Fetch PRBs and issues from Salesforce Reports API instead of local text files')
+    parser.add_argument('--sf-api-version', default='v62.0', help='Salesforce API version to use for Reports API calls')
+    parser.add_argument('--sf-report-prb', default='00OEE000001TXjB2AW', help='Report ID for PRBs (last week)')
+    parser.add_argument('--sf-report-bugs', default='00OEE0000014M4b2AE', help='Report ID for Production Bugs')
+    parser.add_argument('--sf-report-ci', default='00OEE000002WjvJ2AS', help='Report ID for CI Issues')
+    parser.add_argument('--sf-report-leftshift', default='00OEE000002Wjld2AC', help='Report ID for LeftShift Issues')
+    parser.add_argument('--sf-report-abs', default='00OEE000002bDht2AE', help='Report ID for ABS Issues')
+    parser.add_argument('--sf-report-security', default='00OB0000002qWjvMAE', help='Report ID for Security Issues')
     
     args = parser.parse_args()
     
@@ -2810,12 +2997,29 @@ def main():
     # Collect data from all sources
     print("Collecting risk data...")
     collector.load_risk_data(args.risk_file)
-    
+
+    # Reports API integration for PRBs and all issue lists
+    use_reports = bool(getattr(args, 'use_salesforce_reports', False))
+
+    if use_reports:
+        print("Authenticating to Salesforce (sf/sfdx or env vars)...")
+        session = collector._get_sf_session(use_gus_cli=True)
+        if not session:
+            print("⚠️ Could not establish Salesforce session; falling back to file-based inputs")
+            use_reports = False
+
     print("Loading PRB/incident data...")
-    collector.load_prb_data(args.prb_file)
-    
-    print("Loading bugs data...")
-    collector.load_bugs_data(args.bugs_file)
+    if use_reports:
+        collector.load_prb_from_report(args.sf_report_prb, session, args.sf_api_version)
+    else:
+        collector.load_prb_data(args.prb_file)
+
+    print("Loading bugs data (Production issues)...")
+    if use_reports:
+        bugs = collector.load_work_items_from_report(args.sf_report_bugs, session, issue_type='Bug', api_version=args.sf_api_version)
+        collector.data['bugs'] = bugs
+    else:
+        collector.load_bugs_data(args.bugs_file)
     
     # Critical issues are already loaded as part of bugs data - no need for separate extraction
     
@@ -2832,15 +3036,25 @@ def main():
     collector.load_deployment_summary("deployment.txt")
     
     print("Loading development codeline health data...")
-    collector.load_ci_issues(args.ci_file)
-    collector.load_leftshift_issues(args.leftshift_file)
-    collector.load_abs_issues(args.abs_file)
-    # Load security issues from ss.txt (use proper path when week is specified)
-    ss_file = "ss.txt"
-    if args.week:
-        component_dir = os.path.join(f"weeks/{args.week}", args.component)
-        ss_file = os.path.join(component_dir, "ss.txt")
-    collector.load_ss_security_issues(ss_file)
+    if use_reports:
+        ci_items = collector.load_work_items_from_report(args.sf_report_ci, session, issue_type='CI', api_version=args.sf_api_version)
+        collector.data['ci_issues'] = ci_items
+        leftshift_items = collector.load_work_items_from_report(args.sf_report_leftshift, session, issue_type='LeftShift', api_version=args.sf_api_version)
+        collector.data['leftshift_issues'] = leftshift_items
+        abs_items = collector.load_work_items_from_report(args.sf_report_abs, session, issue_type='ABS', api_version=args.sf_api_version)
+        collector.data['abs_issues'] = abs_items
+        security_items = collector.load_work_items_from_report(args.sf_report_security, session, issue_type='security', api_version=args.sf_api_version)
+        collector.data['security_issues'] = security_items
+    else:
+        collector.load_ci_issues(args.ci_file)
+        collector.load_leftshift_issues(args.leftshift_file)
+        collector.load_abs_issues(args.abs_file)
+        # Load security issues from ss.txt (use proper path when week is specified)
+        ss_file = "ss.txt"
+        if args.week:
+            component_dir = os.path.join(f"weeks/{args.week}", args.component)
+            ss_file = os.path.join(component_dir, "ss.txt")
+        collector.load_ss_security_issues(ss_file)
 
     # Load new backlogs and system availability
     print("Loading all-time backlog (allbugs)...")
