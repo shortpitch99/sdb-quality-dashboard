@@ -1,0 +1,122 @@
+Priority Select all rows for Drill Down.
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Created Date
+Sorted by Created Date, oldest-to-newestAscending
+Select row for Drill Down.
+P2(6)
+Sayonara Foundation Services(2)
+9/29/2025(1)
+Subtotal
+10/13/2025(1)
+Subtotal
+Subtotal
+Sayonara TxP(2)
+11/3/2025(1)
+Subtotal
+11/4/2025(1)
+Subtotal
+Subtotal
+SDB Query Proc Execution(1)
+11/5/2025(1)
+Subtotal
+Subtotal
+SDBStore(1)
+11/1/2025(1)
+Subtotal
+Subtotal
+Subtotal
+Total(6)
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Created Date
+Sorted by Created Date, oldest-to-newestAscending
+Work ID
+Subject
+Readme Notes
+Assigned To: Full Name
+Status
+Customer
+Found In Build Name
+Sprint: Name
+P2(6)
+Sayonara Foundation Services(2)
+9/29/2025(1)
+W-19769313
+[EA][PROD][TRAP][usa6s] AllocSetAlloc,palloc_internal,Array_init,ExtentIdList_init,read_extentset
+11/04 - Sagar has sprinted it for 11a.
+10/28 - Sagar will add some diagnostics and timebox the investigation.
+
+9/30: Just transferred to Sagar
+Sagar Ranadive
+In Progress
+SDBFalcon usa6s
+sdb.260.1
+2025.11a-Sayonara Foundation Services
+Subtotal
+10/13/2025(1)
+W-19881426
+[DEU60] log extent got deleted which is not yet applied on one of the log tailer.
+11/04 - Sagar will address it in 11a.
+10/28 - Bug transferred to Sagar. The fix will need some coordination with the Archival team.
+10/20: Bryan reproduced the problem locally. 7+ year old bug in a Storage Catalog support routine used by the Archival S...
+Sagar Ranadive
+Triaged
+Falcon deu60
+258.11
+2025.11a-Sayonara Foundation Services
+Subtotal
+Subtotal
+Sayonara TxP(2)
+11/3/2025(1)
+W-20116241
+[EA][PROD][PROD_ERROR][deu74] Transaction too large in Memstore (8589934656 bytes for 47662427 recor...
+-
+Jonathan Hu
+In Progress
+SDBFalcon deu74
+sdb.258.11
+-
+Subtotal
+11/4/2025(1)
+W-20126502
+[EA][PROD][PROD_ERROR][usa960] Transaction too large in Memstore (8589934848 bytes for 44022778 reco...
+-
+SDB TxP Work Queue
+New
+SDBFalcon usa960
+sdb.258.15
+-
+Subtotal
+Subtotal
+SDB Query Proc Execution(1)
+11/5/2025(1)
+W-20143111
+[EA][ABS][INTERNAL_ERROR] RYOW fetch with a local sequence number. TopXid:13835060288665157632
+-
+SDB QP Execution User
+New
+AutobuildId 34979
+sdb.260.13
+-
+Subtotal
+Subtotal
+SDBStore(1)
+11/1/2025(1)
+W-20098399
+[EA][PROD][PROD_ERROR][che26s] [nzQEsOI41CGw7LRVdRATIw:00000D6B] Req:LedgerReadStreamReq StoreId:a3f...
+-
+Satish Bhat
+In Progress
+SDBFalcon che26s
+sdb.258.15
+2025.11a-SDBStore
+Subtotal
+Subtotal
+Subtotal
+Total(6)
+

@@ -1,0 +1,112 @@
+Created Date Time Select all rows for Drill Down.
+Created Date Time
+Sorted by Created Date Time, oldest-to-newestAscending
+Problem Priority
+Sorted by Problem Priority, ascending picklist orderAscending
+Problem Number
+Sorted by Problem Number, A-to-ZAscending
+Select row for Drill Down.
+10/26/2025 - 11/1/2025(2)
+P1(1)
+PRB-0029212(1)
+P2(1)
+PRB-0029181(1)
+Created Date Time
+Sorted by Created Date Time, oldest-to-newestAscending
+Problem Priority
+Sorted by Problem Priority, ascending picklist orderAscending
+Problem Number
+Sorted by Problem Number, A-to-ZAscending
+Team: Team Name
+Cloud
+Problem State
+Customer Impact
+External RCA Requested
+Problem Description
+Repeat Incident
+Created Date
+Initial Work Issue: Work ID
+Customer Experience
+What Happened?
+Proximate Cause (Why did it happen)?
+How did we find out about the issue?
+How was it Resolved?
+Root Cause
+Next Steps
+Retro Summary
+Owner: Full Name
+10/26/2025 - 11/1/2025(2)
+P1(1)
+PRB-0029212(1)
+SDB App Efficiency (formerly Sayonara Porting)
+SDB
+Under Investigation
+-
+feature not included
+PRB Retrospective | SEV-1 | 11/01/2025 | jpn140/144 - apt spike
+
+[THIS PRB IS MANAGED BY QUIP2GUS]
+feature not included
+11/1/2025
+W-20099818
+User Experience: Customers on JPN144 were unable to access Salesforce Services from 14:51 UTC to 17:05 UTC. | Impact Quantification: Q: What #/% of users/customers/requests got impacted (aggregated across all infra units)?. A: .
+[THIS PRB IS MANAGED BY QUIP2GUS]
+Any updates made in GUS will be overwritten! Update Quip doc: https://salesforce.quip.com/kWeeAQxrDEET
+​
+jpn140/jpn144 - apt spike, service disruption
+​
+​
+​
+Concurrent activities for 258.9.8 and 258.9.9 caused a Service Disruption in JPN144 and degridations on JPN
+https://salesforce.pagerduty.com/incidents/Q3B1E3B7AT88JN?utm_campaign=channel&utm_source=slack
+Stopping the PSQL portion of the 258.9.9 release and restarting the 258.9.8 release allowed the release to complete successfully
+​
+Q: Explain in detail the Time to Fix (i.e key events from detection to resolution)
+A: 
+​
+Q: Was a known miti
+-
+TBD - Fill out CARs table in Quip
+Proximate Cause: Concurrent activities for 258.9.8 and 258.9.9 caused a Service Disruption in JPN144 and degridations on JPN
+​
+Key Questions for Retro (enter as Problem Statements below): 
+​
+Q: When halting releases that cover multiple Cells
+John Cookingham
+P2(1)
+PRB-0029181(1)
+CRM Database Sustaining Engineering
+SDB
+Under Investigation
+Performance degradation (general)
+feature not included
+PRB Retrospective | SEV-2 | 10/29/2025 | usa720 Connection Pool Burn Rate Threshold exceeded on Multiple App Servers / Multiple DB Nodes
+
+[THIS PRB IS MANAGED BY QUIP2GUS]
+feature not included
+10/29/2025
+W-20073708
+User Experience: Performance Degradation. | Impact Quantification: Q: What #/% of users/customers/requests got impacted (aggregated across all infra units)?. A: .
+[THIS PRB IS MANAGED BY QUIP2GUS]
+Any updates made in GUS will be overwritten! Update Quip doc: https://salesforce.quip.com/54xvAl0wduci
+​
+usa720 Connection Pool Burn Rate Threshold exceeded on Multiple App Servers / Multiple DB N
+Node sdb-a-51-3 was unhealthy
+https://salesforce-internal.slack.com/archives/C02J7CM51N3/p1761751907221039
+The problematic node was discarded
+​
+Q: Explain in detail the Time to Fix (i.e key events from detection to resolution)
+A: 
+​
+Q: Was a known mitigation for this incident? If yes, please describe it and can it be automated?  
+A: 
+​
+-
+TBD - Fill out CARs table in Quip
+Proximate Cause: Node sdb-a-51-3 was unhealthy
+​
+Key Questions for Retro (enter as Problem Statements below): 
+​
+Q: How can we prevent this impact in the future? Can node discards be automated in cases like these? Why was the managed operatio
+Site Reliability
+

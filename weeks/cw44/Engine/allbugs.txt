@@ -1,0 +1,232 @@
+Priority Select all rows for Drill Down.
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Bucket
+Breakdown
+Sorted by Breakdown, A-to-ZAscending
+Work ID
+Priority Select all rows for Drill Down.
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Bucket
+Breakdown
+Sorted by Breakdown, A-to-ZAscending
+Work ID
+Select row for Drill Down.
+P1(16)
+Sayonara TxP(2)
+<=30 days(2)
+W-19997612
+W-19997613
+Subtotal
+Subtotal
+SDB Query Proc Execution(1)
+<=30 days(1)
+W-20132172
+Subtotal
+Subtotal
+SDBStore(13)
+<=30 days(4)
+W-20118658
+W-20097162
+W-20097161
+W-19895938
+Subtotal
+1 - 3 months(6)
+W-19566169
+W-19566141
+W-19350460
+W-19654204
+W-19833039
+W-19833035
+Subtotal
+6 - 12 months(3)
+W-17880307
+W-18070923
+W-18070925
+Subtotal
+Subtotal
+Subtotal
+Select row for Drill Down.
+P2(104)
+Sayonara Data Management(20)
+<=30 days(6)
+W-20129201
+W-20006903
+W-20034788
+W-20001991
+W-20113012
+W-19860706
+Subtotal
+1 - 3 months(4)
+W-19627604
+W-19726659
+W-19401383
+W-19624375
+Subtotal
+3 - 6 months(3)
+W-19139721
+W-18941943
+W-18821215
+Subtotal
+6 - 12 months(4)
+W-17811486
+W-18329165
+W-18247782
+W-17580069
+Subtotal
+1 - 2 years(3)
+W-15605652
+W-14852675
+W-15663253
+Subtotal
+Subtotal
+Sayonara Foundation Services(17)
+<=30 days(10)
+W-20032929
+W-20044887
+W-20090984
+W-20044689
+W-19871554
+W-19867650
+W-20026322
+W-19881426
+W-20111296
+W-20081954
+Subtotal
+1 - 3 months(4)
+W-19629257
+W-19769313
+W-19765560
+W-19693432
+Subtotal
+6 - 12 months(1)
+W-18146439
+Subtotal
+1 - 2 years(1)
+W-14520068
+Subtotal
+> 2 years(1)
+W-13181392
+Subtotal
+Subtotal
+Sayonara TxP(20)
+<=30 days(6)
+W-20126502
+W-20034456
+W-20116241
+W-19875629
+W-20082597
+W-20044422
+Subtotal
+1 - 3 months(8)
+W-19690428
+W-19708710
+W-19479658
+W-19629559
+W-19597285
+W-19307267
+W-19465357
+W-19398827
+Subtotal
+3 - 6 months(3)
+W-19140190
+W-19018647
+W-18994384
+Subtotal
+1 - 2 years(1)
+W-14904156
+Subtotal
+> 2 years(2)
+W-11622040
+W-7566639
+Subtotal
+Subtotal
+Sayonara TxP India(1)
+<=30 days(1)
+W-20100268
+Subtotal
+Subtotal
+SDB Catalog Services(3)
+<=30 days(3)
+W-19886119
+W-19978605
+W-20113015
+Subtotal
+Subtotal
+SDB Engine Health and Diagnostics(19)
+<=30 days(8)
+W-19987763
+W-19994951
+W-20035392
+W-20064424
+W-19988598
+W-20063135
+W-20108133
+W-20063957
+Subtotal
+1 - 3 months(4)
+W-19761586
+W-19830161
+W-19386673
+W-19692318
+Subtotal
+3 - 6 months(2)
+W-19164552
+W-18846947
+Subtotal
+6 - 12 months(4)
+W-17978306
+W-17386439
+W-17386378
+W-18040318
+Subtotal
+1 - 2 years(1)
+W-16100582
+Subtotal
+Subtotal
+SDB Query Proc Execution(3)
+<=30 days(3)
+W-20143111
+W-20032932
+W-20096412
+Subtotal
+Subtotal
+SDBStore(21)
+<=30 days(11)
+W-20042903
+W-20042906
+W-19992281
+W-19866380
+W-19979833
+W-20098399
+W-19886880
+W-19987697
+W-20021136
+W-20013637
+W-20132669
+Subtotal
+1 - 3 months(6)
+W-19391577
+W-19616450
+W-19364382
+W-19694051
+W-19672082
+W-19833021
+Subtotal
+3 - 6 months(3)
+W-19134331
+W-19134332
+W-19081141
+Subtotal
+6 - 12 months(1)
+W-18294870
+Subtotal
+Subtotal
+Subtotal
+Total(120)
+

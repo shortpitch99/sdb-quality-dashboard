@@ -1,0 +1,44 @@
+Scrum Team Name Select all rows for Drill Down.
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Select row for Drill Down.
+SDB Query Proc Execution(1)
+P2(1)
+Subtotal
+Subtotal
+Total(1)
+Scrum Team Name
+Sorted by Scrum Team Name, A-to-ZAscending
+Priority
+Sorted by Priority, ascending picklist orderAscending
+Work: Work ID
+Subject
+Status
+Assigned To
+Work: Created Date
+Sorted by Work: Created Date, newest-to-oldestDescending
+Sprint
+Type
+Found in Build
+Scheduled Build
+Customer
+Work: Created By
+SDB Query Proc Execution(1)
+P2(1)
+W-20143111
+[EA][ABS][INTERNAL_ERROR] RYOW fetch with a local sequence number. TopXid:13835060288665157632
+New
+SDB QP Execution User
+11/5/2025
+-
+Bug
+sdb.260.13
+-
+AutobuildId 34979
+API user SDB Analytics
+Subtotal
+Subtotal
+Total(1)
+

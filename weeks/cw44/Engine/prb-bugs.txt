@@ -1,0 +1,488 @@
+Problem: Problem Priority
+Sorted by Problem: Problem Priority, ascending picklist orderAscending
+Problem: Problem Number
+Sorted by Problem: Problem Number, Z-to-ADescending
+Work: Team: Team Name
+Sorted by Work: Team: Team Name, A-to-ZAscending
+Problem: Problem Priority
+Sorted by Problem: Problem Priority, ascending picklist orderAscending
+Problem: Problem Number
+Sorted by Problem: Problem Number, Z-to-ADescending
+Work: Team: Team Name
+Sorted by Work: Team: Team Name, A-to-ZAscending
+Work: Severity Level
+Work: Work ID
+Work: Status
+Work: Subject
+Work: Description
+Work: Assigned To: Full Name
+Work: Due Date
+Work: Priority
+Work: Created Date
+Work: Found in Build: Name
+Work: Comment
+Problem: Team: Team Name
+Problem: Problem Priority Select all rows for Drill Down.
+Problem: Problem Priority
+Sorted by Problem: Problem Priority, ascending picklist orderAscending
+Problem: Problem Number
+Sorted by Problem: Problem Number, Z-to-ADescending
+Work: Team: Team Name
+Sorted by Work: Team: Team Name, A-to-ZAscending
+Select row for Drill Down.
+P0(2)
+PRB-0025440(2)
+Sayonara TxP(2)
+Select row for Drill Down.
+P1(12)
+PRB-0028895(1)
+Sayonara Data Management(1)
+PRB-0028477(1)
+SDB Engine Health and Diagnostics(1)
+PRB-0027576(2)
+SDB Engine Health and Diagnostics(2)
+PRB-0025688(6)
+Sayonara Data Management(3)
+Sayonara Foundation Services(2)
+Sayonara TxP(1)
+PRB-0025328(1)
+Sayonara TxP(1)
+PRB-0021428(1)
+Sayonara Data Management(1)
+Select row for Drill Down.
+P2(8)
+PRB-0029092(3)
+Sayonara TxP(3)
+PRB-0028097(1)
+Sayonara Data Management(1)
+PRB-0027318(2)
+Sayonara Foundation Services(1)
+Sayonara TxP(1)
+PRB-0026432(1)
+Sayonara Foundation Services(1)
+PRB-0025161(1)
+SDB Query Proc Execution(1)
+Select row for Drill Down.
+P3(7)
+PRB-0028186(1)
+SDB Query Proc Optimizer(1)
+PRB-0027010(4)
+Sayonara Foundation Services(4)
+PRB-0022767(1)
+SDB Query Proc Execution(1)
+PRB-0013639(1)
+SDB Query Proc Execution(1)
+Total(29)
+Problem: Problem Priority
+Sorted by Problem: Problem Priority, ascending picklist orderAscending
+Problem: Problem Number
+Sorted by Problem: Problem Number, Z-to-ADescending
+Work: Team: Team Name
+Sorted by Work: Team: Team Name, A-to-ZAscending
+Work: Severity Level
+Work: Work ID
+Work: Status
+Work: Subject
+Work: Description
+Work: Assigned To: Full Name
+Work: Due Date
+Work: Priority
+Work: Created Date
+Work: Found in Build: Name
+Work: Comment
+Problem: Team: Team Name
+P0(2)
+PRB-0025440(2)
+Sayonara TxP(2)
+-
+W-17041393
+Waiting
+NFR: Long recovery should not cause pipelines to fail or disrupt service availability.
+What is it ? Due to long running transactions, recovery start point (RSP) can be held back. During recovery, SDB has to replay all the logs starting at RSP until the tail of the log. If the RSP is significantly behind, the rec
+Matt Woicik
+-
+-
+10/22/2024
+-
+-
+SDB Store / Zk Management
+-
+W-17041290
+Triaged
+NFR: Recovery should succeed when memstore ringbuffer is full to last byte on primary
+What is it ? In production, we have seen that due to infrastructure issues at cloud store layer, the memstore can get full to last byte. In such cases, if the server PANIC, then the recovery can repeatedly fail due to out of me
+Kaushal Mittal
+-
+-
+10/22/2024
+-
+-
+SDB Store / Zk Management
+P1(12)
+PRB-0028895(1)
+Sayonara Data Management(1)
+3
+W-19779110
+New
+Analysis and Investigation for Internal Root Cause Analysis for PRB-0028895
+Please investigate initial incident added to the PRB. Identify triggers, contributing factors, and create CARs once root cause is understood
+Initial Incident Fields:
+Case Number: 81573148
+Case Origin: Cust
+SDB Data Management Work Queue
+-
+-
+9/29/2025
+-
+-
+Sayonara Data Management
+PRB-0028477(1)
+SDB Engine Health and Diagnostics(1)
+-
+W-19339985
+New
+(PRB-0028477) Report elapsed end2end times for active transactions
+Triage of production incidents captured in PRB-0028477 (Related to Memstore throttling caused by Bloom filter fullness on usa376) was hampered by the fact that it was not obvious from our end2end timing metrics that the transaction in question was stu
+Ankur Singh Chauhan
+-
+-
+8/14/2025
+-
+-
+Sayonara TxP
+PRB-0027576(2)
+SDB Engine Health and Diagnostics(2)
+-
+W-18712788
+New
+Identify representative signals that can help identify heavy procArray and lock table contentions
+This WI is to identify some of the representative signals/queries etc to gauge the possibility of situations such as in stateform where heavy procArray and lock partition contentions were observed. This can lead to unfavorable conditions such as panic
+Shrikant Salunke
+-
+-
+6/4/2025
+-
+-
+Sayonara TxP
+-
+W-18712459
+In Progress
+Umbrella item - optimize telemetry capture of blocking information under heavy contention scenarios
+Statefarm, TA and other cells (usa1072, usa1078, usa4s etc.) showed scenarios where the lock blocking information capture and associated rowkey memstore lookups are causing some spiralling situations impacting other areas such as connection delays, la
+Shrikant Salunke
+-
+-
+6/4/2025
+-
+-
+Sayonara TxP
+PRB-0025688(6)
+Sayonara Data Management(3)
+-
+W-17111085
+New
+Work with Observability Team to create a Fawkes alert for sustained catalog contention caused by daemons
+Follow-up from the deu8s incident . We should have better alerting around catalog contention, as that can
+SDB Data Management Work Queue
+-
+-
+10/31/2024
+-
+-
+CRM Database Sustaining Engineering - APAC
+-
+W-17045029
+New
+Enable range-delete optimization for avoiding slicing for empty key-ranges for table truncation (TRUNCATE TABLE FOR TENANT)
+Currently, the range-delete optimization for avoiding slicing for empty key-ranges at flush is only enabled for fine-grained range-delete (TRUNCATE TABLE FOR TENANT WHERE ...) . We also want to enable this optimization for table truncation as well TRU
+Vaibhav Arora
+-
+-
+10/22/2024
+-
+-
+CRM Database Sustaining Engineering - APAC
+-
+W-16364919
+New
+Remove max er input limit for merge for fragmentation merges
+During the analysis of outliers for timing of create tenant snapshot & export tenant, we found that with frag
+Bhargav Reddi
+-
+-
+7/29/2024
+-
+-
+CRM Database Sustaining Engineering - APAC
+Sayonara Foundation Services(2)
+-
+W-14199730
+New
+Feedback and Mixed Ring Extent Expiration problems raised by analysis of W-14163149
+The symptoms of prematurely deleting a log extent while the Standby thread is still using it are usually pretty minor; the standby may panic but once it restarts it will use the new RSP and the new Log Window and it will come up just fine.
+Bryan Pendleton
+-
+-
+9/27/2023
+-
+-
+CRM Database Sustaining Engineering - APAC
+-
+W-9249657
+New
+Enable allocated extent pools in master
+After the AllocatedExtentPools feature has passed the preproduction testing tracked in W-9249646, this user story is to add the setting of the allocated_extent_pool_size GUC to postgresql.conf.falcon to enable the feature in Falcon cells.
+Sagar Ranadive
+-
+-
+5/10/2021
+-
+-
+CRM Database Sustaining Engineering - APAC
+Sayonara TxP(1)
+-
+W-17069485
+New
+NFR: Do not announce support for readwrite connections until all CatalogServer operations have completed
+One of the issues in the deu8s production incident that is the subject of PRB-0025688 (detailed analysis in PRB-0025688: ERS Fragmen
+SDB TxP Work Queue
+-
+-
+10/25/2024
+-
+-
+CRM Database Sustaining Engineering - APAC
+PRB-0025328(1)
+Sayonara TxP(1)
+-
+W-13701862
+In Progress
+NFR: Eliminate Rollback Processing from the Critical Path during Promotion and Soft Restart
+Problem: PRB-0025328
+Matt Woicik
+-
+-
+7/3/2023
+-
+-
+CRM Database Sustaining Engineering
+PRB-0021428(1)
+Sayonara Data Management(1)
+-
+W-13700138
+New
+Raise alert if extent index root page running out of blocks
+This incident ran into W-9978718. Once we ran into it the system got into a wedged state and there was nothing we could do but to restore the database to a point when we were able t
+Terry Chong
+-
+-
+7/3/2023
+-
+-
+Sayonara Data Management
+P2(8)
+PRB-0029092(3)
+Sayonara TxP(3)
+3
+W-19997567
+New
+Analysis and Investigation for Internal Root Cause Analysis for PRB-0029092
+Please investigate initial incident added to the PRB. Identify triggers, contributing factors, and create CARs once root cause is understood
+Initial Incident Fields:
+Case Number: 82761949
+Case Origin: Aler
+Jun Chen
+-
+-
+10/20/2025
+-
+-
+Sayonara TxP
+-
+W-19997612
+New
+[P1-Bug TTD PRB-0029092|82761949] incident missed TTD SLO]
+-
+Jun Chen
+11/19/2025, 6:33 PM
+P1
+10/20/2025
+Incident TTD Miss
+-
+Sayonara TxP
+-
+W-19997613
+New
+[P1-Bug TTR PRB-0029092|82761949] incident missed TTR SLO]
+-
+Jun Chen
+11/19/2025, 6:33 PM
+P1
+10/20/2025
+Incident TTR Miss
+-
+Sayonara TxP
+PRB-0028097(1)
+Sayonara Data Management(1)
+-
+W-19084836
+New
+Implement guardrails to prevent manual flush requests from overloading the database
+We have seen in usa316 ( doc ) that app issuing high frequency, tiny manual flushes can cause huge L0 stacking to happen. In usa31
+SDB Data Management Work Queue
+-
+-
+7/18/2025
+-
+-
+Sayonara Data Management
+PRB-0027318(2)
+Sayonara Foundation Services(1)
+-
+W-14199730
+New
+Feedback and Mixed Ring Extent Expiration problems raised by analysis of W-14163149
+The symptoms of prematurely deleting a log extent while the Standby thread is still using it are usually pretty minor; the standby may panic but once it restarts it will use the new RSP and the new Log Window and it will come up just fine.
+Bryan Pendleton
+-
+-
+9/27/2023
+-
+-
+CRM Database Sustaining Engineering
+Sayonara TxP(1)
+-
+W-18248890
+New
+Add REDO_APPLIERs to stuck daemon alerting mechanism
+In the USA1000 incident where log extents were deleted in a mixed ring environment (https://docs.google.com/document/d/1wzwpuCSiWDHjSMgkRJa09fUnOXsq7Ci9hWOWeg6xMB0/edit?tab=t.0#heading=h.m8ot2nk7gizl) it was not easy to figure out what the redo applie
+Suhas Dantkale
+-
+-
+4/10/2025
+-
+-
+CRM Database Sustaining Engineering
+PRB-0026432(1)
+Sayonara Foundation Services(1)
+-
+W-17623624
+New
+Improve epoch based alerts based on ita18 incident
+Refer to ita18 high APT investigation doc. https://salesforce.quip.com/Dp95AapmOFSH I noticed that 3 of epoch alerts did not fire when we genuinely had a bad epoch straggler. Investigate how can we improve the observability of straggler detectio
+Xinan Yan
+-
+-
+1/17/2025
+-
+-
+Sayonara Foundation Services
+PRB-0025161(1)
+SDB Query Proc Execution(1)
+-
+W-16711070
+New
+Fix CPU/WAIT time accounting for txnproc_bank_block_acquire() and txnproc_bank_block_free()
+See this Slack thread , and in particular
+Jason Young
+-
+-
+9/10/2024
+-
+-
+Sayonara TxP
+P3(7)
+PRB-0028186(1)
+SDB Query Proc Optimizer(1)
+-
+W-18981482
+New
+Turn off non-blocking aggregate distinct if it is under a ModifyTable node
+Non-blocking aggregate distinct has been implemented mainly to allow early termination in the presence of Limit. However, its performance degrades a lot when spill happens. We've made some optimization to improve the performance of aggregate disti
+SDB QP Optimizer User
+-
+-
+7/7/2025
+-
+-
+CRM Database Sustaining Engineering
+PRB-0027010(4)
+Sayonara Foundation Services(4)
+-
+W-17990538
+New
+(PRB-0027010) Review need for mixed ring logic and whether additional guardrails are necessary.
+Nat was wondering if it is practical but is there a way to completely get rid of the mixed ring logic as it
+Bryan Pendleton
+-
+-
+3/7/2025
+-
+-
+Sayonara Foundation Services
+-
+W-18001741
+New
+(PRB-0027010) Improve testing of storage catalog
+From Jamie's notes of the incident Left-shift testing Have a mixed ring
+Sagar Ranadive
+-
+-
+3/10/2025
+-
+-
+Sayonara Foundation Services
+-
+W-18001784
+New
+(PRB-0027010) Review of storage catalog and catalog surgery
+From Jamie's notes: storage catalog and catalog surgery Is it possible to have an option in the st
+Bryan Pendleton
+-
+-
+3/10/2025
+-
+-
+Sayonara Foundation Services
+-
+W-18090603
+New
+(PRB-0027010) Improve FIT testing of storage catalog Mixed Ring scenarios
+﻿FIT testing  Have post upgrade and post stagger tests validate that the deletes are happening.
+Sagar Ranadive
+-
+-
+3/20/2025
+-
+-
+Sayonara Foundation Services
+PRB-0022767(1)
+SDB Query Proc Execution(1)
+-
+W-14584263
+New
+(PRB-0022767) Improve telemetry for end 2 end timers on plan cache eviction
+For IND56, we didn't have any telemetry for backend proceses waiting endlessly on a e2e t
+SDB QP Execution User
+-
+-
+11/30/2023
+-
+-
+SDB Query Proc Execution
+PRB-0013639(1)
+SDB Query Proc Execution(1)
+-
+W-9235088
+New
+(PRB-0013639) Develop a third-party library call wrapper with sanity check on the signal states
+The check should verify that before and after calling the third-party library function the signal states within the backend are consistent.
+Rui Zhang
+-
+-
+5/6/2021
+-
+-
+Sayonara Query Processing
+Total(29)
+

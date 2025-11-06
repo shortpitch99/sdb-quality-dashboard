@@ -196,6 +196,8 @@ class QualityDataCollector:
             'security_issues': [],
             'all_bugs': [],
             'prb_bugs': [],
+            'system_availability': {},
+            'kpis': {},
             'git_stats': {},
             'generated_at': datetime.now().isoformat()
         }
@@ -1272,6 +1274,170 @@ Next week: Planning production rollout to P0-P3 stages pending final validation 
         except Exception as e:
             print(f"Error loading security issues: {e}")
             return []
+
+    def load_all_bugs_backlog(self, allbugs_file: str) -> List[Dict[str, Any]]:
+        """Load ALL-TIME BUG BACKLOG from allbugs.txt (Salesforce clipboard export).
+        Stores parsed items under self.data['all_bugs'] and returns list of dicts.
+        """
+        if not os.path.exists(allbugs_file):
+            print(f"Warning: allbugs file {allbugs_file} not found.")
+            self.data['all_bugs'] = []
+            return []
+        try:
+            with open(allbugs_file, 'r') as f:
+                lines = [ln.strip() for ln in f.readlines()]
+            items = []
+            import re
+            current_priority = None
+            current_team = None
+            # Track counts per priority
+            for i, line in enumerate(lines):
+                # Capture priority headers like P2(134)
+                m = re.match(r'^(P[0-4])\((\d+)\)', line)
+                if m:
+                    current_priority = m.group(1)
+                    continue
+                # Capture team headers like "SDB Engine Health and Diagnostics(17)"
+                if '(' in line and ')' in line and not line.startswith('W-') and not line.startswith('Subtotal') and not line.startswith('Total') and not line.startswith('<'):
+                    # Team lines generally have a name followed by (count)
+                    team_name = line.split('(')[0].strip()
+                    # Avoid picking breakdown buckets like "<=30 days"
+                    if team_name and not team_name.endswith('days') and 'months' not in team_name and 'years' not in team_name:
+                        current_team = team_name
+                        continue
+                # Capture Work IDs
+                if line.startswith('W-'):
+                    items.append({
+                        'id': line,
+                        'priority': current_priority or 'P2',
+                        'team': current_team or 'Unknown'
+                    })
+            # De-duplicate
+            seen = set()
+            unique = []
+            for it in items:
+                if it['id'] not in seen:
+                    seen.add(it['id'])
+                    unique.append(it)
+            self.data['all_bugs'] = unique
+            return unique
+        except Exception as e:
+            print(f"Error loading allbugs backlog: {e}")
+            self.data['all_bugs'] = []
+            return []
+
+    def load_prb_bugs(self, prb_bugs_file: str) -> List[Dict[str, Any]]:
+        """Load PRB-derived bugs backlog from prb-bugs.txt (Salesforce clipboard export).
+        Stores parsed items under self.data['prb_bugs'] and returns list of dicts.
+        """
+        if not os.path.exists(prb_bugs_file):
+            print(f"Warning: prb-bugs file {prb_bugs_file} not found.")
+            self.data['prb_bugs'] = []
+            return []
+        try:
+            with open(prb_bugs_file, 'r') as f:
+                lines = [ln.strip() for ln in f.readlines()]
+            items = []
+            import re
+            current_priority = None
+            current_prb = None
+            current_team = None
+            for i, line in enumerate(lines):
+                # Priority sections like P1(11)
+                m = re.match(r'^(P[0-4])\((\d+)\)', line)
+                if m:
+                    current_priority = m.group(1)
+                    continue
+                # PRB number grouping like PRB-0029092(4)
+                if re.match(r'^PRB-\d+\(\d+\)$', line):
+                    current_prb = line.split('(')[0]
+                    continue
+                # Team lines like "SDB Engine Health and Diagnostics(2)"
+                if '(' in line and ')' in line and not line.startswith('W-') and not line.startswith('Subtotal') and not line.startswith('Total') and not line.startswith('PRB-'):
+                    team_name = line.split('(')[0].strip()
+                    if team_name and team_name not in ['Problem: Problem Priority','Work: Team: Team Name']:
+                        current_team = team_name
+                        continue
+                # Work IDs
+                if line.startswith('W-'):
+                    items.append({
+                        'id': line,
+                        'priority': current_priority or 'P2',
+                        'prb': current_prb,
+                        'team': current_team or 'Unknown'
+                    })
+            # De-duplicate
+            seen = set()
+            unique = []
+            for it in items:
+                if it['id'] not in seen:
+                    seen.add(it['id'])
+                    unique.append(it)
+            self.data['prb_bugs'] = unique
+            return unique
+        except Exception as e:
+            print(f"Error loading prb-bugs backlog: {e}")
+            self.data['prb_bugs'] = []
+            return []
+
+    def load_system_availability(self, availability_json: str) -> Dict[str, Any]:
+        """Load or create manual system availability metrics JSON.
+        Expected schema (example):
+        {
+          "period": "2025-10-20..2025-10-26",
+          "slo": 99.9,
+          "achieved": 99.97,
+          "incidents": [ {"id":"PRB-...","duration_min": 12, "impact":"..."} ]
+        }
+        """
+        template = {
+            "period": "",
+            "slo": 99.9,
+            "achieved": 100.0,
+            "incidents": []
+        }
+        try:
+            if not os.path.exists(availability_json):
+                # Create a template file for manual entry
+                with open(availability_json, 'w') as f:
+                    json.dump(template, f, indent=2)
+                print(f"✓ Created template system availability JSON at {availability_json}")
+                self.data['system_availability'] = template
+                return template
+            with open(availability_json, 'r') as f:
+                data = json.load(f)
+                if not isinstance(data, dict):
+                    data = template
+                self.data['system_availability'] = data
+                return data
+        except Exception as e:
+            print(f"Error loading system availability JSON: {e}")
+            self.data['system_availability'] = template
+            return template
+
+    def compute_custom_kpis(self):
+        """Compute KPIs for All-Time Bug Backlog and PRB-derived backlog using entire report (no team filtering).
+        Also provide combined P0+P1 counts for prominent display.
+        """
+        def count_p(items, pset=("P0", "P1")):
+            try:
+                return sum(1 for x in items if str(x.get('priority','')).upper().split('-')[0] in pset)
+            except Exception:
+                return 0
+        all_bugs = self.data.get('all_bugs', []) or []
+        prb_bugs = self.data.get('prb_bugs', []) or []
+        all_p0_p1 = count_p(all_bugs, ("P0", "P1"))
+        prb_p0_p1 = count_p(prb_bugs, ("P0", "P1"))
+        kpis = {
+            'all_time_bug_backlog_total': len(all_bugs),
+            'all_time_bug_backlog_p0': count_p(all_bugs, ("P0",)),
+            'all_time_bug_backlog_p1': count_p(all_bugs, ("P1",)),
+            'all_time_bug_backlog_p0_p1': all_p0_p1,
+            'prb_backlog_total': len(prb_bugs),
+            'prb_backlog_p0_p1': prb_p0_p1
+        }
+        self.data['kpis'] = kpis
+        return kpis
     
     def _parse_salesforce_issues(self, content: str, issue_type: str) -> List[dict]:
         """Parse Salesforce export format for CI/LeftShift/ABS issues."""
@@ -2572,6 +2738,9 @@ def main():
     parser.add_argument('--abs-file', default='abs.txt', help='ABS issues file')
     parser.add_argument('--security-file', default='security.txt', help='Security issues file')
     parser.add_argument('--git-repo-path', default='/Users/rchowdhuri/SDB', help='Local git repository path for code analysis')
+    parser.add_argument('--allbugs-file', default='allbugs.txt', help='All-time bug backlog file (Salesforce export)')
+    parser.add_argument('--prb-bugs-file', default='prb-bugs.txt', help='PRB-derived bug backlog file (Salesforce export)')
+    parser.add_argument('--availability-file', default='system_availability.json', help='Manual System Availability JSON file')
     parser.add_argument('--prb-augmentation', help='PRB manual augmentation file (legacy)')
     parser.add_argument('--output-dir', default='./reports', help='Output directory')
     parser.add_argument('--report-type', default='comprehensive', choices=['comprehensive', 'compact'], help='Report type')
@@ -2612,6 +2781,9 @@ def main():
         args.leftshift_file = os.path.join(component_dir, os.path.basename(args.leftshift_file))
         args.abs_file = os.path.join(component_dir, os.path.basename(args.abs_file))
         args.security_file = os.path.join(component_dir, os.path.basename(args.security_file))
+        args.allbugs_file = os.path.join(component_dir, os.path.basename(args.allbugs_file))
+        args.prb_bugs_file = os.path.join(component_dir, os.path.basename(args.prb_bugs_file))
+        args.availability_file = os.path.join(component_dir, os.path.basename(args.availability_file))
         
         # Set report-end-date for historical weeks
         current_week = 38  # This week is cw38
@@ -2669,6 +2841,18 @@ def main():
         component_dir = os.path.join(f"weeks/{args.week}", args.component)
         ss_file = os.path.join(component_dir, "ss.txt")
     collector.load_ss_security_issues(ss_file)
+
+    # Load new backlogs and system availability
+    print("Loading all-time backlog (allbugs)...")
+    collector.load_all_bugs_backlog(args.allbugs_file)
+    print("Loading PRB-derived backlog (prb-bugs)...")
+    collector.load_prb_bugs(args.prb_bugs_file)
+    print("Loading system availability JSON (manual)...")
+    collector.load_system_availability(args.availability_file)
+
+    # Compute custom KPIs
+    print("Computing custom KPIs (ALL-TIME BUG BACKLOG, PRB BACKLOG)...")
+    collector.compute_custom_kpis()
     
     # Parse custom report end date if provided
     custom_end_date = None

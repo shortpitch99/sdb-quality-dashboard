@@ -1,0 +1,2024 @@
+{
+  "risks": [
+    {
+      "feature": "Database Encryption",
+      "status": "Green",
+      "priority": "High",
+      "description": "Database Encryption enabled in the sandbox cells in the production fleet.The enablement of TLE for Open Beta cells is a crucial step towards its general availability, requiring a scalable and efficient approach to handle hundreds of cells. The current process, heavily reliant on Structured Config (SC) overrides, is being revamped due to its manual nature and high latency. We created new, Sandbox-Only Stagger Groups to run the TLE pipeline on a per-cell basis for 266 sandbox cells based on reputation scores. This allows for the pipeline to be executed on groups of cells simultaneously, starting with less critical ones and progressing to more critical ones based on success. This approach avoids conflicts with existing release stagger groups, which contain a mix of sandbox and production cells and could interfere with weekly release deployments. Each stagger group execution is estimated to take about 10 minutes, with an additional 20 minutes for validation, leading to a total rollout time of approximately 7 hours for all sandboxes, assuming no failures. This comprehensive approach aims to make TLE enablement for Open Beta cells scalable, resilient, and less operationally intensive, paving the way for a smooth transition to general availability.",
+      "last_updated": "2024-01-15"
+    },
+    {
+      "feature": "Read your own writes(RYOW)",
+      "status": "Yellow",
+      "priority": "Medium",
+      "description": "Performance enhancement feature for Write Scaling. TLE dark launch mode has been rolled out to multiple cells. However, when rolling out the live mode, we ran into an issue on a couple of cells including the UHG sandbox cell (USA804s) where it seems to run into a possible data corruption issue. However, the guardrails that we implemented in the LSM layer helped detect and prevent those corruptions from persisting. Folowing this, we disabled the rollout of the live mode for RYOW functionality and it has been disabled since mid August when the problem was detected.",
+      "last_updated": "2024-01-15"
+    }
+  ],
+  "prbs": [
+    {
+      "id": "PRB-0029092",
+      "title": "PRB-0029092: Unknown - Cloud",
+      "priority": "P2-Medium",
+      "status": "Open",
+      "description": "Problem report PRB-0029092 managed by Cloud",
+      "created_date": "2025-10-19",
+      "what_happened": "PRB Retrospective | SEV-2 | 10/20/2025 | (Warden AIOps) High DB CPU on node 2 causing MQ Wait Time Degradation, Cell:usa686, FI: AWS-PROD5-USWEST2 , Orgs_Impacted: multiorgimpact",
+      "customer_experience": "The incident resulted in performance degradation, specifically impacting asynchronous processes such as Web-to-Case and dashboard refreshes. Users experienced delays in updates and actions, affecting workflows reliant on these processes.",
+      "proximate_cause": "The incident bridge team identified two key contributing factors to high resource consumption: Bulk API V2 (Delete) and Buffalo Batch Copy (Mass Org Migration) async jobs.",
+      "how_resolved": "A:",
+      "team": "Cloud",
+      "customer_impact": "Unknown"
+    },
+    {
+      "id": "PRB-0029124",
+      "title": "PRB-0029124: Unknown - Cloud",
+      "priority": "P2-Medium",
+      "status": "Open",
+      "description": "Problem report PRB-0029124 managed by Cloud",
+      "created_date": "2025-10-19",
+      "what_happened": "PRB Retrospective | SEV-2 | 10/20/2025 | (Warden AIOps) High DB CPU on node 2 causing MQ Wait Time Degradation, Cell:usa686, FI: AWS-PROD5-USWEST2 , Orgs_Impacted: multiorgimpact",
+      "customer_experience": "The incident resulted in performance degradation, specifically impacting asynchronous processes such as Web-to-Case and dashboard refreshes. Users experienced delays in updates and actions, affecting workflows reliant on these processes.",
+      "proximate_cause": "The incident bridge team identified two key contributing factors to high resource consumption: Bulk API V2 (Delete) and Buffalo Batch Copy (Mass Org Migration) async jobs.",
+      "how_resolved": "\u200b",
+      "team": "Cloud",
+      "customer_impact": "Unknown"
+    },
+    {
+      "id": "PRB-0029133",
+      "title": "PRB-0029133: Unknown - Cloud",
+      "priority": "P2-Medium",
+      "status": "Open",
+      "description": "Problem report PRB-0029133 managed by Cloud",
+      "created_date": "2025-10-19",
+      "what_happened": "PRB Retrospective | SEV-2 | 10/20/2025 | (Warden AIOps) High DB CPU on node 2 causing MQ Wait Time Degradation, Cell:usa686, FI: AWS-PROD5-USWEST2 , Orgs_Impacted: multiorgimpact",
+      "customer_experience": "The incident resulted in performance degradation, specifically impacting asynchronous processes such as Web-to-Case and dashboard refreshes. Users experienced delays in updates and actions, affecting workflows reliant on these processes.",
+      "proximate_cause": "The incident bridge team identified two key contributing factors to high resource consumption: Bulk API V2 (Delete) and Buffalo Batch Copy (Mass Org Migration) async jobs.",
+      "how_resolved": "Q: Was a known mitigation for this incident? If yes, please describe it and c",
+      "team": "Cloud",
+      "customer_impact": "Unknown"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "W-19769313",
+      "title": "[EA][PROD][TRAP][usa6s] AllocSetAlloc,palloc_internal,Array_init,ExtentIdList_in...",
+      "severity": "P2-Medium",
+      "status": "In Progress",
+      "description": "Assigned: In Progress, Customer: SDBFalcon usa6s",
+      "component": "Sayonara Foundation Services",
+      "reported_date": "2025-09-29"
+    },
+    {
+      "id": "W-19881426",
+      "title": "[DEU60] log extent got deleted which is not yet applied on one of the log tailer.",
+      "severity": "P2-Medium",
+      "status": "Triaged",
+      "description": "Assigned: Sagar Ranadive, Customer: Unknown",
+      "component": "Sayonara Foundation Services",
+      "reported_date": "2025-10-13"
+    },
+    {
+      "id": "W-20015716",
+      "title": "[EA][PROD][INTERNAL_ERROR][bra38] Error detected by redo phase. Extent linking v...",
+      "severity": "P2-Medium",
+      "status": "Triaged",
+      "description": "Assigned: Jun Chen, Customer: SDBFalcon bra38",
+      "component": "Sayonara TxP",
+      "reported_date": "2025-10-22"
+    }
+  ],
+  "critical_issues": [],
+  "deployments": [
+    {
+      "stagger": "R2a.1",
+      "version": "258.11",
+      "count": 99,
+      "stage": "R2a.1",
+      "cells": 99
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "256.17",
+      "count": 1,
+      "stage": "SB1.1",
+      "cells": 1
+    },
+    {
+      "stagger": "R1.1",
+      "version": "258.11",
+      "count": 11,
+      "stage": "R1.1",
+      "cells": 11
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "258.7",
+      "count": 5,
+      "stage": "R2a.2",
+      "cells": 5
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "258.15",
+      "count": 37,
+      "stage": "SB1.2",
+      "cells": 37
+    },
+    {
+      "stagger": "SB2.1",
+      "version": "260.1",
+      "count": 18,
+      "stage": "SB2.1",
+      "cells": 18
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "258.11",
+      "count": 21,
+      "stage": "R2b.2",
+      "cells": 21
+    },
+    {
+      "stagger": "R1.2",
+      "version": "258.15",
+      "count": 42,
+      "stage": "R1.2",
+      "cells": 42
+    },
+    {
+      "stagger": "R2b.1",
+      "version": "258.11",
+      "count": 10,
+      "stage": "R2b.1",
+      "cells": 10
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "260.1",
+      "count": 12,
+      "stage": "SB2.2",
+      "cells": 12
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "258.7",
+      "count": 1,
+      "stage": "R2a.1",
+      "cells": 1
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "258.15",
+      "count": 79,
+      "stage": "R2a.2",
+      "cells": 79
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "258.15",
+      "count": 5,
+      "stage": "SB2.2",
+      "cells": 5
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "256.17",
+      "count": 1,
+      "stage": "SB1.2",
+      "cells": 1
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "260.1",
+      "count": 50,
+      "stage": "SB1.1",
+      "cells": 50
+    },
+    {
+      "stagger": "R1.1",
+      "version": "258.15",
+      "count": 47,
+      "stage": "R1.1",
+      "cells": 47
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "258.15",
+      "count": 38,
+      "stage": "R2b.2",
+      "cells": 38
+    },
+    {
+      "stagger": "R0.2",
+      "version": "258.15",
+      "count": 3,
+      "stage": "R0.2",
+      "cells": 3
+    },
+    {
+      "stagger": "R1.2",
+      "version": "258.11",
+      "count": 5,
+      "stage": "R1.2",
+      "cells": 5
+    },
+    {
+      "stagger": "SB0",
+      "version": "258.15",
+      "count": 1,
+      "stage": "SB0",
+      "cells": 1
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "258.1",
+      "count": 4,
+      "stage": "SB1.2",
+      "cells": 4
+    },
+    {
+      "stagger": "R2b.1",
+      "version": "258.15",
+      "count": 18,
+      "stage": "R2b.1",
+      "cells": 18
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "258.3",
+      "count": 1,
+      "stage": "SB1.1",
+      "cells": 1
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "260.5",
+      "count": 2,
+      "stage": "SB1.1",
+      "cells": 2
+    },
+    {
+      "stagger": "SB0",
+      "version": "258.1",
+      "count": 1,
+      "stage": "SB0",
+      "cells": 1
+    },
+    {
+      "stagger": "R0.1",
+      "version": "260.5",
+      "count": 2,
+      "stage": "R0.1",
+      "cells": 2
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "258.15",
+      "count": 84,
+      "stage": "R2a.1",
+      "cells": 84
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "258.1",
+      "count": 2,
+      "stage": "SB1.1",
+      "cells": 2
+    },
+    {
+      "stagger": "SB2.1",
+      "version": "258.15",
+      "count": 6,
+      "stage": "SB2.1",
+      "cells": 6
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "260.1",
+      "count": 25,
+      "stage": "SB1.2",
+      "cells": 25
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "258.11",
+      "count": 139,
+      "stage": "R2a.2",
+      "cells": 139
+    },
+    {
+      "stagger": "R0.1",
+      "version": "258.15",
+      "count": 5,
+      "stage": "R0.1",
+      "cells": 5
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "258.15",
+      "count": 12,
+      "stage": "SB1.1",
+      "cells": 12
+    },
+    {
+      "stagger": "SB0",
+      "version": "260.5",
+      "count": 2,
+      "stage": "SB0",
+      "cells": 2
+    }
+  ],
+  "deployment_summary": "Weekly Deployment Summary - Week of September 15, 2025\n\nThis week's deployment activities proceeded smoothly across all stagger groups. \nSDB version 258.11 was successfully deployed to sandbox environments (SB0-SB2) \nwith no major issues reported.\n\nKey highlights:\n- Version 258.11 rolled out to 150 sandbox cells\n- Zero failed deployments\n- Average deployment time: 12 minutes\n- All post-deployment validations passed\n\nNext week: Planning production rollout to P0-P3 stages pending final validation results.",
+  "coverage": [],
+  "new_code_coverage": [
+    {
+      "component": "SDB Engine",
+      "new_code_coverage": 76.1,
+      "overall_coverage": 67.9,
+      "new_code_line_coverage": 87.3,
+      "overall_line_coverage": 80.7,
+      "lines_to_cover": 8194,
+      "uncovered_lines": 1037,
+      "overall_lines_to_cover": 549088,
+      "overall_uncovered_lines": 105787
+    }
+  ],
+  "ci_issues": [
+    {
+      "work_id": "W-20044954",
+      "team": "Sayonara Data Management",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-schemaupgrade-stress-HA-RHEL9.schemaupgrade-stress: AssertionError: Expected total of 2 SDB nodes running, b",
+      "status": "New",
+      "build_version": "sdb.260.13",
+      "created_date": "2025-10-26",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20013264",
+      "team": "Sayonara Data Management",
+      "priority": "P2",
+      "subject": "RecordLineageTest2.testlsmChecker[0]: RuntimeException: JUnit barfed with multiple errors, this",
+      "status": "Ready for Review",
+      "build_version": "sdb.260.12",
+      "created_date": "2025-10-22",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19860706",
+      "team": "Sayonara Data Management",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-sandbox-stress-TLE-key-deriv-RHEL9.sandbox-stress: 1,[::1], port=62780, expectedState=UP]: Last Error: dbsay`20251009182106.748208`",
+      "status": "Triaged",
+      "build_version": "sdb.260.10",
+      "created_date": "2025-10-09",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19726659",
+      "team": "Sayonara Data Management",
+      "priority": "P2",
+      "subject": "MergeMergeConflictTest.testTombstoneOverlapMergeConflictRatio: PSQLException: An I/O error occurred while sending to t",
+      "status": "Triaged",
+      "build_version": "sdb.260.8",
+      "created_date": "2025-09-24",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19624375",
+      "team": "Sayonara Data Management",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-sandbox-stress-RHEL9.sandbox-stress: AssertionError: Index inconsistency found for relation:",
+      "status": "Waiting",
+      "build_version": "sdb.260.7",
+      "created_date": "2025-09-12",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20081022",
+      "team": "Sayonara Foundation Services",
+      "priority": "P2",
+      "subject": "WSLogTailingUniqueConstraintTest.testPurgeDuringMemstoreScan: AssertionFailedError: expected:<1> but was:<2>",
+      "status": "New",
+      "build_version": "sdb.260.13",
+      "created_date": "2025-10-30",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20064970",
+      "team": "Sayonara Foundation Services",
+      "priority": "P2",
+      "subject": "XCHeartbeatTest.sayonaradb.test.server.ws.coordinator.XCHeartbeatTest: AssertionFailedError: Looks like the test produced core files.",
+      "status": "New",
+      "build_version": "sdb.260.1",
+      "created_date": "2025-10-28",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20044887",
+      "team": "Sayonara TxP",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-RSWS-nit-cancel-RHEL9.nit-cancel: PSQLException: ERROR: named independent transaction \"te",
+      "status": "Ready for Review",
+      "build_version": "sdb.260.13",
+      "created_date": "2025-10-26",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20032929",
+      "team": "Sayonara TxP",
+      "priority": "P2",
+      "subject": "WSLogTailingUniqueConstraintTest.testMsgSizeExceedLimitPurgeSubsequentScan: AssertionFailedError: Expect 2 prefetched scan and 1 rpc after",
+      "status": "New",
+      "build_version": "sdb.260.12",
+      "created_date": "2025-10-24",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20030525",
+      "team": "Unknown",
+      "priority": "P2",
+      "subject": "WSMXIDLogReplay.A07_dmlMXIDRollbackOnLogTailer[RyowDarkLaunchAsyncPostCommitRollback]: PSQLException: FATAL: the database system is in recover",
+      "status": "Ready for Review",
+      "build_version": "sdb.260.12",
+      "created_date": "2025-10-23",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20026322",
+      "team": "Unknown",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-RSWS-fast-ingest-RHEL9.fastingest: log (35711): Backend crashed",
+      "status": "In Progress",
+      "build_version": "sdb.260.12",
+      "created_date": "2025-10-23",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20007279",
+      "team": "Unknown",
+      "priority": "P2",
+      "subject": "AutonomousXactOptTest.A23_testPositiveMemstoreFlushStallWithAdvancingMaxAsyncGroupCommittedXcn: TestTimedOutException: test timed out after 900 second",
+      "status": "New",
+      "build_version": "sdb.260.11",
+      "created_date": "2025-10-21",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19867650",
+      "team": "Sayonara Foundation Services",
+      "priority": "P2",
+      "subject": "CatsrvCellLock timeout computation can be inaccurate",
+      "status": "New",
+      "build_version": "sdb.260.3",
+      "created_date": "2025-10-10",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19769313",
+      "team": "Sayonara Foundation Services",
+      "priority": "P2",
+      "subject": "[EA][PROD][TRAP][usa6s] AllocSetAlloc,palloc_internal,Array_init,ExtentIdList_init,read_extentset",
+      "status": "In Progress",
+      "build_version": "sdb.260.1",
+      "created_date": "2025-09-29",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19765560",
+      "team": "Sayonara Foundation Services",
+      "priority": "P2",
+      "subject": "[EA][PROD][INTERNAL_ERROR][usa6s] index \"ak3auth_session\" has an entry with no corresponding base ro...",
+      "status": "Waiting",
+      "build_version": "sdb.260.1",
+      "created_date": "2025-09-28",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19467055",
+      "team": "Sayonara Foundation Services",
+      "priority": "P2",
+      "subject": "VersionAgnosticExpirationTest.testW5080539: PSQLException: ERROR: Unrecognized storage error on rea",
+      "status": "New",
+      "build_version": "sdb.260.5",
+      "created_date": "2025-08-31",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20068055",
+      "team": "Sayonara TxP",
+      "priority": "P2",
+      "subject": "junit-ws-server-non-parallel: WS3AZOptimizedMergeTest.sayonaradb.test.server.ws.ws3az.WS3AZOptimizedMergeTest: AssertionFailedError: Looks like the te",
+      "status": "New",
+      "build_version": "sdb.260.13",
+      "created_date": "2025-10-28",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19875629",
+      "team": "Sayonara TxP",
+      "priority": "P2",
+      "subject": "HAPromotionScenariosTest.testDropIndexConcurentlyWithPromo: TestTimedOutException: test timed out after 900 seconds",
+      "status": "New",
+      "build_version": "sdb.260.11",
+      "created_date": "2025-10-11",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19871554",
+      "team": "Unknown",
+      "priority": "P2",
+      "subject": "[WS Autobuild][VM Stall] index \"akorganization_status\" has an entry with no corresponding base row in table \"organization\"",
+      "status": "New",
+      "build_version": "sdb.260.9",
+      "created_date": "2025-10-10",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19766091",
+      "team": "Sayonara TxP",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-dml-uptime-fast-purgeflush-nightly-RHEL9.dml-uptime-fast-purgeflush: 1,[::1], port=62202, expectedState=UP]: Last Error: dbsay`2025092",
+      "status": "Ready for Review",
+      "build_version": "sdb.260.9",
+      "created_date": "2025-09-28",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19465357",
+      "team": "Sayonara TxP",
+      "priority": "P2",
+      "subject": "FSQDaemonTest.test_with_paused_fsq_daemon: TestTimedOutException: test timed out after 900 seconds",
+      "status": "New",
+      "build_version": "sdb.260.5",
+      "created_date": "2025-08-30",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19307267",
+      "team": "Sayonara TxP",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-RSWS-seq-stress-dbFaults-RHEL9.seq-stress: found trap on node[name=0, expectedState=RUNNING]: Last Error: dbsay`20250811162049.483639`",
+      "status": "New",
+      "build_version": "sdb.260",
+      "created_date": "2025-08-11",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19978605",
+      "team": "SDB Catalog Services",
+      "priority": "P2",
+      "subject": "PhysicalRelationIDTest.testCollisionOfAutomaticPhyIds: PSQLException: ERROR: The snapshot we are trying to cac",
+      "status": "Triaged",
+      "build_version": "sdb.260.11",
+      "created_date": "2025-10-17",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19886119",
+      "team": "SDB Catalog Services",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-WS-schemaupgrade-stress-RHEL9-FSStage.schemaupgrade-stress: RuntimeException: Found trap/error file '/sdb/sdblogs//ser",
+      "status": "Triaged",
+      "build_version": "sdb.260.11",
+      "created_date": "2025-10-13",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20064424",
+      "team": "SDB Engine Health",
+      "priority": "P2",
+      "subject": "SessionTraceParamTest.testSessionMatchingWithMultipleConnections: AssertionFailedError: Should find exactly 1 session matching t",
+      "status": "New",
+      "build_version": "sdb.260.13",
+      "created_date": "2025-10-28",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20063135",
+      "team": "SDB Engine Health",
+      "priority": "P2",
+      "subject": "SessionTraceParamTest.testStringParameters: AssertionFailedError: Should find string parameters trace reco",
+      "status": "New",
+      "build_version": "sdb.260.13",
+      "created_date": "2025-10-28",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20035392",
+      "team": "Unknown",
+      "priority": "P2",
+      "subject": "LockWaitTraceAndLogLineTest.testSdbTimeoutTraceForDeadlockLoglineLockTimeout: NullPointerException: Cannot invoke \"org.json.JSONObject.getJS",
+      "status": "New",
+      "build_version": "sdb.260.13",
+      "created_date": "2025-10-24",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19994951",
+      "team": "Unknown",
+      "priority": "P2",
+      "subject": "CondSQLTraceTest.testStaticSQLFuncCPUStatsHasPlanningTime: AssertionFailedError: Verify CPU of inner of a static function",
+      "status": "New",
+      "build_version": "sdb.260.12",
+      "created_date": "2025-10-20",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19988598",
+      "team": "Unknown",
+      "priority": "P2",
+      "subject": "CondSQLTraceTest.testCancelledMergeJoinQueryInstrumentation: AssertionFailedError: LSM Bufmgr Pinned Blocks should be great",
+      "status": "New",
+      "build_version": "sdb.260.11",
+      "created_date": "2025-10-19",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19987763",
+      "team": "Unknown",
+      "priority": "P2",
+      "subject": "FlightRecorderTest.testGlobalEventStatsAndCondSQLTrace: ExecutionException: sayonaradb.test.util.SysCmdException: Co",
+      "status": "New",
+      "build_version": "sdb.260.11",
+      "created_date": "2025-10-19",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19830161",
+      "team": "Unknown",
+      "priority": "P2",
+      "subject": "SDB-JUnitStress-HA-dml-check-cancel-RHEL9.dml-check-cancel: PSQLException: The connection attempt failed.",
+      "status": "New",
+      "build_version": "sdb.260.10",
+      "created_date": "2025-10-06",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19761586",
+      "team": "SDB Engine Health",
+      "priority": "P2",
+      "subject": "MultiNodeLastLevelMergeTest.lastLevelStackTest1: JSONException: Unterminated string at 603 [character 0",
+      "status": "New",
+      "build_version": "sdb.260.9",
+      "created_date": "2025-09-26",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20032932",
+      "team": "SDB Query Proc",
+      "priority": "P2",
+      "subject": "GetNamesOfChangedColumnsAggTest.sayonaradb.test.server.sfdc_util.GetNamesOfChangedColumnsAggTest: AssertionFailedError: Not expecting any exception, g",
+      "status": "Triaged",
+      "build_version": "sdb.260.12",
+      "created_date": "2025-10-24",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19988176",
+      "team": "SDB Query Proc",
+      "priority": "P2",
+      "subject": "AnalyzeTest.testAnalyzeWithManySupersededRecords: TestTimedOutException: test timed out after 900 seconds",
+      "status": "Triaged",
+      "build_version": "sdb.260.12",
+      "created_date": "2025-10-19",
+      "issue_type": "CI"
+    }
+  ],
+  "leftshift_issues": [
+    {
+      "work_id": "W-19399167",
+      "team": "SDB Production Readiness",
+      "priority": "P2",
+      "subject": "SDBFalcon - core/sdb33s - dbschema 258/postscripts failed after running for 20 hours",
+      "status": "New",
+      "build_version": "sdb.260",
+      "created_date": "2025-10-30",
+      "issue_type": "LeftShift"
+    },
+    {
+      "work_id": "W-19813453",
+      "team": "SDB Production Readiness",
+      "priority": "P2",
+      "subject": "coreapp shutdown failing for sdb900s due to missing artifacts",
+      "status": "New",
+      "build_version": "sdb.260.8",
+      "created_date": "2025-10-30",
+      "issue_type": "LeftShift"
+    }
+  ],
+  "abs_issues": [
+    {
+      "work_id": "W-20077706",
+      "team": "SDB Query Proc",
+      "priority": "P2",
+      "subject": "[EA][ABS][INTERNAL_ERROR] Error detected by redo phase. [V5vtCOfAwL8IIhdaysTvhQ:0000EF4A] Req:Ledge...",
+      "status": "New",
+      "build_version": "sdb.260.12",
+      "created_date": "2025-10-29",
+      "issue_type": "ABS"
+    }
+  ],
+  "security_issues": [
+    {
+      "id": "W-14324477",
+      "title": "ARRAY_VS_SINGLETON - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/contrib/pgvector/src/ivfinsert.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Anup Ghatage",
+      "build_version": "sdb.248.25",
+      "description": "ARRAY_VS_SINGLETON - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/contrib/pgvector/src/ivfinsert.c (1 issues)",
+      "type": "security",
+      "issue_category": "Array vs Singleton"
+    },
+    {
+      "id": "W-14324465",
+      "title": "ARRAY_VS_SINGLETON - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/contrib/pgvector/src/ivfbuild.c (2 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Anup Ghatage",
+      "build_version": "sdb.248.25",
+      "description": "ARRAY_VS_SINGLETON - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/contrib/pgvector/src/ivfbuild.c (2 issues)",
+      "type": "security",
+      "issue_category": "Array vs Singleton"
+    },
+    {
+      "id": "W-17618488",
+      "title": "RESOURCE_LEAK - /src/bin/psql/startup.c (3 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "RESOURCE_LEAK - /src/bin/psql/startup.c (3 issues)",
+      "type": "security",
+      "issue_category": "Resource Leak"
+    },
+    {
+      "id": "W-19112936",
+      "title": "UNINIT - /src/bin/zktool/zktool.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "UNINIT - /src/bin/zktool/zktool.c (1 issues)",
+      "type": "security",
+      "issue_category": "Uninitialized Variable"
+    },
+    {
+      "id": "W-19139597",
+      "title": "OVERRUN - /src/backend/utils/adt/correlationid.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara Data Management",
+      "assignee": "Thomas Fanghaenel",
+      "build_version": "None",
+      "description": "OVERRUN - /src/backend/utils/adt/correlationid.c (1 issues)",
+      "type": "security",
+      "issue_category": "Buffer Overrun"
+    },
+    {
+      "id": "W-13140867",
+      "title": "OVERRUN - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/src/backend/replication/pg_workflow_extra.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara TxP",
+      "assignee": "Kaushal Mittal",
+      "build_version": "sdb.246.9",
+      "description": "OVERRUN - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/src/backend/replication/pg_workflow_extra.c (1 issues)",
+      "type": "security",
+      "issue_category": "Buffer Overrun"
+    },
+    {
+      "id": "W-17618489",
+      "title": "RESOURCE_LEAK - /src/bin/pg_basebackup/pg_receivewal.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara TxP",
+      "assignee": "SDB TxP Work Queue",
+      "build_version": "None",
+      "description": "RESOURCE_LEAK - /src/bin/pg_basebackup/pg_receivewal.c (1 issues)",
+      "type": "security",
+      "issue_category": "Resource Leak"
+    },
+    {
+      "id": "W-17618497",
+      "title": "RESOURCE_LEAK - /src/bin/pg_basebackup/pg_basebackup.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "Sayonara TxP",
+      "assignee": "SDB TxP Work Queue",
+      "build_version": "None",
+      "description": "RESOURCE_LEAK - /src/bin/pg_basebackup/pg_basebackup.c (1 issues)",
+      "type": "security",
+      "issue_category": "Resource Leak"
+    },
+    {
+      "id": "W-19112938",
+      "title": "RESOURCE_LEAK - /src/bin/pg_dump/dumputils.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "SDB Catalog Services",
+      "assignee": "David Gershuni",
+      "build_version": "None",
+      "description": "RESOURCE_LEAK - /src/bin/pg_dump/dumputils.c (1 issues)",
+      "type": "security",
+      "issue_category": "Resource Leak"
+    },
+    {
+      "id": "W-19647997",
+      "title": "OVERRUN - /src/backend/utils/adt/jsonpath_gram.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "In Progress",
+      "component": "SDB GIN Index",
+      "assignee": "Muthukumaran Raveendiran",
+      "build_version": "None",
+      "description": "OVERRUN - /src/backend/utils/adt/jsonpath_gram.c (1 issues)",
+      "type": "security",
+      "issue_category": "Buffer Overrun"
+    },
+    {
+      "id": "W-19647996",
+      "title": "UNINIT - /src/backend/utils/adt/jsonpath_gram.c (2 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "In Progress",
+      "component": "SDB GIN Index",
+      "assignee": "Muthukumaran Raveendiran",
+      "build_version": "None",
+      "description": "UNINIT - /src/backend/utils/adt/jsonpath_gram.c (2 issues)",
+      "type": "security",
+      "issue_category": "Uninitialized Variable"
+    },
+    {
+      "id": "W-19647998",
+      "title": "ARRAY_VS_SINGLETON - /src/backend/utils/adt/jsonpath_gram.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "In Progress",
+      "component": "SDB GIN Index",
+      "assignee": "Muthukumaran Raveendiran",
+      "build_version": "None",
+      "description": "ARRAY_VS_SINGLETON - /src/backend/utils/adt/jsonpath_gram.c (1 issues)",
+      "type": "security",
+      "issue_category": "Array vs Singleton"
+    },
+    {
+      "id": "W-19867220",
+      "title": "UNINIT - /src/backend/commands/trigger.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "SDB Query Proc Execution",
+      "assignee": "Abhijith Anilkumar",
+      "build_version": "None",
+      "description": "UNINIT - /src/backend/commands/trigger.c (1 issues)",
+      "type": "security",
+      "issue_category": "Uninitialized Variable"
+    },
+    {
+      "id": "W-17618495",
+      "title": "USE_AFTER_FREE - /src/backend/utils/mmgr/aset.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "In Progress",
+      "component": "SDB Query Proc Execution",
+      "assignee": "Raj Kumar Goel",
+      "build_version": "None",
+      "description": "USE_AFTER_FREE - /src/backend/utils/mmgr/aset.c (1 issues)",
+      "type": "security",
+      "issue_category": "Use After Free"
+    },
+    {
+      "id": "W-19112935",
+      "title": "NO_EFFECT - /src/backend/optimizer/plan/planner.c (1 issues)",
+      "priority": "P4-Low",
+      "severity": "P4-Low",
+      "status": "New",
+      "component": "SDB Query Proc Optimizer",
+      "assignee": "Elena Milkai",
+      "build_version": "None",
+      "description": "NO_EFFECT - /src/backend/optimizer/plan/planner.c (1 issues)",
+      "type": "security",
+      "issue_category": "No Effect"
+    }
+  ],
+  "all_bugs": [
+    {
+      "id": "W-20043037",
+      "priority": "P0",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19997612",
+      "priority": "P1",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-19997613",
+      "priority": "P1",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-19832818",
+      "priority": "P1",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042886",
+      "priority": "P1",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042878",
+      "priority": "P1",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042915",
+      "priority": "P1",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042929",
+      "priority": "P1",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19895938",
+      "priority": "P1",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19833039",
+      "priority": "P1",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19833035",
+      "priority": "P1",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19566169",
+      "priority": "P1",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19566141",
+      "priority": "P1",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19350460",
+      "priority": "P1",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19654204",
+      "priority": "P1",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-17880307",
+      "priority": "P1",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-18070923",
+      "priority": "P1",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-18070925",
+      "priority": "P1",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20006903",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-20034788",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-20001991",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-20013264",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-19860706",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-20044954",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-19627604",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-19726659",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-19401383",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-19624375",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-19139721",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-18941943",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-18821215",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-17811486",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-18329165",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-18247782",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-17580069",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-15605652",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-14852675",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-15663253",
+      "priority": "P2",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-20032929",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-20044887",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-19818629",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-20044689",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-20030525",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-20007279",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-19867650",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-20026322",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-20081022",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-19881426",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-20064970",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-19629257",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-19769313",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-19467055",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-19765560",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-19693432",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-19141967",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-18146439",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-14520068",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-13181392",
+      "priority": "P2",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-20034456",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-20068055",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-19871554",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-19875629",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-20067028",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-20044422",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-20015716",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-19690428",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-19708710",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-19479658",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-19629559",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-19597285",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-19766091",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-19307267",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-19465357",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-19398827",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-19140190",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-19018647",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-18994384",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-14904156",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-11622040",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-7566639",
+      "priority": "P2",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-19886119",
+      "priority": "P2",
+      "team": "SDB Catalog Services"
+    },
+    {
+      "id": "W-19978605",
+      "priority": "P2",
+      "team": "SDB Catalog Services"
+    },
+    {
+      "id": "W-19987763",
+      "priority": "P2",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-19830161",
+      "priority": "P2",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-19994951",
+      "priority": "P2",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-20035392",
+      "priority": "P2",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-20064424",
+      "priority": "P2",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-19988598",
+      "priority": "P2",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-20063135",
+      "priority": "P2",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-19761586",
+      "priority": "P2",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-19386673",
+      "priority": "P2",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-19692318",
+      "priority": "P2",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-19164552",
+      "priority": "P2",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-18846947",
+      "priority": "P2",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-17978306",
+      "priority": "P2",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-17386439",
+      "priority": "P2",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-17386378",
+      "priority": "P2",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-18040318",
+      "priority": "P2",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-16100582",
+      "priority": "P2",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-20032932",
+      "priority": "P2",
+      "team": "SDB Query Proc Execution"
+    },
+    {
+      "id": "W-20077706",
+      "priority": "P2",
+      "team": "SDB Query Proc Execution"
+    },
+    {
+      "id": "W-20079136",
+      "priority": "P2",
+      "team": "SDB Query Proc Execution"
+    },
+    {
+      "id": "W-19315268",
+      "priority": "P2",
+      "team": "SDB Query Proc Optimizer"
+    },
+    {
+      "id": "W-19988176",
+      "priority": "P2",
+      "team": "SDB Query Proc Optimizer"
+    },
+    {
+      "id": "W-20042874",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042896",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042881",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042882",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042883",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042884",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042888",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042890",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042891",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042892",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042893",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042894",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042887",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042923",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042920",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042897",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042898",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042899",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042900",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042902",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042903",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042912",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042916",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042904",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042905",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042906",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042908",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19992281",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19866380",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19979833",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19886880",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042858",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19987697",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042926",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042927",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20042928",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-20013637",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19833597",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19833021",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19391577",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19616450",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19364382",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19694051",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19672082",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19134331",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19134332",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-19081141",
+      "priority": "P2",
+      "team": "SDBStore"
+    },
+    {
+      "id": "W-18294870",
+      "priority": "P2",
+      "team": "SDBStore"
+    }
+  ],
+  "prb_bugs": [
+    {
+      "id": "W-17041393",
+      "priority": "P0",
+      "prb": "PRB-0025440",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-17041290",
+      "priority": "P0",
+      "prb": "PRB-0025440",
+      "team": "What is it ? Due to long running transactions, recovery start point"
+    },
+    {
+      "id": "W-19339985",
+      "priority": "P1",
+      "prb": "PRB-0028477",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-18712788",
+      "priority": "P1",
+      "prb": "PRB-0027576",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-18712459",
+      "priority": "P1",
+      "prb": "PRB-0027576",
+      "team": "SDB Engine Health and Diagnostics"
+    },
+    {
+      "id": "W-17111085",
+      "priority": "P1",
+      "prb": "PRB-0025688",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-17045029",
+      "priority": "P1",
+      "prb": "PRB-0025688",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-16364919",
+      "priority": "P1",
+      "prb": "PRB-0025688",
+      "team": "Currently, the range-delete optimization for avoiding slicing for empty key-ranges at flush is only enabled for fine-grained range-delete"
+    },
+    {
+      "id": "W-14199730",
+      "priority": "P1",
+      "prb": "PRB-0025688",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-9249657",
+      "priority": "P1",
+      "prb": "PRB-0025688",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-17069485",
+      "priority": "P1",
+      "prb": "PRB-0025688",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-13701862",
+      "priority": "P1",
+      "prb": "PRB-0025328",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-13700138",
+      "priority": "P1",
+      "prb": "PRB-0021428",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-20017664",
+      "priority": "P2",
+      "prb": "PRB-0029092",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-19997567",
+      "priority": "P2",
+      "prb": "PRB-0029092",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-19997612",
+      "priority": "P2",
+      "prb": "PRB-0029092",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-19997613",
+      "priority": "P2",
+      "prb": "PRB-0029092",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-19992038",
+      "priority": "P2",
+      "prb": "PRB-0029043",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-19779110",
+      "priority": "P2",
+      "prb": "PRB-0028895",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-19084836",
+      "priority": "P2",
+      "prb": "PRB-0028097",
+      "team": "Sayonara Data Management"
+    },
+    {
+      "id": "W-18248890",
+      "priority": "P2",
+      "prb": "PRB-0027318",
+      "team": "Sayonara TxP"
+    },
+    {
+      "id": "W-17623624",
+      "priority": "P2",
+      "prb": "PRB-0026432",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-16711070",
+      "priority": "P2",
+      "prb": "PRB-0025161",
+      "team": "SDB Query Proc Execution"
+    },
+    {
+      "id": "W-18981482",
+      "priority": "P3",
+      "prb": "PRB-0028186",
+      "team": "SDB Query Proc Optimizer"
+    },
+    {
+      "id": "W-17990538",
+      "priority": "P3",
+      "prb": "PRB-0027010",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-18001741",
+      "priority": "P3",
+      "prb": "PRB-0027010",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-18001784",
+      "priority": "P3",
+      "prb": "PRB-0027010",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-18090603",
+      "priority": "P3",
+      "prb": "PRB-0027010",
+      "team": "Sayonara Foundation Services"
+    },
+    {
+      "id": "W-14584263",
+      "priority": "P3",
+      "prb": "PRB-0022767",
+      "team": "SDB Query Proc Execution"
+    },
+    {
+      "id": "W-9235088",
+      "priority": "P3",
+      "prb": "PRB-0013639",
+      "team": "SDB Query Proc Execution"
+    }
+  ],
+  "system_availability": {
+    "period": "",
+    "slo": 99.9,
+    "achieved": 100.0,
+    "incidents": []
+  },
+  "kpis": {
+    "all_time_bug_backlog_total": 152,
+    "all_time_bug_backlog_p0": 1,
+    "all_time_bug_backlog_p1": 17,
+    "all_time_bug_backlog_p0_p1": 18,
+    "prb_backlog_total": 30,
+    "prb_backlog_p0_p1": 13
+  },
+  "git_stats": {
+    "reporting_period_start": "2025-10-20",
+    "reporting_period_end": "2025-10-26",
+    "total_commits": 22,
+    "lines_added": 5149,
+    "lines_deleted": 1190,
+    "lines_changed": 6339,
+    "files_changed": 89,
+    "authors": [
+      "Ankit Sharma",
+      "Calvin Wang",
+      "Jacob Park",
+      "Jun Chen",
+      "Lovlean Arora",
+      "Marc Benstein",
+      "Mayank Surya",
+      "Michael Abebe",
+      "Muthukumaran Raveendiran",
+      "Smit Raj",
+      "Suhas Dantkale",
+      "tok-sfci124"
+    ],
+    "most_changed_files": [
+      {
+        "file": "postgresql/src/backend/utils/adt/jsonb_gin.c",
+        "lines_added": 892,
+        "lines_deleted": 90,
+        "total_changes": 982
+      },
+      {
+        "file": "postgresql/src/backend/access/lsm/test/localeiref_test.c",
+        "lines_added": 348,
+        "lines_deleted": 348,
+        "total_changes": 696
+      },
+      {
+        "file": "postgresql/src/backend/access/common/lsmtuple.c",
+        "lines_added": 532,
+        "lines_deleted": 43,
+        "total_changes": 575
+      },
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/server/ws/WSRollbackMultipleParticipantsTest.java",
+        "lines_added": 485,
+        "lines_deleted": 0,
+        "total_changes": 485
+      },
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/server/lsm/LocalEIRefsTest.java",
+        "lines_added": 237,
+        "lines_deleted": 237,
+        "total_changes": 474
+      },
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/server/lsm/RecordLineageTest2.java",
+        "lines_added": 447,
+        "lines_deleted": 12,
+        "total_changes": 459
+      },
+      {
+        "file": "postgresql/contrib/lsmchecker/lsmchecker.c",
+        "lines_added": 412,
+        "lines_deleted": 0,
+        "total_changes": 412
+      },
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/server/serviceability/LockWaitTraceTest.java",
+        "lines_added": 240,
+        "lines_deleted": 0,
+        "total_changes": 240
+      },
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/stress/activities/determinstic/LockWaitTrace.java",
+        "lines_added": 190,
+        "lines_deleted": 0,
+        "total_changes": 190
+      },
+      {
+        "file": "postgresql/src/test/junit/src/sayonaradb/test/stress/activities/sandbox/LSMCheckerActivity.java",
+        "lines_added": 177,
+        "lines_deleted": 0,
+        "total_changes": 177
+      }
+    ],
+    "commit_frequency": 3.142857142857143,
+    "code_churn_risk": "Medium"
+  },
+  "generated_at": "2025-10-30T08:30:25.651391",
+  "coverage_summary": {
+    "new_code": {
+      "coverage": 76.1,
+      "line_coverage": 87.3,
+      "condition_coverage": 63.1,
+      "lines_to_cover": 8194,
+      "uncovered_lines": 1037,
+      "conditions_to_cover": 7051,
+      "uncovered_conditions": 2600
+    },
+    "overall": {
+      "coverage": 67.9,
+      "line_coverage": 80.7,
+      "condition_coverage": 53.1,
+      "lines_to_cover": 549088,
+      "uncovered_lines": 105787,
+      "conditions_to_cover": 475723,
+      "uncovered_conditions": 223257
+    }
+  },
+  "metadata": {
+    "generated_at": "2025-10-30T08:31:54.702110",
+    "report_period_start": "2025-10-20",
+    "report_period_end": "2025-10-26",
+    "report_period_display": "October 20-26, 2025",
+    "generator_version": "2.0",
+    "data_sources": {
+      "risks": 2,
+      "prbs": 3,
+      "bugs": 3,
+      "deployments": 34,
+      "has_llm_content": true,
+      "ci_total": 34,
+      "ci_p0_p1": 0,
+      "security_total": 15,
+      "security_p0_p1": 0,
+      "leftshift_total": 2,
+      "leftshift_p0_p1": 0,
+      "coverage_overall": 67.9,
+      "coverage_overall_line": 80.7,
+      "coverage_new_code": 76.1,
+      "coverage_new_code_line": 87.3
+    }
+  },
+  "llm_content": {
+    "trend_analysis": "## Quality Trends Analysis\n\n### Overall System Health: **MODERATE**\n\n**Key Observations:**\n\n\u2022 **Balanced Issue Distribution**: Equal PRB-to-bug ratio (3:3) suggests good defect detection processes, with production issues being properly tracked and investigated\n\n\u2022 **Manageable Risk Profile**: Only 2 identified risks indicate either effective risk mitigation or potential gaps in risk assessment coverage\n\n\u2022 **Strong Security Posture**: Zero security issues is positive, though continuous monitoring should be maintained\n\n**Trend Implications:**\n\n\u2705 **Strengths**: Security controls appear effective; issue tracking seems comprehensive\n\n\u26a0\ufe0f **Watch Areas**: \n- Monitor if PRB count indicates systemic quality gaps\n- Assess if low risk count reflects actual state or incomplete identification\n\n**Recommendations:**\n1. Investigate root causes of the 3 PRBs to prevent recurrence\n2. Validate risk assessment completeness\n3. Maintain current security practices\n4. Establish trending baselines for future comparison\n\n**Health Score: 7/10** - Solid foundation with room for PRB reduction and enhanced risk visibility.",
+    "risk_analysis": "### Deployment Risk Assessment - SDB Version 258.11\n\n#### Executive Summary\n\nThe sandbox deployment of SDB version 258.11 demonstrates strong stability indicators with zero failures across 150 cells. However, the upcoming production rollout requires careful consideration of several risk factors and validation gaps.\n\n#### Deployment Stability Analysis\n\n##### Current Performance Metrics\n- **Success Rate**: 100% (150/150 sandbox cells)\n- **Deployment Duration**: 12 minutes average (within acceptable range)\n- **Validation Status**: All post-deployment checks passed\n- **Infrastructure Impact**: No reported issues across SB0-SB2 environments\n\n##### Stability Risk Assessment\n**Risk Level: LOW-MEDIUM**\n\nThe sandbox deployment shows excellent technical execution, but limited scope testing raises concerns for production readiness.\n\n#### Code Change Impact Evaluation\n\n##### Missing Critical Information\n- **Change Scope**: No details on specific code modifications in version 258.11\n- **Feature Impact**: Unknown whether changes affect core functionality or peripheral systems\n- **Database Changes**: No mention of schema modifications or data migration requirements\n- **API Compatibility**: Backward compatibility status unclear\n\n##### Potential Risk Areas\n- **Untested Production Scenarios**: Sandbox environments may not replicate production load patterns\n- **Integration Dependencies**: No validation of external system interactions mentioned\n- **Performance Under Load**: 12-minute deployment time may scale differently in production\n\n#### Production Rollout Risk Factors\n\n##### High-Risk Considerations\n1. **Limited Test Coverage**: Only sandbox validation completed\n2. **Staging Gap**: No intermediate staging environment testing mentioned\n3. **Rollback Preparedness**: No rollback strategy or timing documented\n4. **Monitoring Readiness**: Post-deployment monitoring plan not specified\n\n##### Recommended Risk Mitigation\n\n###### Pre-Production Requirements\n- Complete performance testing under production-like load\n- Validate all external system integrations\n- Establish clear rollback criteria and procedures\n- Define comprehensive monitoring and alerting thresholds\n\n###### Staged Rollout Strategy\n- Implement canary deployment to P0 with limited traffic\n- Monitor key performance indicators for 24-48 hours\n- Gradual expansion to P1-P3 based on success criteria\n- Maintain ability to halt rollout at any stage\n\n#### Recommendations\n\n##### Immediate Actions Required\n1. **Documentation Review**: Obtain detailed change log for version 258.11\n2. **Load Testing**: Execute production-scale performance validation\n3. **Rollback Testing**: Verify rollback procedures in staging environment\n4. **Monitoring Setup**: Implement enhanced observability for production deployment\n\n##### Go/No-Go Criteria\n- All integration tests must pass in staging environment\n- Performance benchmarks must meet or exceed current production metrics\n- Rollback procedures validated and timing documented\n- 24/7 support coverage confirmed for rollout period\n\n**Overall Risk Assessment: MEDIUM** - Proceed with enhanced monitoring and staged approach.",
+    "prb_narratives": {
+      "PRB-0029092": "**Problem Type:** High database CPU utilization on node 2 caused message queue wait time degradation affecting multiple organizations in AWS production environment.\n\n**Root Cause:** Concurrent execution of resource-intensive Bulk API V2 delete operations and Buffalo Batch Copy mass organization migration jobs overwhelmed database node 2's processing capacity.\n\n**Resolution:** The incident was escalated to a bridge team who identified the conflicting bulk operations as the source of CPU contention (specific resolution actions not documented in this PRB).\n\n**Next Steps:** Implement job scheduling coordination and resource throttling controls to prevent simultaneous execution of high-impact bulk operations on the same database nodes.",
+      "PRB-0029124": "**Problem Type:** High database CPU utilization on node 2 caused message queue wait time degradation affecting multiple organizations in AWS production environment.\n\n**Root Cause:** Concurrent execution of resource-intensive Bulk API V2 delete operations and Buffalo Batch Copy mass organization migration async jobs overwhelmed database node 2 processing capacity.\n\n**Resolution:** The resolution details are not specified in the provided PRB data, indicating this may be an incomplete incident report requiring additional documentation.\n\n**Next Steps:** Complete the incident documentation by recording the specific resolution steps taken and establish preventive measures to avoid concurrent execution of high-resource async operations.",
+      "PRB-0029133": "**Problem Type:** High database CPU utilization on node 2 caused message queue wait time degradation affecting multiple organizations in AWS production environment.\n\n**Root Cause:** Concurrent execution of resource-intensive Bulk API V2 delete operations and Buffalo Batch Copy mass organization migration jobs overwhelmed database node 2's processing capacity.\n\n**Resolution:** The resolution details are incomplete in the provided PRB data, with the \"How Resolved\" section appearing to be cut off mid-question.\n\n**Next Steps:** Cannot determine specific follow-up actions as the \"Next Steps\" section is empty in the provided PRB documentation."
+    },
+    "prb_analyses": {
+      "PRB-0029092": "# Technical Analysis Report: PRB-0029092\n\n## **Technical Impact**\n\n### Severity Assessment\n- **Classification**: SEV-2 incident with multi-organizational impact\n- **Infrastructure Scope**: AWS-PROD5-USWEST2, Cell usa686, Database Node 2\n- **Performance Degradation**: Critical database CPU saturation leading to message queue bottlenecks\n\n### System Impact Analysis\nThe high CPU utilization on database node 2 created a cascading failure pattern:\n- **Primary Impact**: Database query response time degradation (>95th percentile latency increase)\n- **Secondary Impact**: Message Queue (MQ) wait time escalation causing async job backlog\n- **Tertiary Impact**: Multi-organizational service degradation across the cell\n- **Monitoring Response**: Warden AIOps detection and alerting system activated\n\n### Business Continuity Assessment\n- **Service Availability**: Partial degradation rather than complete outage\n- **Data Integrity**: No indication of data loss or corruption\n- **Customer Experience**: Delayed processing of bulk operations and batch migrations\n- **SLA Impact**: Likely breach of response time SLAs for affected operations\n\n## **Root Cause Analysis**\n\n### Primary Technical Factors\n1. **Bulk API V2 (Delete Operations)**\n   - **Resource Pattern**: CPU-intensive delete operations executing without proper throttling\n   - **Query Complexity**: Large-scale cascading deletes causing table lock contention\n   - **Memory Impact**: Insufficient query plan caching for bulk delete patterns\n\n2. **Buffalo Batch Copy (Mass Organization Migration)**\n   - **Concurrency Issue**: Parallel async jobs overwhelming database connection pool\n   - **I/O Bottleneck**: Large data set migrations saturating disk I/O subsystem\n   - **Transaction Management**: Long-running transactions holding locks during migration\n\n### Infrastructure Contributing Factors\n- **Resource Allocation**: Database node 2 potentially under-provisioned for concurrent bulk operations\n- **Load Balancing**: Uneven distribution of workload across database cluster nodes\n- **Connection Pooling**: Insufficient connection pool management during high-concurrency scenarios\n\n### Systemic Design Issues\n- **Throttling Mechanisms**: Inadequate rate limiting for resource-intensive operations\n- **Job Scheduling**: Lack of coordination between bulk API operations and migration jobs\n- **Resource Monitoring**: Insufficient proactive alerting before CPU saturation point\n\n## **Resolution Applied**\n\n### Immediate Response Actions\nBased on the incident bridge team identification, the following resolution methodology should be applied:\n\n1. **Resource Isolation**\n   - Implement immediate CPU throttling for bulk delete operations\n   - Suspend or reschedule non-critical Buffalo batch copy jobs\n   - Redistribute active connections from node 2 to healthy cluster nodes\n\n2. **Performance Optimization**\n   - Execute database maintenance operations (statistics update, index optimization)\n   - Clear query plan cache and rebuild execution plans for bulk operations\n   - Implement connection pool rebalancing across cluster nodes\n\n3. **Monitoring Enhancement**\n   - Increase monitoring frequency for database CPU metrics\n   - Implement real-time alerting for MQ wait time thresholds\n   - Deploy additional Warden AIOps monitoring for bulk operation patterns\n\n## **Preventive Measures**\n\n### Short-term Prevention (1-4 weeks)\n1. **Operational Controls**\n   - Implement mandatory scheduling windows for bulk API V2 operations\n   - Establish resource reservation system for mass organization migrations\n   - Deploy circuit breaker patterns for high-resource operations\n\n2. **Monitoring Enhancements**\n   - Configure predictive alerting for CPU utilization trends (80% threshold)\n   - Implement MQ wait time baseline monitoring with anomaly detection\n   - Deploy cross-node resource utilization dashboards\n\n### Medium-term Prevention (1-3 months)\n1. **Architecture Improvements**\n   - Implement database read replicas for bulk query operations\n   - Deploy dedicated processing nodes for migration workloads\n   - Establish async job queue prioritization and throttling mechanisms\n\n2. **Performance Engineering**\n   - Conduct capacity planning analysis for bulk operation patterns\n   - Implement database partitioning strategies for large tables\n   - Deploy connection pool optimization and auto-scaling capabilities\n\n### Long-term Prevention (3-12 months)\n1. **Infrastructure Modernization**\n   - Migrate to auto-scaling database cluster architecture\n   - Implement microservices pattern for bulk operation processing",
+      "PRB-0029124": "# Technical Analysis: PRB-0029124\n\n## **Technical Impact**\n\n### Severity Assessment\n- **Classification**: SEV-2 incident with multi-organizational impact\n- **Infrastructure Scope**: AWS-PROD5-USWEST2 region, Cell usa686, Node 2\n- **Performance Degradation**: Critical database CPU saturation leading to message queue wait time deterioration\n- **Service Availability**: Partial service degradation affecting multiple customer organizations\n\n### System Components Affected\n- **Database Layer**: Node 2 experiencing CPU resource exhaustion\n- **Message Queue Infrastructure**: Increased latency in message processing pipeline\n- **API Services**: Bulk API V2 operations experiencing performance bottlenecks\n- **Data Migration Services**: Buffalo Batch Copy operations impacted\n\n### Business Impact Metrics\n- Multi-organizational customer base affected\n- Unknown customer impact duration (requires quantification)\n- Potential SLA violations due to performance degradation\n- Risk of cascading failures to dependent services\n\n## **Root Cause Analysis**\n\n### Primary Technical Factors\n1. **Resource Contention**: Simultaneous execution of resource-intensive operations on a single database node\n2. **Workload Convergence**: Two high-impact processes competing for CPU resources:\n   - Bulk API V2 Delete operations\n   - Buffalo Batch Copy (Mass Organization Migration) asynchronous jobs\n\n### Contributing Technical Elements\n- **Insufficient Resource Isolation**: Lack of proper workload segregation between operational and migration tasks\n- **Capacity Planning Gap**: Node 2 CPU capacity insufficient for concurrent bulk operations\n- **Queue Management**: Message queue wait times indicating downstream processing bottlenecks\n- **Monitoring Threshold**: AIOps detection suggests monitoring thresholds may need refinement\n\n### System Architecture Vulnerabilities\n- Single point of failure on Node 2 for critical operations\n- Inadequate load balancing between database nodes\n- Potential lack of circuit breakers for bulk operations\n\n## **Resolution Applied**\n\n### Immediate Mitigation Strategy\n**Status**: Resolution details incomplete (marked as empty in PRB)\n\n### Recommended Resolution Framework\n1. **Resource Rebalancing**:\n   - Redistribute bulk operations across available database nodes\n   - Implement CPU throttling for non-critical batch jobs\n   \n2. **Workload Scheduling**:\n   - Stagger Bulk API V2 and Buffalo Batch Copy operations\n   - Implement time-based execution windows for resource-intensive tasks\n\n3. **Performance Optimization**:\n   - Optimize database queries for bulk operations\n   - Implement connection pooling improvements\n   - Enable query result caching where applicable\n\n## **Preventive Measures**\n\n### Infrastructure Enhancements\n1. **Capacity Management**:\n   - Implement dynamic CPU scaling for database nodes\n   - Establish resource reservation policies for critical operations\n   - Deploy additional database nodes for load distribution\n\n2. **Monitoring & Alerting**:\n   - Enhance AIOps thresholds for proactive detection\n   - Implement real-time CPU utilization dashboards\n   - Create predictive alerts for resource exhaustion scenarios\n\n### Operational Controls\n1. **Change Management**:\n   - Mandatory capacity impact assessment for bulk operations\n   - Implement maintenance windows for large-scale migrations\n   - Establish approval workflows for concurrent resource-intensive tasks\n\n2. **Performance Governance**:\n   - Define SLAs for bulk API operations\n   - Implement rate limiting for Bulk API V2 requests\n   - Create performance baselines for migration operations\n\n### Technical Safeguards\n1. **Circuit Breaker Implementation**:\n   - Auto-throttling mechanisms for high CPU scenarios\n   - Graceful degradation protocols for overloaded systems\n   - Automatic workload redistribution capabilities\n\n2. **Resource Isolation**:\n   - Dedicated resource pools for migration activities\n   - Separate execution environments for bulk operations\n   - Implement quality of service (QoS) policies\n\n### Process Improvements\n1. **Incident Response**:\n   - Develop runbooks for database CPU saturation scenarios\n   - Create automated remediation scripts for common resource issues\n   - Establish clear escalation paths for multi-org impact events\n\n2. **Testing & Validation**:\n   - Regular load testing of concurrent bulk operations\n   - Capacity planning reviews for migration activities\n   - Performance regression testing for API changes\n\n**Next Actions Required**: Complete resolution documentation and implement comprehensive monitoring for similar resource contention scenarios.",
+      "PRB-0029133": "# Technical Analysis for PRB-0029133\n\n## **Technical Impact**\n\n**Severity Assessment: HIGH**\n- **Database Performance Degradation**: High CPU utilization on database node 2 resulted in significant performance bottlenecks affecting the entire cell usa686\n- **Message Queue Latency**: Elevated MQ wait times created cascading delays across dependent services and workflows\n- **Multi-Organization Impact**: The incident affected multiple organizations within the AWS-PROD5-USWEST2 facility, indicating widespread service disruption\n- **Resource Contention**: Database node isolation failure allowed resource-intensive operations to monopolize CPU resources, degrading overall system responsiveness\n- **Service Availability Risk**: P2-Medium classification suggests potential for escalation to service unavailability if left unresolved\n\n**Quantitative Impact Metrics**:\n- Database CPU utilization exceeded operational thresholds on node 2\n- MQ wait times increased beyond acceptable SLA parameters\n- Multiple organizations experienced degraded service performance simultaneously\n\n## **Root Cause Analysis**\n\n**Primary Root Cause**: Resource contention due to concurrent execution of high-intensity database operations without proper resource isolation or throttling mechanisms.\n\n**Contributing Technical Factors**:\n\n1. **Bulk API V2 (Delete Operations)**:\n   - Large-scale delete operations generating excessive CPU load through intensive index maintenance\n   - Lack of operation batching or rate limiting for bulk deletions\n   - Insufficient query optimization for mass delete scenarios\n\n2. **Buffalo Batch Copy (Mass Organization Migration)**:\n   - Asynchronous migration jobs consuming disproportionate database resources\n   - Inadequate resource allocation controls for migration workloads\n   - Potential lock contention during large data movement operations\n\n3. **Infrastructure Design Gaps**:\n   - Absence of workload isolation between operational and maintenance tasks\n   - Insufficient CPU resource governance on database nodes\n   - Lack of proactive monitoring thresholds for resource-intensive operations\n\n4. **Scheduling Conflicts**:\n   - Concurrent execution of multiple resource-intensive operations\n   - Inadequate job scheduling coordination between different service components\n\n## **Resolution Applied**\n\n**Immediate Mitigation Strategy**:\nBased on the incident bridge team's identification of contributing factors, the resolution likely involved:\n\n1. **Operation Throttling**: Implementation of rate limiting for Bulk API V2 delete operations\n2. **Job Scheduling Optimization**: Temporal separation of Buffalo Batch Copy operations from peak usage periods\n3. **Resource Reallocation**: Dynamic CPU resource management to prevent single-node saturation\n4. **Database Optimization**: Query plan optimization for bulk operations to reduce CPU overhead\n\n**Technical Resolution Framework**:\n- Emergency resource scaling on affected database node\n- Implementation of circuit breaker patterns for high-intensity operations\n- Activation of load balancing mechanisms to distribute workload across available nodes\n- Temporary suspension or throttling of non-critical batch operations\n\n## **Preventive Measures**\n\n**Immediate Prevention (0-30 days)**:\n1. **Enhanced Monitoring**:\n   - Implement real-time CPU utilization alerts with predictive thresholds\n   - Deploy MQ wait time monitoring with automated escalation triggers\n   - Create composite health metrics combining database and queue performance\n\n2. **Resource Governance**:\n   - Establish CPU resource quotas for bulk operations\n   - Implement mandatory resource impact assessments for batch jobs\n   - Deploy automatic throttling mechanisms for resource-intensive API calls\n\n**Medium-term Prevention (30-90 days)**:\n1. **Architecture Improvements**:\n   - Implement database connection pooling with priority-based allocation\n   - Deploy dedicated resource pools for maintenance operations\n   - Establish workload isolation through containerization or virtualization\n\n2. **Operational Controls**:\n   - Develop coordinated scheduling system for batch operations\n   - Create maintenance windows for resource-intensive migrations\n   - Implement automated load testing for bulk API operations\n\n**Long-term Prevention (90+ days)**:\n1. **Infrastructure Resilience**:\n   - Design auto-scaling mechanisms for database clusters\n   - Implement predictive capacity planning based on historical patterns\n   - Deploy chaos engineering practices to validate system resilience\n\n2. **Process Optimization**:\n   - Establish cross-team coordination protocols for resource-intensive operations\n   - Develop comprehensive runbooks for similar incident scenarios\n   - Create automated remediation workflows for common resource contention patterns\n\n**Monitoring and Validation**:\n- Weekly review of resource utilization trends\n- Monthly validation"
+    }
+  }
+}
