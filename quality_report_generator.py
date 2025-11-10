@@ -2093,6 +2093,47 @@ Next week: Planning production rollout to P0-P3 stages pending final validation 
         else:
             return 'Other'
     
+    def _is_test_file(self, filename: str) -> bool:
+        """Check if a file should be excluded from code change analysis (test files)."""
+        filename_lower = filename.lower()
+        
+        # Exclude test directories
+        test_directories = [
+            '/test/', '/tests/', '/testing/',
+            '/src/test/', '/src/tests/',
+            '/junit/', '/regress/',
+            '/spec/', '/specs/',
+            '/mock/', '/mocks/',
+            '/fixture/', '/fixtures/'
+        ]
+        
+        for test_dir in test_directories:
+            if test_dir in filename_lower:
+                return True
+        
+        # Exclude test file patterns
+        test_patterns = [
+            '_test.', '_tests.',
+            'test_', 'tests_',
+            '.test.', '.tests.',
+            'test.sql', 'test.java', 'test.c', 'test.cpp', 'test.py',
+            '.out',  # test output files like gin_maintenance.out
+            'mock_', 'fixture_',
+            'spec.', 'specs.'
+        ]
+        
+        for pattern in test_patterns:
+            if pattern in filename_lower:
+                return True
+        
+        # Exclude specific test file extensions
+        test_extensions = ['.out', '.expected']
+        for ext in test_extensions:
+            if filename_lower.endswith(ext):
+                return True
+        
+        return False
+
     def analyze_git_repository(self, repo_path: str, period_start: str, period_end: str) -> GitStats:
         """Analyze git repository for code changes during reporting period."""
         import subprocess
@@ -2136,6 +2177,10 @@ Next week: Planning production rollout to P0-P3 stages pending final validation 
                         added = parts[0] if parts[0] != '-' else '0'
                         deleted = parts[1] if parts[1] != '-' else '0'
                         filename = parts[2]
+                        
+                        # Skip test files and directories
+                        if self._is_test_file(filename):
+                            continue
                         
                         try:
                             lines_added += int(added)
