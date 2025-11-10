@@ -1,0 +1,13 @@
+{
+  "packageDirectories": [
+    {
+      "path": "force-app",
+      "default": true
+    }
+  ],
+  "name": "QC Dashboard",
+  "namespace": "",
+  "sfdcLoginUrl": "https://gus.salesforce.com",
+  "sourceApiVersion": "62.0",
+  "oauthLocalPort": 1718
+}

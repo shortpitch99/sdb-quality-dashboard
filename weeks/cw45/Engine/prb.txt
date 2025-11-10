@@ -1,0 +1,23 @@
+# PRB/Incident Tracking
+# Format: Each incident block should contain PRB, Title, Priority, Status, Description, Reported
+
+PRB: PRB-2024-001
+Title: Authentication service timeout
+Priority: High
+Status: Open
+Description: Users experiencing 30-second timeouts during SSO login process
+Reported: 2024-01-15
+
+PRB: PRB-2024-002
+Title: Database connection pool exhaustion
+Priority: Critical
+Status: In Progress
+Description: Production database reaching max connections during peak hours
+Reported: 2024-01-14
+
+PRB: PRB-2024-003
+Title: Search index corruption
+Priority: Medium
+Status: Resolved
+Description: Search results returning incomplete data for specific queries
+Reported: 2024-01-12
