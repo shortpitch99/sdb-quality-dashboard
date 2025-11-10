@@ -1113,7 +1113,7 @@ class QualityReportDashboard:
             
             # Determine color based on critical bugs
             backlog_delta_class = "metric-delta-green" if critical_backlog_bugs == 0 else ("metric-delta-yellow" if critical_backlog_bugs <= 5 else "metric-delta-red")
-            backlog_status = "CLEAN" if critical_backlog_bugs == 0 else ("BACKLOG" if critical_backlog_bugs <= 5 else "HIGH BACKLOG")
+            backlog_status = "GREEN" if critical_backlog_bugs == 0 else ("YELLOW" if critical_backlog_bugs <= 5 else "RED")
             
             st.markdown(f"""
             <a href="https://gus.lightning.force.com/lightning/r/Report/00OEE000002XRUv2AO/view" target="_blank" style="text-decoration: none; color: inherit;">
@@ -1138,7 +1138,7 @@ class QualityReportDashboard:
                 
                 # Determine color based on critical PRB backlog items
                 prb_backlog_delta_class = "metric-delta-green" if critical_prb_backlog == 0 else ("metric-delta-yellow" if critical_prb_backlog <= 3 else "metric-delta-red")
-                prb_backlog_status = "CLEAN" if critical_prb_backlog == 0 else ("BACKLOG" if critical_prb_backlog <= 3 else "HIGH BACKLOG")
+                prb_backlog_status = "GREEN" if critical_prb_backlog == 0 else ("YELLOW" if critical_prb_backlog <= 3 else "RED")
                 
                 # Format the value with week-over-week change
                 critical_prb_backlog_display = f"{critical_prb_backlog}"
