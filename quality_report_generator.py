@@ -414,12 +414,8 @@ class QualityDataCollector:
         items: List[Dict[str, Any]] = []
         
         for r in rows:
-            # Try different work ID field patterns
-            work_id = str(r.get('ADM_Work__c.Name') or r.get('Work__c.Name') or r.get('Work.Name') or r.get('Work: Work ID') or r.get('Work__c.Id') or '')
-            
-            # For CI/Security reports, work ID is in CUST_NAME_label
-            if not work_id or not work_id.startswith('W-'):
-                work_id = str(r.get('CUST_NAME_label') or r.get('CUST_NAME') or '')
+            # Try different work ID field patterns - check _label fields first as they contain human-readable work IDs
+            work_id = str(r.get('ADM_Work__c.Name_label') or r.get('CUST_NAME_label') or r.get('ADM_Work__c.Name') or r.get('Work__c.Name') or r.get('Work.Name') or r.get('Work: Work ID') or r.get('Work__c.Id') or r.get('CUST_NAME') or '')
             
             if not work_id or (not work_id.startswith('W-') and 'W-' not in str(r)):
                 continue
