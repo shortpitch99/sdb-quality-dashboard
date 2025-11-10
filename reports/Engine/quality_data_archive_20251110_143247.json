@@ -16,7 +16,74 @@
     }
   ],
   "prbs": [],
-  "bugs": [],
+  "bugs": [
+    {
+      "work_id": "W-20169058",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDBFalcon - core/sdb17 - XX000`FailedAssertion !(msg->msg_rpcs != ((void *)0))",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2025-11-10",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-20169065",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDBFalcon - core/sdb17 - XX000`FailedAssertion !(numInsertsDone <= batchOps->length)",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2025-11-10",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-20176091",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDBFalcon - core/sdb17 - 100% dbcpu running workloads that typically see 30-40% dbcpu with guc overrides",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2025-11-10",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-20166838",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][INTERNAL_ERROR][jpn144] No bloom filters usable anymore. PANIC for now",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2025-11-10",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-19769313",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][TRAP][usa6s] AllocSetAlloc,palloc_internal,Array_init,ExtentIdList_init,read_extentset",
+      "status": "In Progress",
+      "build_version": "",
+      "created_date": "2025-11-10",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-19881426",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[DEU60] log extent got deleted which is not yet applied on one of the log tailer.",
+      "status": "Triaged",
+      "build_version": "",
+      "created_date": "2025-11-10",
+      "issue_type": "Bug"
+    }
+  ],
   "critical_issues": [],
   "deployments": [
     {
@@ -398,7 +465,7 @@
       "priority": "P2",
       "severity": "P2",
       "subject": "ZDTTablePKConversionTest.testIdempotency[1]: PSQLException: ERROR: deadlock detected   Detail: Proce",
-      "status": "In Progress",
+      "status": "Ready for Review",
       "build_version": "sdb.260.14",
       "created_date": "2025-11-07",
       "issue_type": "CI"
@@ -596,7 +663,7 @@
       "priority": "P2",
       "severity": "P2",
       "subject": "transam CTests segfault with decouple_memstore_from_lock_manager=true",
-      "status": "In Progress",
+      "status": "Ready for Review",
       "build_version": "sdb.260",
       "created_date": "2025-11-07",
       "issue_type": "CI"
@@ -646,7 +713,52 @@
       "issue_type": "CI"
     }
   ],
-  "leftshift_issues": [],
+  "leftshift_issues": [
+    {
+      "work_id": "W-19399167",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDBFalcon - core/sdb33s - dbschema 258/postscripts failed after running for 20 hours",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2025-11-10",
+      "issue_type": "LeftShift"
+    },
+    {
+      "work_id": "W-20169058",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDBFalcon - core/sdb17 - XX000`FailedAssertion !(msg->msg_rpcs != ((void *)0))",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2025-11-10",
+      "issue_type": "LeftShift"
+    },
+    {
+      "work_id": "W-20169065",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDBFalcon - core/sdb17 - XX000`FailedAssertion !(numInsertsDone <= batchOps->length)",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2025-11-10",
+      "issue_type": "LeftShift"
+    },
+    {
+      "work_id": "W-19813453",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "coreapp shutdown failing for sdb900s due to missing artifacts",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2025-11-10",
+      "issue_type": "LeftShift"
+    }
+  ],
   "abs_issues": [],
   "security_issues": [
     {
@@ -900,7 +1012,7 @@
   "git_stats": {
     "reporting_period_start": "2025-11-03",
     "reporting_period_end": "2025-11-09",
-    "total_commits": 25,
+    "total_commits": 24,
     "lines_added": 6264,
     "lines_deleted": 1354,
     "lines_changed": 7618,
@@ -920,7 +1032,6 @@
       "Neel Mookerjee",
       "Raj Kumar Goel",
       "Shao Yuan Ho",
-      "Shreyas Belur Sampath",
       "Suhas Dantkale",
       "Theo Vanderkooy",
       "tok-sfci124",
@@ -989,10 +1100,10 @@
         "total_changes": 121
       }
     ],
-    "commit_frequency": 3.5714285714285716,
+    "commit_frequency": 3.4285714285714284,
     "code_churn_risk": "Medium"
   },
-  "generated_at": "2025-11-10T12:51:49.135297",
+  "generated_at": "2025-11-10T14:32:36.614247",
   "coverage_summary": {
     "new_code": {
       "coverage": 75.1,
@@ -2337,7 +2448,7 @@
     }
   ],
   "metadata": {
-    "generated_at": "2025-11-10T12:52:35.334687",
+    "generated_at": "2025-11-10T14:33:14.392399",
     "report_period_start": "2025-11-03",
     "report_period_end": "2025-11-09",
     "report_period_display": "November 03-09, 2025",
@@ -2345,14 +2456,14 @@
     "data_sources": {
       "risks": 2,
       "prbs": 0,
-      "bugs": 0,
+      "bugs": 6,
       "deployments": 32,
       "has_llm_content": true,
       "ci_total": 35,
       "ci_p0_p1": 0,
       "security_total": 21,
       "security_p0_p1": 0,
-      "leftshift_total": 0,
+      "leftshift_total": 4,
       "leftshift_p0_p1": 0,
       "coverage_overall": 67.9,
       "coverage_overall_line": 80.8,
@@ -2361,8 +2472,8 @@
     }
   },
   "llm_content": {
-    "trend_analysis": "## Quality Trends Analysis\n\n### Overall System Health: **EXCELLENT**\n\n**Key Findings:**\n- **Zero Defects**: No PRBs or bugs indicates robust development processes and effective quality controls\n- **Clean Security Posture**: Zero security issues demonstrates strong security practices and vulnerability management\n- **Minimal Risk Exposure**: Only 2 risks identified suggests good risk management and proactive issue identification\n\n### Trend Insights:\n\u2705 **Positive Indicators:**\n- Defect prevention strategies are highly effective\n- Security-by-design approach is working well\n- Quality gates and testing processes are performing optimally\n\n\u26a0\ufe0f **Areas for Monitoring:**\n- The 2 existing risks should be actively tracked and mitigated\n- Maintain current quality practices to sustain this performance level\n- Consider if risk identification processes are comprehensive enough\n\n### Recommendations:\n1. **Sustain Excellence**: Document and replicate current quality practices across other projects\n2. **Risk Focus**: Prioritize resolution of the 2 identified risks to achieve zero-risk status\n3. **Continuous Vigilance**: Maintain current testing rigor and security scanning frequency\n\n**Overall Assessment**: The system demonstrates exceptional quality health with industry-leading defect rates. This performance level indicates mature quality processes and should be used as a benchmark for other initiatives.",
-    "risk_analysis": "### Deployment Risk Assessment - SDB Version 258.11\n\n#### Executive Summary\n\nThe sandbox deployment of SDB version 258.11 demonstrates strong stability indicators with zero failures across 150 cells. However, the upcoming production rollout requires careful consideration of several risk factors and validation gaps.\n\n#### Deployment Stability Analysis\n\n##### Current Performance Metrics\n- **Success Rate**: 100% (150/150 sandbox cells)\n- **Deployment Duration**: 12 minutes average (within acceptable range)\n- **Validation Status**: All post-deployment checks passed\n- **Environment Coverage**: Complete sandbox tier (SB0-SB2)\n\n##### Stability Risk Assessment\n**LOW RISK** - The sandbox deployment exhibits excellent stability characteristics:\n- Zero deployment failures indicate robust packaging and deployment scripts\n- Consistent 12-minute deployment time suggests predictable resource utilization\n- Successful validation across all sandbox environments demonstrates functional integrity\n\n#### Code Change Impact Evaluation\n\n##### Missing Critical Information\nThe deployment summary lacks essential details for comprehensive risk assessment:\n- **Change scope and complexity** - No information on modified components or features\n- **Database schema changes** - Potential for data migration issues in production\n- **Configuration updates** - Risk of environment-specific configuration conflicts\n- **Dependency modifications** - Third-party library or service integration changes\n\n##### Recommended Pre-Production Validation\n\n###### High Priority Items\n1. **Performance Impact Analysis**\n   - Conduct load testing to validate performance under production traffic volumes\n   - Monitor resource consumption patterns compared to previous version\n\n2. **Data Integrity Verification**\n   - Execute comprehensive data validation if schema changes are present\n   - Verify backup and rollback procedures for data-related modifications\n\n3. **Integration Testing**\n   - Validate external service integrations and API compatibility\n   - Test cross-system dependencies that may not be present in sandbox\n\n#### Production Rollout Risk Factors\n\n##### Environmental Differences\n- **Scale Variance**: Production environments (P0-P3) likely handle significantly higher traffic than sandbox\n- **Data Volume**: Production datasets may expose edge cases not visible in sandbox testing\n- **Integration Complexity**: Production systems have more complex interdependencies\n\n##### Mitigation Strategies\n1. **Phased Rollout Approach**\n   - Deploy to P0 (lowest traffic) first\n   - Monitor key metrics for 24-48 hours before proceeding\n   - Implement automated rollback triggers for critical failures\n\n2. **Enhanced Monitoring**\n   - Establish baseline metrics before deployment\n   - Configure real-time alerting for performance degradation\n   - Prepare incident response procedures\n\n#### Recommendations\n\n##### Immediate Actions Required\n1. **Code Change Documentation** - Obtain detailed change logs and impact analysis\n2. **Performance Baseline** - Establish current production performance metrics\n3. **Rollback Preparation** - Verify rollback procedures and timing requirements\n\n##### Go/No-Go Criteria for Production\n- Completion of performance testing with acceptable results\n- Validation of all database migration scripts (if applicable)\n- Confirmation of monitoring and alerting system readiness\n- Stakeholder approval based on comprehensive change impact assessment\n\n**Overall Risk Level: MEDIUM** - While sandbox deployment success is encouraging, insufficient change detail and the inherent risks of production deployment warrant careful validation before proceeding.",
+    "trend_analysis": "## Quality Trends Analysis\n\n### Overall System Health: **GOOD** \u2705\n\n**Key Insights:**\n\n**Strengths:**\n- **Zero critical issues**: No PRBs (Problem Reports/Bugs) or security vulnerabilities indicate strong system stability\n- **Controlled defect rate**: Only 6 bugs suggests effective development practices and testing coverage\n- **Minimal risk exposure**: 2 identified risks show proactive risk management\n\n**Areas for Attention:**\n- **Bug resolution focus**: While the bug count is manageable, ensure timely resolution to prevent accumulation\n- **Risk mitigation**: Monitor the 2 identified risks closely and implement mitigation strategies\n\n**Trend Indicators:**\n- The absence of security issues and PRBs suggests robust quality gates are functioning effectively\n- The low bug-to-risk ratio (6:2) indicates good predictive quality management\n- Current metrics align with healthy software development lifecycle practices\n\n**Recommendations:**\n1. Maintain current quality standards and testing rigor\n2. Establish bug resolution velocity targets\n3. Implement regular risk assessment reviews\n4. Continue security-first development practices\n\nThe system demonstrates strong quality fundamentals with well-controlled technical debt.",
+    "risk_analysis": "### Deployment Risk Assessment - SDB Version 258.11\n\n#### Executive Summary\n\nThe sandbox deployment of SDB version 258.11 demonstrates strong stability indicators with zero failures across 150 cells. However, the upcoming production rollout requires careful consideration of several risk factors and validation gaps.\n\n#### Deployment Stability Analysis\n\n##### Current Performance Metrics\n- **Success Rate**: 100% (150/150 sandbox cells)\n- **Deployment Duration**: 12 minutes average (within acceptable range)\n- **Validation Status**: All post-deployment checks passed\n- **Environment Coverage**: Complete sandbox tier (SB0-SB2)\n\n##### Stability Risk Assessment\n**LOW RISK** - The sandbox deployment exhibits excellent stability characteristics:\n- Zero deployment failures indicate robust deployment automation\n- Consistent 12-minute deployment window suggests predictable resource utilization\n- Successful validation across all sandbox environments demonstrates functional integrity\n\n#### Code Change Impact Evaluation\n\n##### Missing Critical Information\nThe deployment summary lacks essential details for comprehensive risk assessment:\n- **Change scope and complexity** - No information on modified components\n- **Feature flags or configuration changes** - Potential runtime behavior impacts\n- **Database schema modifications** - Migration risks not addressed\n- **Third-party dependency updates** - Integration stability concerns\n\n##### Recommended Pre-Production Validation\n1. **Performance Impact Analysis**\n   - Conduct load testing to validate 12-minute deployment window scales to production\n   - Verify resource consumption patterns match production capacity\n\n2. **Rollback Preparedness**\n   - Confirm rollback procedures tested in sandbox environment\n   - Validate database migration reversibility if applicable\n\n#### Production Rollout Risk Factors\n\n##### High-Risk Considerations\n- **Scale Differential**: Production environments (P0-P3) likely have significantly higher traffic and complexity than sandbox\n- **Dependency Validation**: Limited visibility into external system integration testing\n- **Monitoring Coverage**: No mention of enhanced monitoring during production deployment\n\n##### Mitigation Strategies\n1. **Phased Rollout Approach**\n   - Deploy to P0 (lowest traffic) first with extended monitoring period\n   - Implement automated rollback triggers for key performance metrics\n   - Maintain 24-hour observation window between production stages\n\n2. **Enhanced Validation Protocol**\n   - Execute comprehensive smoke tests post-deployment\n   - Validate critical business workflows in each production stage\n   - Monitor error rates, response times, and system resource utilization\n\n#### Recommendations\n\n##### Immediate Actions Required\n1. **Documentation Review** - Obtain detailed change log and impact analysis\n2. **Load Testing** - Validate performance characteristics under production load\n3. **Rollback Testing** - Verify rollback procedures in sandbox environment\n\n##### Production Deployment Approval\n**CONDITIONAL APPROVAL** - Proceed with production rollout contingent on:\n- Completion of missing validation activities\n- Implementation of enhanced monitoring and alerting\n- Confirmation of rollback readiness across all production stages\n\nThe sandbox deployment success provides confidence in deployment mechanics, but production readiness requires additional validation of change impact and operational preparedness.",
     "prb_narratives": {},
     "prb_analyses": {}
   }
