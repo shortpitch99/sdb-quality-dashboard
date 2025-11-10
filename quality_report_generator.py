@@ -2276,29 +2276,11 @@ Next week: Planning production rollout to P0-P3 stages pending final validation 
         if days == 0:
             return "Unknown"
         
-        # Calculate daily averages
-        daily_commits = commits / days
-        daily_lines_changed = lines_changed / days
-        daily_files_changed = len(files_changed) / days
-        
-        # Risk thresholds (adjustable based on team size and project type)
-        high_risk_conditions = [
-            daily_commits > 10,  # More than 10 commits per day
-            daily_lines_changed > 1000,  # More than 1000 lines changed per day
-            daily_files_changed > 20,  # More than 20 files changed per day
-            lines_changed > 50000  # More than 50k total lines changed in period
-        ]
-        
-        medium_risk_conditions = [
-            daily_commits > 5,
-            daily_lines_changed > 500,
-            daily_files_changed > 10,
-            lines_changed > 20000
-        ]
-        
-        if sum(high_risk_conditions) >= 2:
+        # Risk assessment based on total lines changed (excluding test files)
+        # GREEN: < 5000 lines, YELLOW: < 10000 lines, RED: >= 10000 lines
+        if lines_changed >= 10000:
             return "High"
-        elif sum(medium_risk_conditions) >= 2:
+        elif lines_changed >= 5000:
             return "Medium"
         else:
             return "Low"

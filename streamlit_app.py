@@ -1343,7 +1343,32 @@ class QualityReportDashboard:
             with col2:
                 st.metric("Files Changed", git_stats.get('files_changed', 0))
                 st.metric("Authors", len(git_stats.get('authors', [])))
-                st.metric("Code Churn Risk", git_stats.get('code_churn_risk', 'Unknown'))
+                
+                # Code Churn Risk with color coding
+                churn_risk = git_stats.get('code_churn_risk', 'Unknown')
+                lines_changed = git_stats.get('lines_changed', 0)
+                
+                # Map risk levels to GREEN/YELLOW/RED
+                if churn_risk == 'Low':
+                    risk_display = "GREEN"
+                    risk_color = "#28a745"  # Green
+                elif churn_risk == 'Medium':
+                    risk_display = "YELLOW"
+                    risk_color = "#ffc107"  # Yellow
+                elif churn_risk == 'High':
+                    risk_display = "RED"
+                    risk_color = "#dc3545"  # Red
+                else:
+                    risk_display = churn_risk
+                    risk_color = "#6c757d"  # Gray
+                
+                st.markdown(f"""
+                <div style="background-color: white; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e0e0e0;">
+                    <div style="color: #666; font-size: 0.875rem; margin-bottom: 0.25rem;">Code Churn Risk</div>
+                    <div style="font-size: 1.75rem; font-weight: 600; color: {risk_color};">{risk_display}</div>
+                    <div style="color: #888; font-size: 0.75rem;">{lines_changed:,} lines changed</div>
+                </div>
+                """, unsafe_allow_html=True)
             
             # Show most changed files if available
             most_changed = git_stats.get('most_changed_files', [])

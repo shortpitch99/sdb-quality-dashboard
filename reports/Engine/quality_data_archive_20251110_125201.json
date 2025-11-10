@@ -305,17 +305,6 @@
       "issue_type": "CI"
     },
     {
-      "work_id": "W-20154721",
-      "team": "Unknown",
-      "priority": "P2",
-      "severity": "P2",
-      "subject": "[EA][ABS][INTERNAL_ERROR] RYOW fetch with a local sequence number. TopXid:13835059640125095936 at character 71",
-      "status": "New",
-      "build_version": "sdb.260.13",
-      "created_date": "2025-11-07",
-      "issue_type": "CI"
-    },
-    {
       "work_id": "W-20044887",
       "team": "Unknown",
       "priority": "P2",
@@ -409,7 +398,7 @@
       "priority": "P2",
       "severity": "P2",
       "subject": "ZDTTablePKConversionTest.testIdempotency[1]: PSQLException: ERROR: deadlock detected   Detail: Proce",
-      "status": "New",
+      "status": "In Progress",
       "build_version": "sdb.260.14",
       "created_date": "2025-11-07",
       "issue_type": "CI"
@@ -459,14 +448,14 @@
       "issue_type": "CI"
     },
     {
-      "work_id": "W-20166298",
+      "work_id": "W-20152401",
       "team": "Unknown",
       "priority": "P2",
       "severity": "P2",
-      "subject": "SDB\" ShardingPOC: ERROR: Could not read trailer for extent 2d3b39f9-a582-4f07-840a-4bd73ca3edd8 because the extent does not exist",
-      "status": "New",
-      "build_version": "sdb.260",
-      "created_date": "2025-11-08",
+      "subject": "OptimizerTest.testOptimizerCrossTenantAccess: StringIndexOutOfBoundsException: begin 10986, end 28, length 11048",
+      "status": "Ready for Review",
+      "build_version": "sdb.260.14",
+      "created_date": "2025-11-06",
       "issue_type": "CI"
     },
     {
@@ -602,17 +591,6 @@
       "issue_type": "CI"
     },
     {
-      "work_id": "W-20166130",
-      "team": "Unknown",
-      "priority": "P2",
-      "severity": "P2",
-      "subject": "[EA][PROD][PROD_ERROR][usa432s] Transaction too large in Memstore (8589934784 bytes for 47433186 rec...",
-      "status": "New",
-      "build_version": "sdb.260.1",
-      "created_date": "2025-11-08",
-      "issue_type": "CI"
-    },
-    {
       "work_id": "W-20162346",
       "team": "Unknown",
       "priority": "P2",
@@ -666,33 +644,10 @@
       "build_version": "sdb.260",
       "created_date": "2025-08-11",
       "issue_type": "CI"
-    },
-    {
-      "work_id": "W-20152401",
-      "team": "Unknown",
-      "priority": "P2",
-      "severity": "P2",
-      "subject": "OptimizerTest.testOptimizerCrossTenantAccess: StringIndexOutOfBoundsException: begin 10986, end 28, length 11048",
-      "status": "Ready for Review",
-      "build_version": "sdb.260.14",
-      "created_date": "2025-11-06",
-      "issue_type": "CI"
     }
   ],
   "leftshift_issues": [],
-  "abs_issues": [
-    {
-      "work_id": "W-20154721",
-      "team": "Unknown",
-      "priority": "P2",
-      "severity": "P2",
-      "subject": "[EA][ABS][INTERNAL_ERROR] RYOW fetch with a local sequence number. TopXid:13835059640125095936 at character 71",
-      "status": "New",
-      "build_version": "sdb.260.13",
-      "created_date": "2025-11-07",
-      "issue_type": "ABS"
-    }
-  ],
+  "abs_issues": [],
   "security_issues": [
     {
       "work_id": "W-14324477",
@@ -945,15 +900,13 @@
   "git_stats": {
     "reporting_period_start": "2025-11-03",
     "reporting_period_end": "2025-11-09",
-    "total_commits": 27,
-    "lines_added": 42693,
-    "lines_deleted": 3034,
-    "lines_changed": 45727,
-    "files_changed": 153,
+    "total_commits": 25,
+    "lines_added": 6264,
+    "lines_deleted": 1354,
+    "lines_changed": 7618,
+    "files_changed": 74,
     "authors": [
       "Ankit Sharma",
-      "Arundhati Tambe",
-      "Benjamin Busjaeger",
       "Calvin Wang",
       "Chandra Sekhar Tekur",
       "David DeHaan",
@@ -976,40 +929,10 @@
     ],
     "most_changed_files": [
       {
-        "file": "postgresql/src/test/regress/expected/gin_maintenance.out",
-        "lines_added": 20285,
-        "lines_deleted": 0,
-        "total_changes": 20285
-      },
-      {
         "file": "postgresql/src/backend/commands/sequence_v2.c",
         "lines_added": 1857,
         "lines_deleted": 734,
         "total_changes": 2591
-      },
-      {
-        "file": "postgresql/src/test/regress/sql/gin_maintenance.sql",
-        "lines_added": 2522,
-        "lines_deleted": 0,
-        "total_changes": 2522
-      },
-      {
-        "file": "postgresql/src/test/junit/src/sayonaradb/test/functional/gin/GinIndexCreationTest.java",
-        "lines_added": 2245,
-        "lines_deleted": 0,
-        "total_changes": 2245
-      },
-      {
-        "file": "postgresql/src/backend/commands/test/sequences_v2_cache_test.c",
-        "lines_added": 1630,
-        "lines_deleted": 599,
-        "total_changes": 2229
-      },
-      {
-        "file": "postgresql/src/test/junit/src/sayonaradb/test/server/lsm/SequenceV2ServerTest.java",
-        "lines_added": 1592,
-        "lines_deleted": 557,
-        "total_changes": 2149
       },
       {
         "file": "postgresql/src/backend/access/gin/ginlsmindex.c",
@@ -1018,28 +941,58 @@
         "total_changes": 1132
       },
       {
-        "file": "postgresql/src/test/junit/src/sayonaradb/test/functional/gin/GinIndexTestUtils.java",
-        "lines_added": 1004,
-        "lines_deleted": 0,
-        "total_changes": 1004
+        "file": "postgresql/src/backend/commands/sequence.c",
+        "lines_added": 656,
+        "lines_deleted": 165,
+        "total_changes": 821
       },
       {
-        "file": "postgresql/src/test/regress/expected/catalog_content_validation.out",
-        "lines_added": 940,
-        "lines_deleted": 38,
-        "total_changes": 978
+        "file": "postgresql/src/include/catalog/pg_amop.h",
+        "lines_added": 492,
+        "lines_deleted": 2,
+        "total_changes": 494
       },
       {
-        "file": "postgresql/src/test/junit/src/sayonaradb/test/server/ws/ryow/WSRYOWAsyncRollbackTest.java",
-        "lines_added": 971,
+        "file": "postgresql/src/backend/access/transam/xact.c",
+        "lines_added": 339,
+        "lines_deleted": 106,
+        "total_changes": 445
+      },
+      {
+        "file": "postgresql/src/backend/commands/sequence_v2_impl.h",
+        "lines_added": 154,
+        "lines_deleted": 82,
+        "total_changes": 236
+      },
+      {
+        "file": "postgresql/src/backend/access/gin/ginlsmutil.c",
+        "lines_added": 223,
         "lines_deleted": 0,
-        "total_changes": 971
+        "total_changes": 223
+      },
+      {
+        "file": "postgresql/src/backend/utils/misc/guc.c",
+        "lines_added": 161,
+        "lines_deleted": 23,
+        "total_changes": 184
+      },
+      {
+        "file": "postgresql/src/backend/lsmp/ersmod.c",
+        "lines_added": 93,
+        "lines_deleted": 29,
+        "total_changes": 122
+      },
+      {
+        "file": "postgresql/src/include/commands/sequence_v2.h",
+        "lines_added": 71,
+        "lines_deleted": 50,
+        "total_changes": 121
       }
     ],
-    "commit_frequency": 3.857142857142857,
-    "code_churn_risk": "High"
+    "commit_frequency": 3.5714285714285716,
+    "code_churn_risk": "Medium"
   },
-  "generated_at": "2025-11-10T07:57:06.119196",
+  "generated_at": "2025-11-10T12:51:49.135297",
   "coverage_summary": {
     "new_code": {
       "coverage": 75.1,
@@ -2059,33 +2012,6 @@
       "status": "Open",
       "created_date": "2025-11-10",
       "type": "backlog_bug"
-    },
-    {
-      "work_id": "Bug_112",
-      "severity": "P2",
-      "team": "Unknown",
-      "subject": "Bug from All-time Backlog Report",
-      "status": "Open",
-      "created_date": "2025-11-10",
-      "type": "backlog_bug"
-    },
-    {
-      "work_id": "Bug_113",
-      "severity": "P2",
-      "team": "Unknown",
-      "subject": "Bug from All-time Backlog Report",
-      "status": "Open",
-      "created_date": "2025-11-10",
-      "type": "backlog_bug"
-    },
-    {
-      "work_id": "Bug_114",
-      "severity": "P2",
-      "team": "Unknown",
-      "subject": "Bug from All-time Backlog Report",
-      "status": "Open",
-      "created_date": "2025-11-10",
-      "type": "backlog_bug"
     }
   ],
   "prb_backlog": [
@@ -2411,7 +2337,7 @@
     }
   ],
   "metadata": {
-    "generated_at": "2025-11-10T07:57:34.553194",
+    "generated_at": "2025-11-10T12:52:35.334687",
     "report_period_start": "2025-11-03",
     "report_period_end": "2025-11-09",
     "report_period_display": "November 03-09, 2025",
@@ -2422,7 +2348,7 @@
       "bugs": 0,
       "deployments": 32,
       "has_llm_content": true,
-      "ci_total": 38,
+      "ci_total": 35,
       "ci_p0_p1": 0,
       "security_total": 21,
       "security_p0_p1": 0,
@@ -2435,8 +2361,8 @@
     }
   },
   "llm_content": {
-    "trend_analysis": "## Quality Trends Analysis\n\n### Overall System Health: **EXCELLENT**\n\n**Key Findings:**\n- **Zero Defects**: No PRBs or bugs indicate robust development practices and effective testing coverage\n- **Clean Security Posture**: Zero security issues demonstrate strong security controls and practices\n- **Minimal Risk Profile**: Only 2 risks identified suggests good risk management and proactive issue identification\n\n### Health Indicators:\n\u2705 **Defect Management**: Outstanding - zero active defects  \n\u2705 **Security Compliance**: Excellent - no vulnerabilities detected  \n\u26a0\ufe0f **Risk Management**: Good - low risk count requires monitoring\n\n### Recommendations:\n1. **Maintain Current Practices**: Continue existing quality processes that are delivering zero-defect results\n2. **Risk Monitoring**: Evaluate the 2 identified risks for potential impact and mitigation strategies\n3. **Preventive Focus**: Leverage this stable baseline to implement additional preventive quality measures\n\n### Trend Outlook:\nThe metrics indicate a mature, well-controlled system with strong quality foundations. The absence of critical issues suggests effective upstream quality practices are in place.\n\n**Overall Quality Score: 9/10** - Exceptional performance with minor risk monitoring needed.",
-    "risk_analysis": "### Deployment Risk Assessment - SDB Version 258.11\n\n#### Executive Summary\n\nThe sandbox deployment of SDB version 258.11 demonstrates strong stability indicators with zero failed deployments across 150 cells. However, the upcoming production rollout requires careful consideration of several risk factors and validation gaps.\n\n#### Deployment Stability Analysis\n\n##### Positive Indicators\n- **Zero Failure Rate**: 100% success rate across all 150 sandbox cells indicates robust deployment automation\n- **Consistent Timing**: 12-minute average deployment time suggests predictable and stable deployment processes\n- **Validation Success**: All post-deployment validations passed, indicating functional integrity maintained\n- **Environment Coverage**: Complete sandbox coverage (SB0-SB2) provides comprehensive pre-production testing\n\n##### Risk Factors\n- **Limited Environment Scope**: Testing confined to sandbox environments may not capture production-specific issues\n- **Missing Performance Metrics**: No load testing or performance degradation data provided\n- **Rollback Preparedness**: No mention of rollback procedures or success criteria for production deployment\n\n#### Code Change Impact Assessment\n\n##### Unknown Variables\n- **Change Scope**: No details provided on the nature of code changes in version 258.11\n- **Database Migrations**: Potential schema changes or data migrations not documented\n- **Dependency Updates**: Third-party library or service dependency changes unclear\n- **Feature Flags**: No information on feature toggles or gradual rollout mechanisms\n\n##### Recommended Validation Areas\n- **Backward Compatibility**: Ensure API compatibility with existing integrations\n- **Data Integrity**: Validate database operations under production load\n- **Security Scanning**: Confirm security vulnerability assessments completed\n- **Performance Baseline**: Establish performance benchmarks before production deployment\n\n#### Production Rollout Risk Mitigation\n\n##### High Priority Actions\n1. **Staged Rollout Plan**: Implement gradual rollout across P0-P3 with defined success criteria\n2. **Monitoring Enhancement**: Deploy comprehensive monitoring for key performance indicators\n3. **Rollback Strategy**: Establish clear rollback triggers and automated rollback procedures\n4. **Communication Plan**: Define stakeholder notification procedures for deployment status\n\n##### Medium Priority Considerations\n- **Load Testing**: Conduct production-scale load testing if not already completed\n- **Canary Deployment**: Consider canary releases for critical production stages\n- **Documentation Review**: Ensure runbooks and troubleshooting guides are current\n\n#### Recommendation\n\n**PROCEED WITH CAUTION**: While sandbox results are encouraging, recommend implementing additional validation steps and risk mitigation measures before production deployment. The lack of detailed change information and production-specific testing data presents moderate risk that should be addressed through enhanced monitoring and staged rollout procedures.",
+    "trend_analysis": "## Quality Trends Analysis\n\n### Overall System Health: **EXCELLENT**\n\n**Key Findings:**\n- **Zero Defects**: No PRBs or bugs indicates robust development processes and effective quality controls\n- **Clean Security Posture**: Zero security issues demonstrates strong security practices and vulnerability management\n- **Minimal Risk Exposure**: Only 2 risks identified suggests good risk management and proactive issue identification\n\n### Trend Insights:\n\u2705 **Positive Indicators:**\n- Defect prevention strategies are highly effective\n- Security-by-design approach is working well\n- Quality gates and testing processes are performing optimally\n\n\u26a0\ufe0f **Areas for Monitoring:**\n- The 2 existing risks should be actively tracked and mitigated\n- Maintain current quality practices to sustain this performance level\n- Consider if risk identification processes are comprehensive enough\n\n### Recommendations:\n1. **Sustain Excellence**: Document and replicate current quality practices across other projects\n2. **Risk Focus**: Prioritize resolution of the 2 identified risks to achieve zero-risk status\n3. **Continuous Vigilance**: Maintain current testing rigor and security scanning frequency\n\n**Overall Assessment**: The system demonstrates exceptional quality health with industry-leading defect rates. This performance level indicates mature quality processes and should be used as a benchmark for other initiatives.",
+    "risk_analysis": "### Deployment Risk Assessment - SDB Version 258.11\n\n#### Executive Summary\n\nThe sandbox deployment of SDB version 258.11 demonstrates strong stability indicators with zero failures across 150 cells. However, the upcoming production rollout requires careful consideration of several risk factors and validation gaps.\n\n#### Deployment Stability Analysis\n\n##### Current Performance Metrics\n- **Success Rate**: 100% (150/150 sandbox cells)\n- **Deployment Duration**: 12 minutes average (within acceptable range)\n- **Validation Status**: All post-deployment checks passed\n- **Environment Coverage**: Complete sandbox tier (SB0-SB2)\n\n##### Stability Risk Assessment\n**LOW RISK** - The sandbox deployment exhibits excellent stability characteristics:\n- Zero deployment failures indicate robust packaging and deployment scripts\n- Consistent 12-minute deployment time suggests predictable resource utilization\n- Successful validation across all sandbox environments demonstrates functional integrity\n\n#### Code Change Impact Evaluation\n\n##### Missing Critical Information\nThe deployment summary lacks essential details for comprehensive risk assessment:\n- **Change scope and complexity** - No information on modified components or features\n- **Database schema changes** - Potential for data migration issues in production\n- **Configuration updates** - Risk of environment-specific configuration conflicts\n- **Dependency modifications** - Third-party library or service integration changes\n\n##### Recommended Pre-Production Validation\n\n###### High Priority Items\n1. **Performance Impact Analysis**\n   - Conduct load testing to validate performance under production traffic volumes\n   - Monitor resource consumption patterns compared to previous version\n\n2. **Data Integrity Verification**\n   - Execute comprehensive data validation if schema changes are present\n   - Verify backup and rollback procedures for data-related modifications\n\n3. **Integration Testing**\n   - Validate external service integrations and API compatibility\n   - Test cross-system dependencies that may not be present in sandbox\n\n#### Production Rollout Risk Factors\n\n##### Environmental Differences\n- **Scale Variance**: Production environments (P0-P3) likely handle significantly higher traffic than sandbox\n- **Data Volume**: Production datasets may expose edge cases not visible in sandbox testing\n- **Integration Complexity**: Production systems have more complex interdependencies\n\n##### Mitigation Strategies\n1. **Phased Rollout Approach**\n   - Deploy to P0 (lowest traffic) first\n   - Monitor key metrics for 24-48 hours before proceeding\n   - Implement automated rollback triggers for critical failures\n\n2. **Enhanced Monitoring**\n   - Establish baseline metrics before deployment\n   - Configure real-time alerting for performance degradation\n   - Prepare incident response procedures\n\n#### Recommendations\n\n##### Immediate Actions Required\n1. **Code Change Documentation** - Obtain detailed change logs and impact analysis\n2. **Performance Baseline** - Establish current production performance metrics\n3. **Rollback Preparation** - Verify rollback procedures and timing requirements\n\n##### Go/No-Go Criteria for Production\n- Completion of performance testing with acceptable results\n- Validation of all database migration scripts (if applicable)\n- Confirmation of monitoring and alerting system readiness\n- Stakeholder approval based on comprehensive change impact assessment\n\n**Overall Risk Level: MEDIUM** - While sandbox deployment success is encouraging, insufficient change detail and the inherent risks of production deployment warrant careful validation before proceeding.",
     "prb_narratives": {},
     "prb_analyses": {}
   }
