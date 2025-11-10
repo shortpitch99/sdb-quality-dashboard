@@ -1640,15 +1640,11 @@ Next week: Planning production rollout to P0-P3 stages pending final validation 
             self.data['prb_bugs'] = []
             return []
 
-    def load_system_availability(self, availability_json: str) -> Dict[str, Any]:
-        """Load or create manual system availability metrics JSON.
-        Expected schema (example):
-        {
-          "period": "2025-10-20..2025-10-26",
-          "slo": 99.9,
-          "achieved": 99.97,
-          "incidents": [ {"id":"PRB-...","duration_min": 12, "impact":"..."} ]
-        }
+    def load_system_availability(self, availability_file: str) -> Dict[str, Any]:
+        """Load system availability from avail.txt file or JSON fallback.
+        
+        For avail.txt: expects a single number like 99.99
+        For JSON: legacy format with period, slo, achieved, incidents
         """
         template = {
             "period": "",
@@ -1656,22 +1652,51 @@ Next week: Planning production rollout to P0-P3 stages pending final validation 
             "achieved": 100.0,
             "incidents": []
         }
+        
         try:
-            if not os.path.exists(availability_json):
+            # Check if it's the new avail.txt format
+            if availability_file.endswith('.txt') or os.path.basename(availability_file) == 'avail.txt':
+                if not os.path.exists(availability_file):
+                    # Create example avail.txt file
+                    with open(availability_file, 'w') as f:
+                        f.write("99.99\n")
+                    print(f"✓ Created example avail.txt at {availability_file} with 99.99%")
+                    availability_value = 99.99
+                else:
+                    with open(availability_file, 'r') as f:
+                        content = f.read().strip()
+                        try:
+                            availability_value = float(content)
+                        except ValueError:
+                            print(f"Warning: Invalid number in {availability_file}, using 99.99")
+                            availability_value = 99.99
+                
+                # Convert to standard format
+                availability_data = {
+                    "period": "",
+                    "slo": 99.9,
+                    "achieved": availability_value,
+                    "incidents": []
+                }
+                self.data['system_availability'] = availability_data
+                return availability_data
+            
+            # Legacy JSON format
+            if not os.path.exists(availability_file):
                 # Create a template file for manual entry
-                with open(availability_json, 'w') as f:
+                with open(availability_file, 'w') as f:
                     json.dump(template, f, indent=2)
-                print(f"✓ Created template system availability JSON at {availability_json}")
+                print(f"✓ Created template system availability JSON at {availability_file}")
                 self.data['system_availability'] = template
                 return template
-            with open(availability_json, 'r') as f:
+            with open(availability_file, 'r') as f:
                 data = json.load(f)
                 if not isinstance(data, dict):
                     data = template
                 self.data['system_availability'] = data
                 return data
         except Exception as e:
-            print(f"Error loading system availability JSON: {e}")
+            print(f"Error loading system availability from {availability_file}: {e}")
             self.data['system_availability'] = template
             return template
 
@@ -3000,7 +3025,7 @@ def main():
     parser.add_argument('--git-repo-path', default='/Users/rchowdhuri/SDB', help='Local git repository path for code analysis')
     parser.add_argument('--allbugs-file', default='allbugs.txt', help='All-time bug backlog file (Salesforce export)')
     parser.add_argument('--prb-bugs-file', default='prb-bugs.txt', help='PRB-derived bug backlog file (Salesforce export)')
-    parser.add_argument('--availability-file', default='system_availability.json', help='Manual System Availability JSON file')
+    parser.add_argument('--availability-file', default='avail.txt', help='System Availability file (avail.txt with single number like 99.99)')
     parser.add_argument('--prb-augmentation', help='PRB manual augmentation file (legacy)')
     parser.add_argument('--output-dir', default='./reports', help='Output directory')
     parser.add_argument('--report-type', default='comprehensive', choices=['comprehensive', 'compact'], help='Report type')
@@ -3156,7 +3181,7 @@ def main():
     print("Loading PRB-derived backlog (prb-bugs)...")
     if not use_reports:
         collector.load_prb_bugs(args.prb_bugs_file)
-    print("Loading system availability JSON (manual)...")
+    print("Loading system availability from avail.txt...")
     collector.load_system_availability(args.availability_file)
 
     # Compute custom KPIs

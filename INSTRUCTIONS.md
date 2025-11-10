@@ -45,7 +45,12 @@
 - **Source**: [Salesforce Security Dashboard](https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=lightningdashboard&wave__assetId=01ZEE000001BaVp2AK) ✅ **CONFIRMED**
 - **Action**: Run the dashboard → Use "Copy to clipboard" feature → Create `security.txt` file
 
-### 10. Git Repository Refresh (`/Users/rchowdhuri/SDB`)
+### 10. System Availability (`avail.txt`)
+- **Format**: Single number representing availability percentage (e.g., `99.99`)
+- **Source**: Manual entry based on system monitoring data
+- **Action**: Create `avail.txt` file with availability percentage for the week
+
+### 11. Git Repository Refresh (`/Users/rchowdhuri/SDB`)
 - **Actions Required**:
   ```bash
   cd /Users/rchowdhuri/SDB

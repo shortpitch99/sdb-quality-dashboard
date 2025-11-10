@@ -540,6 +540,12 @@ class QualityReportDashboard:
             previous_critical_prb_backlog = len([b for b in previous_prb_backlog if 'P0' in str(b.get('priority', '')) or 'P1' in str(b.get('priority', ''))])
             changes['prb_backlog'] = calc_pct_change(current_critical_prb_backlog, previous_critical_prb_backlog)
             
+            # System Availability
+            current_availability = current_data.get('system_availability', {}).get('achieved', 0.0)
+            previous_availability = previous_data.get('system_availability', {}).get('achieved', 0.0)
+            if current_availability > 0 and previous_availability > 0:
+                changes['availability'] = calc_pct_change(current_availability, previous_availability)
+            
         except Exception as e:
             # If we can't calculate changes, return empty dict
             print(f"Could not calculate week-over-week changes: {e}")
@@ -895,13 +901,34 @@ class QualityReportDashboard:
             """, unsafe_allow_html=True)
         
         with col5_prod:
+            # System Availability - use real data from avail.txt
+            availability_data = data.get('system_availability', {})
+            availability_achieved = availability_data.get('achieved', 0.0)
+            availability_slo = availability_data.get('slo', 99.9)
+            
+            # Format the value with week-over-week change
+            availability_display = f"{availability_achieved:.2f}%"
+            if changes.get('availability'):
+                availability_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['availability']})</span>"
+            
+            # Determine color based on SLO achievement
+            if availability_achieved >= availability_slo:
+                availability_delta_class = "metric-delta-green"
+                availability_status = "MEETS SLO"
+            elif availability_achieved >= (availability_slo - 0.1):
+                availability_delta_class = "metric-delta-yellow" 
+                availability_status = "NEAR SLO"
+            else:
+                availability_delta_class = "metric-delta-red"
+                availability_status = "BELOW SLO"
+            
             st.markdown(f"""
             <div class="metric-card">
                 <div class="metric-label">⚡ System Availability</div>
-                <div class="metric-value">--</div>
-                <div class="metric-total">Coming Soon</div>
-                <div class="metric-delta">
-                    --
+                <div class="metric-value">{availability_display}</div>
+                <div class="metric-total">SLO: {availability_slo}%</div>
+                <div class="metric-delta {availability_delta_class}">
+                    {availability_status}
                 </div>
             </div>
             """, unsafe_allow_html=True)
