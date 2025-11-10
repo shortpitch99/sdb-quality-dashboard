@@ -398,6 +398,88 @@ class QualityDataCollector:
             })
         return items
     
+    def load_alltime_backlog_from_report(self, report_id: str, session: Dict[str, str], api_version: str = "v62.0") -> List[Dict[str, Any]]:
+        """Load all-time bug backlog data from Salesforce report."""
+        data = self._fetch_report(report_id, session, api_version)
+        if not data:
+            print("Failed to fetch All-time Bug Backlog report; using empty data")
+            return []
+        
+        rows = self._get_rows_from_report(data)
+        backlog_items = []
+        
+        for r in rows:
+            work_id = str(r.get('ADM_Work__c.Name') or r.get('Work__c.Name') or r.get('Work.Name') or r.get('Work: Work ID') or '')
+            if not work_id:
+                continue
+                
+            severity = str(r.get('ADM_Work__c.Priority__c') or r.get('Priority') or r.get('Severity') or 'P2')
+            team = str(r.get('ADM_Work__c.Scrum_Team_Name__c') or r.get('Scrum_Team_Name__c') or r.get('Scrum Team Name') or 'Unknown')
+            subject = str(r.get('ADM_Work__c.Subject__c') or r.get('Subject') or '')
+            status = str(r.get('ADM_Work__c.Status__c') or r.get('Status') or '')
+            created = r.get('ADM_Work__c.CreatedDate') or r.get('Work: Created Date')
+            
+            created_date = ''
+            if created:
+                try:
+                    created_date = datetime.fromisoformat(str(created).replace('Z','+00:00')).strftime('%Y-%m-%d')
+                except Exception:
+                    created_date = str(created)
+            
+            backlog_items.append({
+                'work_id': work_id,
+                'severity': severity if severity.startswith('P') else 'P2',
+                'team': team,
+                'subject': subject[:200],
+                'status': status,
+                'created_date': created_date or datetime.now().strftime('%Y-%m-%d'),
+                'type': 'backlog_bug'
+            })
+        
+        return backlog_items
+    
+    def load_prb_backlog_from_report(self, report_id: str, session: Dict[str, str], api_version: str = "v62.0") -> List[Dict[str, Any]]:
+        """Load PRB-related backlog items from Salesforce report."""
+        data = self._fetch_report(report_id, session, api_version)
+        if not data:
+            print("Failed to fetch PRB Backlog report; using empty data")
+            return []
+        
+        rows = self._get_rows_from_report(data)
+        prb_backlog_items = []
+        
+        for r in rows:
+            work_id = str(r.get('ADM_Work__c.Name') or r.get('Work__c.Name') or r.get('Work.Name') or r.get('Work: Work ID') or '')
+            if not work_id:
+                continue
+                
+            priority = str(r.get('ADM_Work__c.Priority__c') or r.get('Priority') or 'P2')
+            team = str(r.get('ADM_Work__c.Scrum_Team_Name__c') or r.get('Scrum_Team_Name__c') or r.get('Scrum Team Name') or 'Unknown')
+            subject = str(r.get('ADM_Work__c.Subject__c') or r.get('Subject') or '')
+            status = str(r.get('ADM_Work__c.Status__c') or r.get('Status') or '')
+            prb_reference = str(r.get('ADM_Work__c.PRB__c') or r.get('PRB') or r.get('Related PRB') or '')
+            created = r.get('ADM_Work__c.CreatedDate') or r.get('Work: Created Date')
+            
+            created_date = ''
+            if created:
+                try:
+                    created_date = datetime.fromisoformat(str(created).replace('Z','+00:00')).strftime('%Y-%m-%d')
+                except Exception:
+                    created_date = str(created)
+            
+            prb_backlog_items.append({
+                'work_id': work_id,
+                'priority': priority if priority.startswith('P') else 'P2',
+                'team': team,
+                'subject': subject[:200],
+                'status': status,
+                'prb_reference': prb_reference,
+                'created_date': created_date or datetime.now().strftime('%Y-%m-%d'),
+                'type': 'prb_backlog'
+            })
+        
+        return prb_backlog_items
+    
     def load_risk_data(self, risk_file: str) -> List[RiskItem]:
         """Load risk/feature tracking data from text file."""
         risks = []
@@ -2935,6 +3017,8 @@ def main():
     parser.add_argument('--sf-report-leftshift', default='00OEE000002Wjld2AC', help='Report ID for LeftShift Issues')
     parser.add_argument('--sf-report-abs', default='00OEE000002bDht2AE', help='Report ID for ABS Issues')
     parser.add_argument('--sf-report-security', default='00OB0000002qWjvMAE', help='Report ID for Security Issues')
+    parser.add_argument('--sf-report-alltime-backlog', default='00OEE000002XRUv2AO', help='Report ID for All-time Bug Backlog')
+    parser.add_argument('--sf-report-prb-backlog', default='00OEE000002ZnZN2A0', help='Report ID for Backlog from PRB')
     
     args = parser.parse_args()
     
@@ -3045,6 +3129,15 @@ def main():
         collector.data['abs_issues'] = abs_items
         security_items = collector.load_work_items_from_report(args.sf_report_security, session, issue_type='security', api_version=args.sf_api_version)
         collector.data['security_issues'] = security_items
+        
+        # Load backlog data from Salesforce reports
+        print("Loading all-time bug backlog from Salesforce...")
+        alltime_backlog = collector.load_alltime_backlog_from_report(args.sf_report_alltime_backlog, session, args.sf_api_version)
+        collector.data['alltime_backlog'] = alltime_backlog
+        
+        print("Loading PRB backlog from Salesforce...")
+        prb_backlog = collector.load_prb_backlog_from_report(args.sf_report_prb_backlog, session, args.sf_api_version)
+        collector.data['prb_backlog'] = prb_backlog
     else:
         collector.load_ci_issues(args.ci_file)
         collector.load_leftshift_issues(args.leftshift_file)
@@ -3056,11 +3149,13 @@ def main():
             ss_file = os.path.join(component_dir, "ss.txt")
         collector.load_ss_security_issues(ss_file)
 
-    # Load new backlogs and system availability
+    # Load new backlogs and system availability (fallback for file-based mode)
     print("Loading all-time backlog (allbugs)...")
-    collector.load_all_bugs_backlog(args.allbugs_file)
+    if not use_reports:
+        collector.load_all_bugs_backlog(args.allbugs_file)
     print("Loading PRB-derived backlog (prb-bugs)...")
-    collector.load_prb_bugs(args.prb_bugs_file)
+    if not use_reports:
+        collector.load_prb_bugs(args.prb_bugs_file)
     print("Loading system availability JSON (manual)...")
     collector.load_system_availability(args.availability_file)
 

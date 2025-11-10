@@ -524,6 +524,22 @@ class QualityReportDashboard:
             changes['critical_backlog'] = calc_pct_change(current_critical_backlog, previous_critical_backlog)
             changes['total_backlog'] = calc_pct_change(current_total_backlog, previous_total_backlog)
             
+            # All-time Backlog (from Salesforce report)
+            current_alltime_backlog = current_data.get('alltime_backlog', [])
+            current_critical_alltime = len([b for b in current_alltime_backlog if 'P0' in str(b.get('severity', '')) or 'P1' in str(b.get('severity', ''))])
+            
+            previous_alltime_backlog = previous_data.get('alltime_backlog', [])
+            previous_critical_alltime = len([b for b in previous_alltime_backlog if 'P0' in str(b.get('severity', '')) or 'P1' in str(b.get('severity', ''))])
+            changes['alltime_backlog'] = calc_pct_change(current_critical_alltime, previous_critical_alltime)
+            
+            # PRB Backlog (from Salesforce report)
+            current_prb_backlog = current_data.get('prb_backlog', [])
+            current_critical_prb_backlog = len([b for b in current_prb_backlog if 'P0' in str(b.get('priority', '')) or 'P1' in str(b.get('priority', ''))])
+            
+            previous_prb_backlog = previous_data.get('prb_backlog', [])
+            previous_critical_prb_backlog = len([b for b in previous_prb_backlog if 'P0' in str(b.get('priority', '')) or 'P1' in str(b.get('priority', ''))])
+            changes['prb_backlog'] = calc_pct_change(current_critical_prb_backlog, previous_critical_prb_backlog)
+            
         except Exception as e:
             # If we can't calculate changes, return empty dict
             print(f"Could not calculate week-over-week changes: {e}")
@@ -1040,14 +1056,23 @@ class QualityReportDashboard:
         col10, col11, col12, col13, col14 = st.columns(5)
         
         with col10:
-            # All-time Bug Backlog - use real data
-            bugs = data.get('bugs', [])
-            critical_backlog_bugs = len([b for b in bugs if 'P0' in str(b.get('severity', '')) or 'P1' in str(b.get('severity', ''))])
-            total_backlog_bugs = len(bugs)
+            # All-time Bug Backlog - use real data from Salesforce report
+            alltime_backlog = data.get('alltime_backlog', [])
+            if alltime_backlog:
+                # Use data from Salesforce All-time Backlog report
+                critical_backlog_bugs = len([b for b in alltime_backlog if 'P0' in str(b.get('severity', '')) or 'P1' in str(b.get('severity', ''))])
+                total_backlog_bugs = len(alltime_backlog)
+            else:
+                # Fallback to bugs data if alltime_backlog not available
+                bugs = data.get('bugs', [])
+                critical_backlog_bugs = len([b for b in bugs if 'P0' in str(b.get('severity', '')) or 'P1' in str(b.get('severity', ''))])
+                total_backlog_bugs = len(bugs)
             
             # Format the value with week-over-week change
             critical_backlog_display = f"{critical_backlog_bugs}"
-            if changes.get('critical_backlog'):
+            if alltime_backlog and changes.get('alltime_backlog'):
+                critical_backlog_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['alltime_backlog']})</span>"
+            elif changes.get('critical_backlog'):
                 critical_backlog_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['critical_backlog']})</span>"
             
             # Determine color based on critical bugs
@@ -1055,28 +1080,59 @@ class QualityReportDashboard:
             backlog_status = "CLEAN" if critical_backlog_bugs == 0 else ("BACKLOG" if critical_backlog_bugs <= 5 else "HIGH BACKLOG")
             
             st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-label">🐛 All-time Bug Backlog</div>
-                <div class="metric-value">{critical_backlog_display}</div>
-                <div class="metric-total">{total_backlog_bugs} bugs</div>
-                <div class="metric-delta {backlog_delta_class}">
-                    {backlog_status}
+            <a href="https://gus.lightning.force.com/lightning/r/Report/00OEE000002XRUv2AO/view" target="_blank" style="text-decoration: none; color: inherit;">
+                <div class="metric-card metric-card-clickable">
+                    <div class="metric-label">🐛 All-time Bug Backlog</div>
+                    <div class="metric-value">{critical_backlog_display}</div>
+                    <div class="metric-total">{total_backlog_bugs} bugs</div>
+                    <div class="metric-delta {backlog_delta_class}">
+                        {backlog_status}
+                    </div>
                 </div>
-            </div>
+            </a>
             """, unsafe_allow_html=True)
         
         with col11:
-            # Backlog from PRB
-            st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-label">📋 Backlog from PRB</div>
-                <div class="metric-value">--</div>
-                <div class="metric-total">Coming Soon</div>
-                <div class="metric-delta metric-delta-gray">
-                    PENDING
+            # Backlog from PRB - use real data from Salesforce report
+            prb_backlog = data.get('prb_backlog', [])
+            if prb_backlog:
+                # Use data from Salesforce PRB Backlog report
+                critical_prb_backlog = len([b for b in prb_backlog if 'P0' in str(b.get('priority', '')) or 'P1' in str(b.get('priority', ''))])
+                total_prb_backlog = len(prb_backlog)
+                
+                # Determine color based on critical PRB backlog items
+                prb_backlog_delta_class = "metric-delta-green" if critical_prb_backlog == 0 else ("metric-delta-yellow" if critical_prb_backlog <= 3 else "metric-delta-red")
+                prb_backlog_status = "CLEAN" if critical_prb_backlog == 0 else ("BACKLOG" if critical_prb_backlog <= 3 else "HIGH BACKLOG")
+                
+                # Format the value with week-over-week change
+                critical_prb_backlog_display = f"{critical_prb_backlog}"
+                if changes.get('prb_backlog'):
+                    critical_prb_backlog_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['prb_backlog']})</span>"
+                
+                st.markdown(f"""
+                <a href="https://gus.lightning.force.com/lightning/r/Report/00OEE000002ZnZN2A0/view" target="_blank" style="text-decoration: none; color: inherit;">
+                    <div class="metric-card metric-card-clickable">
+                        <div class="metric-label">📋 Backlog from PRB</div>
+                        <div class="metric-value">{critical_prb_backlog_display}</div>
+                        <div class="metric-total">{total_prb_backlog} items</div>
+                        <div class="metric-delta {prb_backlog_delta_class}">
+                            {prb_backlog_status}
+                        </div>
+                    </div>
+                </a>
+                """, unsafe_allow_html=True)
+            else:
+                # Fallback when no PRB backlog data available
+                st.markdown(f"""
+                <div class="metric-card">
+                    <div class="metric-label">📋 Backlog from PRB</div>
+                    <div class="metric-value">--</div>
+                    <div class="metric-total">No Data</div>
+                    <div class="metric-delta metric-delta-gray">
+                        PENDING
+                    </div>
                 </div>
-            </div>
-            """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
         
         # Leave remaining columns empty for future expansion
         with col12:
