@@ -1044,42 +1044,29 @@ class QualityReportDashboard:
                 current_week_changes = git_stats.get('lines_changed', 0)
                 total_commits = git_stats.get('total_commits', 0)
                 
-                # Calculate a simple activity metric based on commits and changes
-                # For demo purposes, we'll use a baseline comparison
-                baseline_changes = 5000  # Typical week baseline
-                
-                if baseline_changes > 0:
-                    percentage_change = ((current_week_changes - baseline_changes) / baseline_changes) * 100
-                else:
-                    percentage_change = 100 if current_week_changes > 0 else 0
-                
-                # Determine status color based on percentage change and commit activity
-                if total_commits < 10 and current_week_changes < 3000:
+                # Use the same thresholds as Code Churn Risk
+                # GREEN: < 5000 lines, YELLOW: 5000-9999 lines, RED: >= 10000 lines
+                if current_week_changes < 5000:
                     change_status = "GREEN"
                     change_delta_class = "metric-delta-green"
-                elif total_commits < 25 and current_week_changes < 8000:
+                elif current_week_changes < 10000:
                     change_status = "YELLOW" 
                     change_delta_class = "metric-delta-yellow"
                 else:
                     change_status = "RED"
                     change_delta_class = "metric-delta-red"
-                
-                # Format percentage with + or - sign
-                change_sign = "+" if percentage_change >= 0 else ""
             else:
                 # Fallback when no git stats available
                 current_week_changes = 0
-                percentage_change = 0
                 change_status = "UNKNOWN"
                 change_delta_class = "metric-delta-gray"
-                change_sign = ""
             
             st.markdown(f"""
             <a href="#code-changes-analysis" style="text-decoration: none; color: inherit;">
                 <div class="metric-card metric-card-clickable">
                     <div class="metric-label">📈 Code Changes</div>
-                    <div class="metric-value">{change_sign}{percentage_change:.1f}%</div>
-                    <div class="metric-total">{current_week_changes:,} lines changed</div>
+                    <div class="metric-value">{current_week_changes:,}</div>
+                    <div class="metric-total">lines changed</div>
                     <div class="metric-delta {change_delta_class}">
                         {change_status}
                     </div>
