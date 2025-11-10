@@ -1054,12 +1054,12 @@ class QualityReportDashboard:
                 current_week_changes = git_stats.get('lines_changed', 0)
                 total_commits = git_stats.get('total_commits', 0)
                 
-                # Use the same thresholds as Code Churn Risk
-                # GREEN: < 5000 lines, YELLOW: 5000-9999 lines, RED: >= 10000 lines
-                if current_week_changes < 5000:
+                # Code Changes thresholds
+                # GREEN: < 10000 lines, YELLOW: 10000-19999 lines, RED: >= 20000 lines
+                if current_week_changes < 10000:
                     change_status = "GREEN"
                     change_delta_class = "metric-delta-green"
-                elif current_week_changes < 10000:
+                elif current_week_changes < 20000:
                     change_status = "YELLOW" 
                     change_delta_class = "metric-delta-yellow"
                 else:

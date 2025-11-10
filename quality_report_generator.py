@@ -2273,10 +2273,10 @@ Next week: Planning production rollout to P0-P3 stages pending final validation 
             return "Unknown"
         
         # Risk assessment based on total lines changed (excluding test files)
-        # GREEN: < 5000 lines, YELLOW: < 10000 lines, RED: >= 10000 lines
-        if lines_changed >= 10000:
+        # GREEN: < 10000 lines, YELLOW: < 20000 lines, RED: >= 20000 lines
+        if lines_changed >= 20000:
             return "High"
-        elif lines_changed >= 5000:
+        elif lines_changed >= 10000:
             return "Medium"
         else:
             return "Low"
