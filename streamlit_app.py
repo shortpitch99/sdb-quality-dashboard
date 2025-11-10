@@ -546,6 +546,16 @@ class QualityReportDashboard:
             if current_availability > 0 and previous_availability > 0:
                 changes['availability'] = calc_pct_change(current_availability, previous_availability)
             
+            # Code Changes (lines changed from git stats)
+            current_git_stats = current_data.get('git_stats', {})
+            current_lines_changed = current_git_stats.get('lines_changed', 0)
+            
+            previous_git_stats = previous_data.get('git_stats', {})
+            previous_lines_changed = previous_git_stats.get('lines_changed', 0)
+            
+            if current_lines_changed >= 0 and previous_lines_changed >= 0:  # Allow 0 values
+                changes['code_changes'] = calc_pct_change(current_lines_changed, previous_lines_changed)
+            
         except Exception as e:
             # If we can't calculate changes, return empty dict
             print(f"Could not calculate week-over-week changes: {e}")
@@ -1061,11 +1071,16 @@ class QualityReportDashboard:
                 change_status = "UNKNOWN"
                 change_delta_class = "metric-delta-gray"
             
+            # Format the value with week-over-week change
+            code_changes_display = f"{current_week_changes:,}"
+            if changes.get('code_changes'):
+                code_changes_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['code_changes']})</span>"
+            
             st.markdown(f"""
             <a href="#code-changes-analysis" style="text-decoration: none; color: inherit;">
                 <div class="metric-card metric-card-clickable">
                     <div class="metric-label">📈 Code Changes</div>
-                    <div class="metric-value">{current_week_changes:,}</div>
+                    <div class="metric-value">{code_changes_display}</div>
                     <div class="metric-total">lines changed</div>
                     <div class="metric-delta {change_delta_class}">
                         {change_status}
