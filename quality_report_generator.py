@@ -412,32 +412,57 @@ class QualityDataCollector:
             return []
         rows = self._get_rows_from_report(data)
         items: List[Dict[str, Any]] = []
+        
         for r in rows:
+            # Try different work ID field patterns
             work_id = str(r.get('ADM_Work__c.Name') or r.get('Work__c.Name') or r.get('Work.Name') or r.get('Work: Work ID') or r.get('Work__c.Id') or '')
-            if not work_id and 'W-' in str(r):
+            
+            # For CI/Security reports, work ID is in CUST_NAME_label
+            if not work_id or not work_id.startswith('W-'):
+                work_id = str(r.get('CUST_NAME_label') or r.get('CUST_NAME') or '')
+            
+            if not work_id or (not work_id.startswith('W-') and 'W-' not in str(r)):
                 continue
+            
             team = str(r.get('ADM_Work__c.Scrum_Team_Name__c') or r.get('Scrum_Team_Name__c') or r.get('Scrum Team Name') or 'Unknown')
             subject = str(r.get('ADM_Work__c.Subject__c') or r.get('Subject') or '')
             status = str(r.get('ADM_Work__c.Status__c') or r.get('Status') or '')
-            priority = str(r.get('ADM_Work__c.Priority__c') or r.get('Priority') or 'P2')
-            created = r.get('ADM_Work__c.CreatedDate') or r.get('Work: Created Date')
+            
+            # Priority/Severity handling - try multiple field patterns
+            priority = str(r.get('ADM_Work__c.Priority__c') or r.get('Priority') or r.get('ADM_Work__c.Severity__c') or r.get('Severity') or r.get('ADM_Work__c.Severity_Level__c') or 'P2')
+            
+            # For reports that don't have priority, default to P2
+            if not priority or priority in ['', 'None', 'null']:
+                priority = 'P2'
+            
+            # Ensure priority format is correct (P0, P1, P2, P3, P4)
+            if not priority.startswith('P'):
+                priority = 'P2'
+            
+            created = r.get('ADM_Work__c.CreatedDate') or r.get('Work: Created Date') or r.get('CUST_CREATED_DATE')
             created_date = ''
             if created:
                 try:
                     created_date = datetime.fromisoformat(str(created).replace('Z','+00:00')).strftime('%Y-%m-%d')
                 except Exception:
                     created_date = str(created)
-            build_version = str(r.get('ADM_Work__c.Found_in_Build_Name__c') or r.get('Found in Build') or r.get('Found in Build Name') or '')
+            
+            build_version = str(r.get('ADM_Work__c.Found_in_Build_Name__c') or r.get('Found in Build') or r.get('Found in Build Name') or r.get('ADM_Work__c.Found_in_Build__c_label') or '')
+            
             items.append({
                 'work_id': work_id,
                 'team': team,
                 'priority': priority if priority.startswith('P') else 'P2',
+                'severity': priority if priority.startswith('P') else 'P2',  # Add severity field for compatibility
                 'subject': subject[:200],
                 'status': status,
                 'build_version': build_version,
                 'created_date': created_date or datetime.now().strftime('%Y-%m-%d'),
                 'issue_type': issue_type
             })
+        
+        # Work items loading complete
+        
         return items
     
     def load_alltime_backlog_from_report(self, report_id: str, session: Dict[str, str], api_version: str = "v62.0") -> List[Dict[str, Any]]:
