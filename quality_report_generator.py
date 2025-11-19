@@ -303,6 +303,18 @@ class QualityDataCollector:
             }, params={"includeDetails": "true"}, timeout=60)
             if 200 <= resp.status_code < 300:
                 return resp.json()
+            
+            # Check for authentication errors (401 Unauthorized)
+            if resp.status_code == 401:
+                error_text = resp.text
+                print(f"Reports API error {resp.status_code}: {error_text[:300]}")
+                
+                # Check if this is a session expired/invalid error
+                if "Session expired" in error_text or "INVALID_SESSION_ID" in error_text or "invalid" in error_text.lower():
+                    print("❌ Salesforce session expired or invalid. Please re-authenticate and try again.")
+                    print("💡 Run: sfdx force:auth:web:login --instance-url https://gus.salesforce.com --alias gus")
+                    sys.exit(1)  # Exit immediately on authentication failure
+            
             print(f"Reports API error {resp.status_code}: {resp.text[:300]}")
         except Exception as e:
             print(f"Reports API exception: {e}")

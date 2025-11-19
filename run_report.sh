@@ -175,8 +175,9 @@ if [ "$USE_SF_REPORTS" = "1" ]; then
 fi
 
 "${GEN_CMD[@]}"
+exit_code=$?
 
-if [ $? -eq 0 ]; then
+if [ $exit_code -eq 0 ]; then
     echo ""
     echo "✅ Quality report generated successfully!"
     echo "📁 Reports available in: ./reports/$COMPONENT/"
@@ -190,6 +191,18 @@ if [ $? -eq 0 ]; then
         echo "📄 Latest report: $latest_report"
         echo "📏 Report size: $(wc -c < "$latest_report") bytes"
     fi
+elif [ $exit_code -eq 1 ] && [ "$USE_SF_REPORTS" = "1" ]; then
+    echo ""
+    echo "❌ Report generation failed due to Salesforce authentication error!"
+    echo "🔐 Your Salesforce session has expired or is invalid."
+    echo ""
+    echo "📋 To fix this issue:"
+    echo "   1. Re-authenticate with Salesforce:"
+    echo "      sfdx force:auth:web:login --instance-url https://gus.salesforce.com --alias gus"
+    echo "   2. Re-run the report generation command"
+    echo ""
+    echo "💡 Alternative: Run without --use-salesforce-reports to use local files instead"
+    exit 1
 else
     echo ""
     echo "❌ Report generation failed!"
@@ -198,6 +211,9 @@ else
     echo "   - Missing or invalid .env file with LLM Gateway credentials"
     echo "   - Network connectivity issues"
     echo "   - Invalid data in source files"
+    if [ "$USE_SF_REPORTS" = "1" ]; then
+        echo "   - Salesforce authentication issues (try re-authenticating)"
+    fi
     exit 1
 fi
 
