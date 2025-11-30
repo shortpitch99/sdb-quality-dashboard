@@ -373,14 +373,34 @@ class QualityDataCollector:
             return []
         rows = self._get_rows_from_report(data)
         prbs: List[PRBItem] = []
-        for r in rows:
-            prb_id = str(r.get('SM_Problem__c.Name') or r.get('SM_Problem__c.Id') or '')
-            if not prb_id:
+        
+        for i, r in enumerate(rows):
+            # The report structure for 00OEE000001TXjB2AW doesn't have SM_Problem__c.Name or SM_Problem__c.Id
+            # Instead, we need to create PRB IDs from available data
+            
+            work_id = str(r.get('SM_Problem__c.Initial_Work_Issue__c.Name_label') or '')
+            description = str(r.get('SM_Problem__c.Problem_Description__c') or '')
+            
+            # Skip if no meaningful data
+            if not work_id and not description:
                 continue
-            priority_raw = str(r.get('SM_Problem__c.Problem_Priority__c') or '')
-            priority = {
-                'P0': 'P0-Critical', 'P1': 'P1-High', 'P2': 'P2-Medium', 'P3': 'P3-Low', 'P4': 'P4-Minimal'
-            }.get(priority_raw, priority_raw or 'P2-Medium')
+                
+            # Create synthetic PRB ID from work ID
+            if work_id and work_id != 'None':
+                prb_id = f"PRB-{work_id.replace('W-', '')}"
+            else:
+                # Fallback: use date and row index
+                prb_id = f"PRB-{datetime.now().strftime('%Y%m%d')}{i+1:02d}"
+            
+            # Extract priority from description (SEV-X pattern)
+            priority = 'P2-Medium'  # default
+            import re
+            sev_match = re.search(r'SEV-(\d+)', description)
+            if sev_match:
+                sev_level = sev_match.group(1)
+                priority_map = {'0': 'P0-Critical', '1': 'P1-High', '2': 'P2-Medium', '3': 'P3-Low', '4': 'P4-Minimal'}
+                priority = priority_map.get(sev_level, 'P2-Medium')
+            
             status = str(r.get('SM_Problem__c.Problem_State__c') or 'Open')
             created = r.get('SM_Problem__c.CreatedDate')
             created_date = ''
@@ -415,6 +435,7 @@ class QualityDataCollector:
         for p in prbs:
             uniq[p.id] = p
         self.data['prbs'] = [vars(p) for p in uniq.values()]
+        print(f"Loaded {len(prbs)} PRBs from Salesforce report {report_id}")
         return list(uniq.values())
 
     def load_work_items_from_report(self, report_id: str, session: Dict[str, str], issue_type: str, api_version: str = "v62.0") -> List[Dict[str, Any]]:
