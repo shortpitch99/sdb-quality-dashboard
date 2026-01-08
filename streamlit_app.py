@@ -589,20 +589,20 @@ class QualityReportDashboard:
         # Determine PRB status
         if p0_prbs > 0:
             prb_status = "CRITICAL"
-            prb_color = "#dc3545"  # Red
-            prb_bg_color = "#f8d7da"
+            prb_color = "#C0392B"  # Bright Red
+            prb_bg_color = "#FADBD8"
         elif critical_prbs > 4:
             prb_status = "HIGH RISK"
-            prb_color = "#dc3545"  # Red
-            prb_bg_color = "#f8d7da"
+            prb_color = "#E74C3C"  # Red
+            prb_bg_color = "#FADBD8"
         elif critical_prbs > 2:
             prb_status = "ELEVATED"
-            prb_color = "#ffc107"  # Yellow
-            prb_bg_color = "#fff3cd"
+            prb_color = "#F39C12"  # Orange
+            prb_bg_color = "#FEF9E7"
         else:
             prb_status = "GREEN"
-            prb_color = "#28a745"  # Green
-            prb_bg_color = "#d4edda"
+            prb_color = "#27AE60"  # Green
+            prb_bg_color = "#D5F4E6"
         
         # Production Bug metrics with scoring system
         bugs = data.get('bugs', [])
@@ -618,13 +618,13 @@ class QualityReportDashboard:
         # Determine production bug status based on scoring
         if bug_score > 32:
             prod_bug_status = "RED"
-            prod_bug_color = "#dc3545"
+            prod_bug_color = "#C0392B"
         elif bug_score > 16:
             prod_bug_status = "YELLOW" 
-            prod_bug_color = "#ffc107"
+            prod_bug_color = "#F39C12"
         else:
             prod_bug_status = "GREEN"
-            prod_bug_color = "#28a745"
+            prod_bug_color = "#27AE60"
         
         # Other metrics - use Overall Line Coverage from coverage.txt instead of component average
         coverage_summary = data.get('coverage_summary', {})
@@ -1353,16 +1353,16 @@ class QualityReportDashboard:
                 # Map risk levels to GREEN/YELLOW/RED
                 if churn_risk == 'Low':
                     risk_display = "GREEN"
-                    risk_color = "#28a745"  # Green
+                    risk_color = "#27AE60"  # Green
                 elif churn_risk == 'Medium':
                     risk_display = "YELLOW"
-                    risk_color = "#ffc107"  # Yellow
+                    risk_color = "#F39C12"  # Orange
                 elif churn_risk == 'High':
                     risk_display = "RED"
-                    risk_color = "#dc3545"  # Red
+                    risk_color = "#C0392B"  # Red
                 else:
                     risk_display = churn_risk
-                    risk_color = "#6c757d"  # Gray
+                    risk_color = "#7F8C8D"  # Gray
                 
                 st.markdown(f"""
                 <div style="background-color: white; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e0e0e0;">
@@ -1419,7 +1419,7 @@ class QualityReportDashboard:
                 name='Lines Added',
                 x=categories,
                 y=added_lines,
-                marker_color='#28a745',
+                marker_color='#27AE60',
                 hovertemplate='<b>%{x}</b><br>Added: %{y} lines<extra></extra>'
             ))
             
@@ -1427,7 +1427,7 @@ class QualityReportDashboard:
                 name='Lines Deleted',
                 x=categories,
                 y=deleted_lines,
-                marker_color='#dc3545',
+                marker_color='#C0392B',
                 hovertemplate='<b>%{x}</b><br>Deleted: %{y} lines<extra></extra>'
             ))
             
@@ -2166,7 +2166,7 @@ class QualityReportDashboard:
             name='New Code Coverage',
             x=metrics,
             y=new_code_values,
-            marker_color='#1f77b4',  # Blue
+            marker_color='#3498DB',  # Bright Blue
             hovertemplate='<b>New Code</b><br>%{x}: %{y:.1f}%<extra></extra>'
         ))
         
@@ -2174,7 +2174,7 @@ class QualityReportDashboard:
             name='Overall Coverage',
             x=metrics,
             y=overall_values,
-            marker_color='#ff7f0e',  # Orange
+            marker_color='#E67E22',  # Bright Orange
             hovertemplate='<b>Overall</b><br>%{x}: %{y:.1f}%<extra></extra>'
         ))
         
@@ -2392,9 +2392,9 @@ class QualityReportDashboard:
         
         fig = go.Figure()
         
-        # Color map for priorities
+        # Color map for priorities (distinctive and accessible)
         priority_colors = {
-            'P0': '#dc3545', 'P1': '#fd7e14', 'P2': '#ffc107', 'P3': '#28a745', 'P4': '#6f42c1'
+            'P0': '#C0392B', 'P1': '#E67E22', 'P2': '#F39C12', 'P3': '#27AE60', 'P4': '#8E44AD'
         }
         
         # Create stacked bars - each priority is a layer in the stack
@@ -2455,9 +2455,9 @@ class QualityReportDashboard:
         
         fig = go.Figure()
         
-        # Color map for priorities
+        # Color map for priorities (distinctive and accessible)
         priority_colors = {
-            'P0': '#dc3545', 'P1': '#fd7e14', 'P2': '#ffc107', 'P3': '#28a745', 'P4': '#6f42c1'
+            'P0': '#C0392B', 'P1': '#E67E22', 'P2': '#F39C12', 'P3': '#27AE60', 'P4': '#8E44AD'
         }
         
         for priority in priorities:
@@ -2513,9 +2513,9 @@ class QualityReportDashboard:
         
         fig = go.Figure()
         
-        # Color map for priorities
+        # Color map for priorities (distinctive and accessible)
         priority_colors = {
-            'P0': '#dc3545', 'P1': '#fd7e14', 'P2': '#ffc107', 'P3': '#28a745', 'P4': '#6f42c1'
+            'P0': '#C0392B', 'P1': '#E67E22', 'P2': '#F39C12', 'P3': '#27AE60', 'P4': '#8E44AD'
         }
         
         for priority in priorities:
@@ -2647,15 +2647,15 @@ class QualityReportDashboard:
         # Create dual-axis chart
         fig = make_subplots(specs=[[{"secondary_y": True}]])
 
-        # Define colors for each metric
+        # Define distinctive colors for each metric (improved contrast and accessibility)
         colors = {
-            'Feature Rollout Risk': '#FF6B6B',      # Red
-            'Sev 0/1 PRBs': '#FF8E53',             # Orange
-            'P0/P1 Production Bugs': '#4ECDC4',     # Teal
-            'P0/P1 CI Issues': '#45B7D1',          # Blue
-            'P0/P1 Security Issues': '#96CEB4',     # Green
-            'P0/P1 Left Shift': '#FECA57',         # Yellow
-            'Total Line Coverage %': '#6C5CE7'      # Purple
+            'Feature Rollout Risk': '#E74C3C',      # Bright Red (critical issues)
+            'Sev 0/1 PRBs': '#F39C12',             # Bright Orange (high severity)
+            'P0/P1 Production Bugs': '#8E44AD',     # Purple (production focus)
+            'P0/P1 CI Issues': '#3498DB',          # Bright Blue (CI/CD)
+            'P0/P1 Security Issues': '#27AE60',     # Green (security)
+            'P0/P1 Left Shift': '#E67E22',         # Dark Orange (development)
+            'Total Line Coverage %': '#2C3E50'      # Dark Blue-Gray (coverage metric)
         }
 
         # Left axis: KPI scores
