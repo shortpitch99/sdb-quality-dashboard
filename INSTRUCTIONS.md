@@ -88,3 +88,18 @@ After report generation, view the results in the interactive dashboard:
 - **Fleet Context**: Reports include 795-cell fleet operational context
 - **Git Analysis**: Includes code churn and development velocity metrics
 - **Dashboard vs Report**: Security uses Lightning Dashboard format while others use standard reports
+
+Adding files to github
+cd /Users/rchowdhuri/QC && git add reports/Engine/quality_data_archive_20260108_055152.json weeks/cw01/
+cd /Users/rchowdhuri/QC && git status
+cd /Users/rchowdhuri/QC && git commit -m "Add quality metrics for CW01 2026 and latest Engine report
+
+- Added quality_data_archive_20260108_055152.json with latest Engine metrics
+- Added CW01 2026 data files for Engine component:
+  - avail.txt: System availability metrics
+  - coverage.txt: Code coverage data
+  - deployment.csv: Deployment tracking
+  - risks.txt: Risk assessment data
+- Supports quality tracking and reporting for new calendar year"
+
+cd /Users/rchowdhuri/QC && git push origin main

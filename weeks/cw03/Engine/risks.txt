@@ -1,0 +1,15 @@
+# Risk and Feature Tracking
+# Format: Each feature block should contain Feature, Status, Priority, Description, Updated
+
+Feature: Read your own writes(RYOW)
+Status: Yellow
+Priority: Medium
+Description: Performance enhancement feature for Write Scaling. TLE dark launch mode has been rolled out to multiple cells. However, when rolling out the live mode, we ran into an issue on a couple of cells including the UHG sandbox cell (USA804s) where it seems to run into a possible data corruption issue. However, the guardrails that we implemented in the LSM layer helped detect and prevent those corruptions from persisting. Folowing this, we disabled the rollout of the live mode for RYOW functionality and it has been disabled since mid August when the problem was detected.
+Updated: 2024-01-15
+
+Feature: Allocated Extent Pool
+Status: Green
+Priority: Medium
+Description: Allocated Extent Pools have been running stably in production for 3 months since enabling on usa16s and usa18s on 08/15. This feature continues to deliver on its primary goal of reducing storage catalog writes while maintaining a minimal and stable storage footprint. This post provides a detailed analysis of the feature's behavior and stability over the past 30 days.
+This feature is deemed ready to be enabled in production.
+Updated: 2025-11-21
