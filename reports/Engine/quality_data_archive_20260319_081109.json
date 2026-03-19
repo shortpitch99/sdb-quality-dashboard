@@ -1,0 +1,1838 @@
+{
+  "risks": [
+    {
+      "feature": "Read your own writes(RYOW)",
+      "status": "Yellow",
+      "priority": "Medium",
+      "description": "Performance enhancement feature for Write Scaling. TLE dark launch mode has been rolled out to multiple cells. However, when rolling out the live mode, we ran into an issue on a couple of cells including the UHG sandbox cell (USA804s) where it seems to run into a possible data corruption issue. However, the guardrails that we implemented in the LSM layer helped detect and prevent those corruptions from persisting. Folowing this, we disabled the rollout of the live mode for RYOW functionality and it has been disabled since mid August when the problem was detected.",
+      "last_updated": "2024-01-15"
+    },
+    {
+      "feature": "Allocated Extent Pool",
+      "status": "Green",
+      "priority": "Medium",
+      "description": "Allocated Extent Pools have been running stably in production for 3 months since enabling on usa16s and usa18s on 08/15. This feature continues to deliver on its primary goal of reducing storage catalog writes while maintaining a minimal and stable storage footprint. This post provides a detailed analysis of the feature's behavior and stability over the past 30 days.",
+      "last_updated": "2025-11-21"
+    }
+  ],
+  "prbs": [
+    {
+      "id": "PRB-21588931",
+      "title": "PRB-21588931: Service disruption (general)",
+      "priority": "P2-Medium",
+      "status": "Under Investigation",
+      "description": "Team: SDB App Efficiency (formerly Sayonara Porting) | Impact: Service disruption (general)",
+      "created_date": "2026-03-14",
+      "what_happened": "[THIS PRB IS MANAGED BY G2G. Updates should be made in Google doc]\nA service disruption began at 01:26 UTC on instance USA1000, when host logins started to fail. The primary technical symptom observed is high Application Processing Times (APTs), w",
+      "customer_experience": "User Experience:\n\nComplete Service Disruption of Org62. There was 1 Signature and 2 Basic customer experienced the disruption.\n\nQ: Was this an external customer impacting event?\nA:\n\nQ: User retry may have succeeded?\nA:\n\nImpact Quantification:\n\nQ: What # ...",
+      "proximate_cause": "A PL/SQL process ran as part of a release executed a \"drop dwarf grumpy\" command, which deleted the active database schema ('Grumpy') that the application was using. This action severed the application's connection to the database.",
+      "how_resolved": "Core release 260.10.3 deployment on USA1000 established connection with the SDB.",
+      "team": "SDB App Efficiency (formerly Sayonara Porting)",
+      "customer_impact": "Service disruption (general)"
+    },
+    {
+      "id": "PRB-21577064",
+      "title": "PRB-21577064: Feature degradation / disruption",
+      "priority": "P2-Medium",
+      "status": "Waiting 3rd Party",
+      "description": "Team: CRM Database Sustaining Engineering | Impact: Feature degradation / disruption",
+      "created_date": "2026-03-13",
+      "what_happened": "[THIS PRB IS MANAGED BY G2G. Updates should be made in Google doc]\nCCSRE | Multiple realms down on POD287 impacting Business Manager",
+      "customer_experience": "User Experience:\n\nUsers were seeing \"something went wrong\" messages; Business Manager and Storefront were inaccessible.\n\nQ: Was this an external customer impacting event?\nA:\n\nQ: User retry may have succeeded?\nA:\n\nImpact Quantification:\n\nQ: What # or % of...",
+      "proximate_cause": "An incident that began at 04:11 UTC 03/13/2026 and resurfaced at 06:19 UTC caused a service disruption for multiple live customers on POD 287. After identifying an ethernet link issue on database blade 8-3, the team rebooted the host at 07:01 UTC. The re...",
+      "how_resolved": "The incident, previously thought to be mitigated, resurfaced and expanded. The current mitigation strategy was to remove the faulty database blade (blade 8-3), which has successfully taken the node offline. All customers are now confirmed recovered, and",
+      "team": "CRM Database Sustaining Engineering",
+      "customer_impact": "Feature degradation / disruption"
+    },
+    {
+      "id": "PRB-21532089",
+      "title": "PRB-21532089: Performance degradation (general)",
+      "priority": "P2-Medium",
+      "status": "Under Investigation",
+      "description": "Team: Core Database Performance | Impact: Performance degradation (general)",
+      "created_date": "2026-03-10",
+      "what_happened": "[THIS PRB IS MANAGED BY G2G. Updates should be made in Google doc]\nOn March 10, 2026, from 19:42 to 19:47 UTC, the na253 pod experienced high connection pool utilization, causing performance degradation across 13 application hosts. This was due to",
+      "customer_experience": "User Experience:\n\nThe incident resulted in performance degradation, with users experiencing slow performance and potential timeouts across 13 application hosts. This affected their ability to access and use the service optimally.\n\nQ: Was this an external...",
+      "proximate_cause": "The contributing factor to the incident was identified as a SQL query causing high DB active sessions, which led to increased connection pool utilization on the na253 pod.",
+      "how_resolved": "An auto-remediation was triggered with CSP throttle rules applied to mitigate the issue with RuleID : 08790e35-fb0b-4029-8112-352f84bf2e9c. This was applied at 19:22 UTC.\nURI Throttled : /aura/#aura.ApexAction.execute/#ApexActionController.execute",
+      "team": "Core Database Performance",
+      "customer_impact": "Performance degradation (general)"
+    },
+    {
+      "id": "PRB-21520890",
+      "title": "PRB-21520890: Performance degradation (general)",
+      "priority": "P2-Medium",
+      "status": "Under Investigation",
+      "description": "Team: Core Database Performance | Impact: Performance degradation (general)",
+      "created_date": "2026-03-10",
+      "what_happened": "[THIS PRB IS MANAGED BY G2G. Updates should be made in Google doc]\nFawkes detected Single Org causing Connection Pool Burn rate threshold to be exceededfor Cell: ind2s, Falcon Instance: aws-prod2-apsouth1 StartTime: 2026-03-10 05:50:04.000 , EndTi",
+      "customer_experience": "User Experience:\n\nUsers experienced performance degradation as connection pool timeouts led to intermittent slow performance and connectivity issues.\n\nQ: Was this an external customer impacting event?\nA:\n\nQ: User retry may have succeeded?\nA:\n\nImpact Quan...",
+      "proximate_cause": "The spike was attributed to a sudden burst of connections, likely caused by customer 00D710000015s41 activity, which led to contention on a specific SQL query and resulted in lock timeouts and intermittent issues.",
+      "how_resolved": "The issue got self resolved",
+      "team": "Core Database Performance",
+      "customer_impact": "Performance degradation (general)"
+    },
+    {
+      "id": "PRB-21537120",
+      "title": "PRB-21537120: No Customer Impact (internal or external)",
+      "priority": "P2-Medium",
+      "status": "Under Investigation",
+      "description": "Team: SDB Management Plane | Impact: No Customer Impact (internal or external)",
+      "created_date": "2026-03-11",
+      "what_happened": "[THIS PRB IS MANAGED BY G2G. Updates should be made in Google doc]\nThe SDB MP service instance is down in the esvc/monitoring FD instance.",
+      "customer_experience": "User Experience:\n\nN/A\n\nQ: Was this an external customer impacting event?\nA:\n\nQ: User retry may have succeeded?\nA:\n\nImpact Quantification:\n\nQ: What # or % of users/tenants/requests got impacted? (aggregated across all infra units)\nA:\n\nImpact Details:\n\nQ: ...",
+      "proximate_cause": "N/A",
+      "how_resolved": "N/A",
+      "team": "SDB Management Plane",
+      "customer_impact": "No Customer Impact (internal or external)"
+    }
+  ],
+  "bugs": [
+    {
+      "work_id": "W-21460014",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][usa3h1] insufficient data left in message",
+      "status": "In Progress",
+      "build_version": "",
+      "created_date": "2026-03-19",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-21636557",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][INTERNAL_ERROR][usa4s] RYOW fetch with a local sequence number. TopXid:13835116711650525184 at character 71",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-03-19",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-21640821",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][ABS][INTERNAL_ERROR] RYOW fetch with a local sequence number. TopXid:13835060151226204160",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-03-19",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-21047929",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDBFalcon - core/sdb17 - sdb service unavailable for 7min+ with primary az partitioned from both secondary az's",
+      "status": "Triaged",
+      "build_version": "",
+      "created_date": "2026-03-19",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-21650292",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][usa18s] Standby has fallen more than 300000 milliseconds behind the master's ...",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-03-19",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-21658173",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][usa6s] Error reported in earlier RPC, no more batch inserts processed, need rollback to continue",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-03-19",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-21658185",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][usa6s] Error reported in earlier RPC, no more batch inserts processed, need rollback to continue",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-03-19",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-21661292",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][usa5h1] prepared statement \"X\" does not exist",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-03-19",
+      "issue_type": "Bug"
+    }
+  ],
+  "critical_issues": [],
+  "deployments": [
+    {
+      "stagger": "SB0",
+      "version": "260.9",
+      "count": 1,
+      "stage": "SB0",
+      "cells": 1
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.3",
+      "count": 162,
+      "stage": "R2a.1",
+      "cells": 162
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "260.15",
+      "count": 1,
+      "stage": "SB1.2",
+      "cells": 1
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "262.3",
+      "count": 221,
+      "stage": "R2a.2",
+      "cells": 221
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.7",
+      "count": 30,
+      "stage": "SB1.1",
+      "cells": 30
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.7",
+      "count": 15,
+      "stage": "SB2.2",
+      "cells": 15
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.3",
+      "count": 2,
+      "stage": "SB1.1",
+      "cells": 2
+    },
+    {
+      "stagger": "R0.2",
+      "version": "262.3",
+      "count": 3,
+      "stage": "R0.2",
+      "cells": 3
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.3",
+      "count": 59,
+      "stage": "R2b.2",
+      "cells": 59
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.3",
+      "count": 2,
+      "stage": "SB1.2",
+      "cells": 2
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "260.1",
+      "count": 1,
+      "stage": "SB1.2",
+      "cells": 1
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.12",
+      "count": 4,
+      "stage": "SB1.1",
+      "cells": 4
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.12",
+      "count": 2,
+      "stage": "SB0",
+      "cells": 2
+    },
+    {
+      "stagger": "R1.1",
+      "version": "260.15",
+      "count": 1,
+      "stage": "R1.1",
+      "cells": 1
+    },
+    {
+      "stagger": "R1.1",
+      "version": "262.3",
+      "count": 57,
+      "stage": "R1.1",
+      "cells": 57
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.3",
+      "count": 1,
+      "stage": "SB0",
+      "cells": 1
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.7",
+      "count": 42,
+      "stage": "SB1.2",
+      "cells": 42
+    },
+    {
+      "stagger": "SB2.1",
+      "version": "262.9",
+      "count": 5,
+      "stage": "SB2.1",
+      "cells": 5
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.9",
+      "count": 2,
+      "stage": "SB2.2",
+      "cells": 2
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "260.15",
+      "count": 2,
+      "stage": "R2a.2",
+      "cells": 2
+    },
+    {
+      "stagger": "R0.1",
+      "version": "262.12",
+      "count": 2,
+      "stage": "R0.1",
+      "cells": 2
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.9",
+      "count": 31,
+      "stage": "SB1.1",
+      "cells": 31
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.3",
+      "count": 1,
+      "stage": "SB2.2",
+      "cells": 1
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "260.15",
+      "count": 22,
+      "stage": "R2a.1",
+      "cells": 22
+    },
+    {
+      "stagger": "SB2.1",
+      "version": "262.7",
+      "count": 17,
+      "stage": "SB2.1",
+      "cells": 17
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.9",
+      "count": 18,
+      "stage": "SB1.2",
+      "cells": 18
+    },
+    {
+      "stagger": "R1.2",
+      "version": "262.3",
+      "count": 47,
+      "stage": "R1.2",
+      "cells": 47
+    },
+    {
+      "stagger": "R0.1",
+      "version": "262.3",
+      "count": 5,
+      "stage": "R0.1",
+      "cells": 5
+    },
+    {
+      "stagger": "R2b.1",
+      "version": "262.3",
+      "count": 25,
+      "stage": "R2b.1",
+      "cells": 25
+    }
+  ],
+  "deployment_summary": "Weekly Deployment Summary - Week of September 15, 2025\n\nThis week's deployment activities proceeded smoothly across all stagger groups. \nSDB version 258.11 was successfully deployed to sandbox environments (SB0-SB2) \nwith no major issues reported.\n\nKey highlights:\n- Version 258.11 rolled out to 150 sandbox cells\n- Zero failed deployments\n- Average deployment time: 12 minutes\n- All post-deployment validations passed\n\nNext week: Planning production rollout to P0-P3 stages pending final validation results.",
+  "coverage": [],
+  "new_code_coverage": [
+    {
+      "component": "SDB Engine",
+      "new_code_coverage": 0.0,
+      "overall_coverage": 68.0,
+      "new_code_line_coverage": 0.0,
+      "overall_line_coverage": 81.2,
+      "lines_to_cover": 0,
+      "uncovered_lines": 0,
+      "overall_lines_to_cover": 562541,
+      "overall_uncovered_lines": 105901
+    }
+  ],
+  "ci_issues": [
+    {
+      "work_id": "W-20230450",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDB-JUnitStress-LD-FC-mixed-workload-RHEL9.mixed-workload:  sdb_stress_test_tab1x_idx_sec_9761 Base Table Name : sdb_stress_test_tab1 Details of last inconsistency: Record count mismatch  +  PSQLExcep",
+      "status": "Triaged",
+      "build_version": "sdb.260.15",
+      "created_date": "2025-11-15",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19860706",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDB-JUnitStress-sandbox-stress-TLE-key-deriv-RHEL9.sandbox-stress: 1,[::1], port=62780, expectedState=UP]: Last Error: dbsay`20251009182106.748208`",
+      "status": "Triaged",
+      "build_version": "sdb.260.10",
+      "created_date": "2025-10-09",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19726659",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "MergeMergeConflictTest.testTombstoneOverlapMergeConflictRatio: PSQLException: An I/O error occurred while sending to t",
+      "status": "Triaged",
+      "build_version": "sdb.260.8",
+      "created_date": "2025-09-24",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19626626",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDB-JUnitStress-sandbox-stress-encryption-kms-RHEL9.sandbox-stress-encryption-kms: PSQLException: ERROR: FAILED: get_current_active_server",
+      "status": "Triaged",
+      "build_version": "sdb.260.7",
+      "created_date": "2025-09-12",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-21401725",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "Tombstone merge candidate selection breaks early, skipping candidates from other LSM levels when per-level limit is reached",
+      "status": "New",
+      "build_version": "sdb.260.15",
+      "created_date": "2026-03-02",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20108133",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "MergeEventTraceTest.testTerminateOnMaxER: AssertionFailedError: expected:<1> but was:<0>",
+      "status": "New",
+      "build_version": "sdb.260.14",
+      "created_date": "2025-11-03",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-21210960",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "Regression in sdb_activity_statement.elapsed_time calculation in 260.15.4",
+      "status": "New",
+      "build_version": "260",
+      "created_date": "2026-02-08",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20285195",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "Trap in main_sanity_sdb (Sayonara 260.9.0)",
+      "status": "Ready for Review",
+      "build_version": "sdb.260.9",
+      "created_date": "2025-11-20",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-21164651",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "Trap file after using SET configuration_parameter TO value clause in CREATE FUNCTION",
+      "status": "New",
+      "build_version": "sdb.260.16",
+      "created_date": "2026-02-03",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-21112987",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][usa3s] out of memory",
+      "status": "Waiting",
+      "build_version": "sdb.260.15",
+      "created_date": "2026-01-30",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20889732",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][INTERNAL_ERROR][usa6s] cache lookup failed for type 1329526563",
+      "status": "Waiting",
+      "build_version": "sdb.260.15",
+      "created_date": "2026-01-13",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-21512555",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "ZDT TC sync triggers are not visible on ZDT TC BlackTab page",
+      "status": "Ready for Review",
+      "build_version": "260.10",
+      "created_date": "2026-03-09",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20440787",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][usa996s] there is already a transaction in progress",
+      "status": "Waiting",
+      "build_version": "sdb.260.9",
+      "created_date": "2025-12-05",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19978605",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "PhysicalRelationIDTest.testCollisionOfAutomaticPhyIds: PSQLException: ERROR: The snapshot we are trying to cac",
+      "status": "Triaged",
+      "build_version": "sdb.260.11",
+      "created_date": "2025-10-17",
+      "issue_type": "CI"
+    }
+  ],
+  "leftshift_issues": [
+    {
+      "work_id": "W-19399167",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDBFalcon - core/sdb33s - dbschema 258/postscripts failed after running for 20 hours",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-03-19",
+      "issue_type": "LeftShift"
+    },
+    {
+      "work_id": "W-19813453",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "coreapp shutdown failing for sdb900s due to missing artifacts",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-03-19",
+      "issue_type": "LeftShift"
+    }
+  ],
+  "abs_issues": [],
+  "security_issues": [
+    {
+      "work_id": "W-14324477",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "ARRAY_VS_SINGLETON - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/contrib/pgvector/src/ivfinsert.c (1 issues)",
+      "status": "New",
+      "build_version": "sdb.248.25",
+      "created_date": "2026-03-19",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-14324465",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "ARRAY_VS_SINGLETON - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/contrib/pgvector/src/ivfbuild.c (2 issues)",
+      "status": "New",
+      "build_version": "sdb.248.25",
+      "created_date": "2026-03-19",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-20482272",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "OVERRUN - /src/backend/access/common/lsmkey.c (1 issues)",
+      "status": "New",
+      "build_version": "None",
+      "created_date": "2026-03-19",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21103239",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "UNINIT - /src/backend/executor/execExprInterp.c (1 issues)",
+      "status": "New",
+      "build_version": "None",
+      "created_date": "2026-03-19",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21103241",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "RESOURCE_LEAK - /src/test/regress/pg_regress.c (1 issues)",
+      "status": "New",
+      "build_version": "None",
+      "created_date": "2026-03-19",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21103240",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "UNINIT - /src/backend/optimizer/path/indxpath.c (2 issues)",
+      "status": "New",
+      "build_version": "None",
+      "created_date": "2026-03-19",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21435466",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "Y2K38_SAFETY - /src/backend/lsmp/materializer/test/materializer_test_utils.c (1 issues)",
+      "status": "New",
+      "build_version": "None",
+      "created_date": "2026-03-19",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21435467",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "RETURN_LOCAL - /src/backend/keystone/catalog/catsrv_zk.c (1 issues)",
+      "status": "New",
+      "build_version": "None",
+      "created_date": "2026-03-19",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21435468",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "UNINIT - /src/backend/ws/cluster/wscluster_impl.c (1 issues)",
+      "status": "New",
+      "build_version": "None",
+      "created_date": "2026-03-19",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21435464",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "RESOURCE_LEAK - /src/test/regress/pg_regress.c (1 issues)",
+      "status": "New",
+      "build_version": "None",
+      "created_date": "2026-03-19",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-13140867",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "OVERRUN - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/src/backend/replication/pg_workflow_extra.c (1 issues)",
+      "status": "New",
+      "build_version": "sdb.246.9",
+      "created_date": "2026-03-19",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-19647997",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "OVERRUN - /src/backend/utils/adt/jsonpath_gram.c (1 issues)",
+      "status": "New",
+      "build_version": "None",
+      "created_date": "2026-03-19",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-19647996",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "UNINIT - /src/backend/utils/adt/jsonpath_gram.c (2 issues)",
+      "status": "New",
+      "build_version": "None",
+      "created_date": "2026-03-19",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-19647998",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "ARRAY_VS_SINGLETON - /src/backend/utils/adt/jsonpath_gram.c (1 issues)",
+      "status": "New",
+      "build_version": "None",
+      "created_date": "2026-03-19",
+      "issue_type": "security"
+    }
+  ],
+  "all_bugs": [],
+  "prb_bugs": [],
+  "system_availability": {
+    "period": "",
+    "slo": 99.9,
+    "achieved": 99.99,
+    "incidents": []
+  },
+  "kpis": {
+    "all_time_bug_backlog_total": 0,
+    "all_time_bug_backlog_p0": 0,
+    "all_time_bug_backlog_p1": 0,
+    "all_time_bug_backlog_p0_p1": 0,
+    "prb_backlog_total": 0,
+    "prb_backlog_p0_p1": 0
+  },
+  "git_stats": {
+    "reporting_period_start": "2026-03-09",
+    "reporting_period_end": "2026-03-15",
+    "total_commits": 46,
+    "lines_added": 4980,
+    "lines_deleted": 550,
+    "lines_changed": 5530,
+    "files_changed": 101,
+    "authors": [
+      "Ankit Sharma",
+      "Calvin Wang",
+      "Chris Drexelius",
+      "Dipesh Pandit",
+      "Dongfang Ling",
+      "Jacob Park",
+      "Jason Young",
+      "Jun Chen",
+      "Jun Yuan",
+      "Karan Mehta",
+      "Kun Ren",
+      "Mark Mears",
+      "Matt Woicik",
+      "Muthukumaran Raveendiran",
+      "Sagar Ranadive",
+      "Sanjib Ghosh",
+      "Sanjib Mishra",
+      "Sanoop Nambiar",
+      "Shao Yuan Ho",
+      "Shreyas Belur Sampath",
+      "svc_sdb_infra_agent",
+      "Swadesh Bhattarai",
+      "Terry Chong",
+      "Theo",
+      "Theo Vanderkooy",
+      "tok-sfci124",
+      "Xinan Yan"
+    ],
+    "most_changed_files": [
+      {
+        "file": "postgresql/src/backend/access/transam/lsmxlog_schema.c",
+        "lines_added": 1209,
+        "lines_deleted": 0,
+        "total_changes": 1209
+      },
+      {
+        "file": "postgresql/src/backend/access/transam/lsmxlog2.c",
+        "lines_added": 476,
+        "lines_deleted": 80,
+        "total_changes": 556
+      },
+      {
+        "file": "postgresql/src/backend/keystone/catalog/PreHydratedExtentSetList.c",
+        "lines_added": 363,
+        "lines_deleted": 0,
+        "total_changes": 363
+      },
+      {
+        "file": "postgresql/src/bin/scripts/sdbconf",
+        "lines_added": 277,
+        "lines_deleted": 3,
+        "total_changes": 280
+      },
+      {
+        "file": "postgresql/src/backend/access/transam/xlog_redo.c",
+        "lines_added": 90,
+        "lines_deleted": 122,
+        "total_changes": 212
+      },
+      {
+        "file": "postgresql/src/backend/keystone/catalog/CatalogServer.c",
+        "lines_added": 189,
+        "lines_deleted": 13,
+        "total_changes": 202
+      },
+      {
+        "file": "postgresql/src/include/access/lsmxlog_lr.h",
+        "lines_added": 181,
+        "lines_deleted": 1,
+        "total_changes": 182
+      },
+      {
+        "file": "postgresql/src/backend/access/transam/lsmxlog_schema.h",
+        "lines_added": 181,
+        "lines_deleted": 0,
+        "total_changes": 181
+      },
+      {
+        "file": "postgresql/src/backend/commands/analyze.c",
+        "lines_added": 147,
+        "lines_deleted": 6,
+        "total_changes": 153
+      },
+      {
+        "file": "postgresql/contrib/storage/storage.c",
+        "lines_added": 138,
+        "lines_deleted": 1,
+        "total_changes": 139
+      }
+    ],
+    "commit_frequency": 6.571428571428571,
+    "code_churn_risk": "Low"
+  },
+  "generated_at": "2026-03-19T08:11:00.674345",
+  "coverage_summary": {
+    "new_code": {
+      "coverage": 0.0,
+      "line_coverage": 0.0,
+      "condition_coverage": 0.0,
+      "lines_to_cover": 0,
+      "uncovered_lines": 0,
+      "conditions_to_cover": 0,
+      "uncovered_conditions": 0
+    },
+    "overall": {
+      "coverage": 68.0,
+      "line_coverage": 81.2,
+      "condition_coverage": 53.0,
+      "lines_to_cover": 562541,
+      "uncovered_lines": 105901,
+      "conditions_to_cover": 493852,
+      "uncovered_conditions": 232082
+    }
+  },
+  "alltime_backlog": [
+    {
+      "work_id": "Bug_1",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_2",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_3",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_4",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_5",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_6",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_7",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_8",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_9",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_10",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_11",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_12",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_13",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_14",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_15",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_16",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_17",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_18",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_19",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_20",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_21",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_22",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_23",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_24",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_25",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_26",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_27",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_28",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_29",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_30",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_31",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_32",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_33",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_34",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_35",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_36",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_37",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_38",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_39",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_40",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_41",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_42",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_43",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_44",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_45",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_46",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_47",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_48",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_49",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_50",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_51",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_52",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_53",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_54",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_55",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_56",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_57",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_58",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_59",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_60",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_61",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_62",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_63",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_64",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_65",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_66",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_67",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_68",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_69",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_70",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_71",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_72",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_73",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_74",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_75",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_76",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_77",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_78",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_79",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_80",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_81",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_82",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_83",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_84",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_85",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-03-19",
+      "type": "backlog_bug"
+    }
+  ],
+  "prb_backlog": [
+    {
+      "work_id": "PRB_Work_1",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "CRM Database Sustaining Engineering - APAC",
+      "subject": "Work with Observability Team to create a Fawkes alert for sustained catalog contention caused by daemons",
+      "status": "New",
+      "created_date": "2024-11-01",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_2",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "CRM Database Sustaining Engineering - APAC",
+      "subject": "Enable range-delete optimization for avoiding slicing for empty key-ranges for table truncation (TRUNCATE TABLE FOR TENANT)",
+      "status": "New",
+      "created_date": "2024-10-23",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_3",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "SDB Store / Zk Management",
+      "subject": "NFR: Long recovery should not cause pipelines to fail or disrupt service availability.",
+      "status": "Waiting",
+      "created_date": "2024-10-22",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_4",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "SDB Store / Zk Management",
+      "subject": "NFR: Recovery should succeed when memstore ringbuffer is full to last byte on primary",
+      "status": "Waiting",
+      "created_date": "2024-10-22",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_5",
+      "priority": "P2",
+      "severity": "3",
+      "team": "Sayonara TxP",
+      "subject": "Analysis and Investigation for Internal Root Cause Analysis for PRB-0029575",
+      "status": "New",
+      "created_date": "2025-12-18",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_6",
+      "priority": "P2",
+      "severity": "4",
+      "team": "Connection Pool",
+      "subject": "Investigate function cache eviction issue on perf cells due to inconsistent global metrics values",
+      "status": "New",
+      "created_date": "2026-03-13",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_7",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "Sandbox",
+      "subject": "Fix interaction between merge private EAs and max_data_extents",
+      "status": "New",
+      "created_date": "2024-02-12",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_8",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "CRM Database Sustaining Engineering",
+      "subject": "NFR: Eliminate Rollback Processing from the Critical Path during Promotion and Soft Restart",
+      "status": "Waiting",
+      "created_date": "2023-07-03",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_9",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "Sayonara TxP",
+      "subject": "Fix CPU/WAIT time accounting for txnproc_bank_block_acquire() and txnproc_bank_block_free()",
+      "status": "New",
+      "created_date": "2024-09-10",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_10",
+      "priority": "P2",
+      "severity": "2",
+      "team": "CRM Database Sustaining Engineering - US",
+      "subject": "[Warden AIOps] APT degradation detected in Cell: usa288, FI: AWS-PROD5-USWEST2 (PRB-0030224)",
+      "status": "Investigating",
+      "created_date": "2026-03-04",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_11",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "Sayonara Data Management",
+      "subject": "Raise alert if extent index root page running out of blocks",
+      "status": "New",
+      "created_date": "2023-07-03",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_12",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "HTP VAT",
+      "subject": "review SDB AZ fault chaos testing after sweden incident",
+      "status": "In Progress",
+      "created_date": "2025-03-11",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_13",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "Sayonara Data Management",
+      "subject": "Implement guardrails around tenant snapshot creation and export to prevent snapshots with excessive levels of stacking",
+      "status": "Triaged",
+      "created_date": "2025-11-06",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_14",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "Sayonara Data Management",
+      "subject": "Implement counting of range tombstones in Memstore to apply backpressure before excessive slicing is irreversible",
+      "status": "In Progress",
+      "created_date": "2025-11-06",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_15",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "Sayonara Data Management",
+      "subject": "JPN182S: Monitoring improvements",
+      "status": "Triaged",
+      "created_date": "2025-11-06",
+      "type": "prb_backlog"
+    }
+  ],
+  "metadata": {
+    "generated_at": "2026-03-19T08:13:25.180312",
+    "report_period_start": "2026-03-09",
+    "report_period_end": "2026-03-15",
+    "report_period_display": "March 09-15, 2026",
+    "generator_version": "2.0",
+    "data_sources": {
+      "risks": 2,
+      "prbs": 5,
+      "bugs": 8,
+      "deployments": 29,
+      "has_llm_content": true,
+      "ci_total": 14,
+      "ci_p0_p1": 0,
+      "security_total": 14,
+      "security_p0_p1": 0,
+      "leftshift_total": 2,
+      "leftshift_p0_p1": 0,
+      "coverage_overall": 68.0,
+      "coverage_overall_line": 81.2,
+      "coverage_new_code": 0.0,
+      "coverage_new_code_line": 0.0
+    }
+  },
+  "llm_content": {
+    "trend_analysis": "## Quality Trends Analysis\n\n### Overall System Health: **MODERATE** \u26a0\ufe0f\n\n**Key Insights:**\n\n**Positive Indicators:**\n- **Zero security issues** - Excellent security posture maintained\n- **Low risk count (2)** - Suggests good risk management and mitigation strategies\n- **Manageable defect volume** - Total of 13 issues across all categories indicates controlled quality state\n\n**Areas of Concern:**\n- **Bug-to-PRB ratio of 1.6:1** - Higher than optimal; indicates potential gaps in early defect detection\n- **PRB count (5)** suggests some customer-impacting issues have escaped to production\n\n**Trend Assessment:**\nThe quality metrics suggest a **stable but improvable** system. While the overall defect count is reasonable and security remains strong, the bug distribution pattern indicates opportunities for:\n\n1. **Enhanced testing coverage** to catch more defects pre-release\n2. **Improved defect prevention** processes to reduce PRB generation\n3. **Root cause analysis** on the 5 PRBs to prevent similar escapes\n\n**Recommendation:** Focus on shifting quality left in the development cycle to convert potential PRBs into earlier-stage bugs, maintaining the current strong security and risk management practices.\n\n**Health Score: 7/10** - Solid foundation with clear improvement opportunities.",
+    "risk_analysis": "### Deployment Risk Assessment - SDB Version 258.11\n\n#### Executive Summary\n\nThe sandbox deployment of SDB version 258.11 demonstrates strong stability indicators with zero failures across 150 cells. However, the upcoming production rollout requires careful consideration of several risk factors and validation gaps.\n\n#### Deployment Stability Analysis\n\n##### Current Performance Metrics\n- **Success Rate**: 100% (150/150 sandbox cells)\n- **Deployment Duration**: 12 minutes average (within acceptable range)\n- **Validation Status**: All post-deployment checks passed\n- **Infrastructure Impact**: No reported issues across SB0-SB2 environments\n\n##### Stability Risk Assessment\n**Risk Level: LOW-MEDIUM**\n\nThe sandbox deployment shows excellent technical execution, but limited scope testing raises concerns for production readiness.\n\n#### Code Change Impact Evaluation\n\n##### Missing Critical Information\n- **Change Scope**: No details on feature modifications, bug fixes, or architectural changes\n- **Backward Compatibility**: Compatibility assessment not documented\n- **Performance Impact**: No baseline performance comparisons provided\n- **Database Changes**: Schema or data migration impacts unclear\n\n##### Potential Impact Areas\n- **User-Facing Features**: Unknown scope of UI/UX changes\n- **API Modifications**: Potential breaking changes not assessed\n- **Integration Points**: Third-party service compatibility unclear\n- **Data Integrity**: Migration or transformation risks not evaluated\n\n#### Production Rollout Risk Factors\n\n##### High-Risk Considerations\n1. **Limited Test Coverage**: Only sandbox environments tested (SB0-SB2)\n2. **Production Load Differences**: Sandbox may not reflect production traffic patterns\n3. **Data Volume Variance**: Production datasets likely significantly larger\n4. **Integration Complexity**: Production has more external dependencies\n\n##### Recommended Risk Mitigation\n\n###### Pre-Production Requirements\n- **Comprehensive Change Documentation**: Detailed feature and technical change log\n- **Performance Baseline Testing**: Load testing with production-like data volumes\n- **Rollback Strategy**: Verified rollback procedures and timing estimates\n- **Monitoring Enhancement**: Additional alerting for new features/changes\n\n###### Staged Rollout Strategy\n- **P0 Pilot Deployment**: Single production cell with enhanced monitoring\n- **Validation Gates**: Defined success criteria before P1-P3 progression\n- **Traffic Monitoring**: Real-time performance and error rate tracking\n- **Stakeholder Communication**: Clear escalation and communication protocols\n\n#### Recommendations\n\n##### Immediate Actions Required\n1. **Document Code Changes**: Provide comprehensive change impact analysis\n2. **Performance Testing**: Execute production-scale load testing\n3. **Rollback Validation**: Test and time rollback procedures\n4. **Monitoring Setup**: Implement enhanced observability for new version\n\n##### Go/No-Go Criteria for Production\n- All change documentation completed and reviewed\n- Performance testing shows no degradation\n- Rollback procedures validated and documented\n- Incident response team availability confirmed\n- Business stakeholder approval obtained\n\n**Overall Recommendation**: Proceed with caution. While sandbox deployment success is encouraging, additional validation and documentation are essential before production rollout.",
+    "prb_narratives": {
+      "PRB-21588931": "**Problem Type:** Database schema deletion caused service disruption with failed host logins and high application processing times.\n\n**Root Cause:** A PL/SQL process during release execution incorrectly ran a \"drop dwarf grumpy\" command that deleted the active 'Grumpy' database schema, severing the application's database connection.\n\n**Resolution:** Core release 260.10.3 was deployed on USA1000 to reestablish the connection with the SDB database.\n\n**Next Steps:** Implement safeguards to prevent accidental schema deletion during release processes and review deployment procedures.",
+      "PRB-21577064": "**Problem Type:** Database service disruption caused by hardware failure affecting multiple customer realms on POD287.\n\n**Root Cause:** An ethernet link issue on database blade 8-3 caused intermittent connectivity problems that persisted despite initial reboot attempts.\n\n**Resolution:** The faulty database blade 8-3 was physically removed from service, successfully restoring connectivity for all affected customers.\n\n**Next Steps:** Hardware replacement and investigation into why the initial reboot mitigation failed to permanently resolve the ethernet link issue.",
+      "PRB-21532089": "**Problem Type:** Database connection pool exhaustion caused by inefficient SQL query execution leading to performance degradation across multiple application hosts.\n\n**Root Cause:** A specific SQL query generated excessive database active sessions, overwhelming the connection pool on the na253 pod and degrading performance for 13 application hosts.\n\n**Resolution:** Auto-remediation system activated CSP throttle rules (RuleID: 08790e35-fb0b-4029-8112-352f84bf2e9c) to limit traffic to the problematic URI endpoint at 19:22 UTC.\n\n**Next Steps:** The \"Next Steps\" section in the PRB is incomplete and requires follow-up documentation of planned query optimization and monitoring improvements.",
+      "PRB-21520890": "**Problem Type:** Database connection pool exhaustion caused by excessive connection burn rate from a single customer organization.\n\n**Root Cause:** Customer 00D710000015s41 generated a sudden burst of connections that caused SQL query contention, leading to lock timeouts and connection pool threshold violations.\n\n**Resolution:** The issue self-resolved without manual intervention as the connection burst subsided naturally.\n\n**Next Steps:** Implement connection rate limiting or monitoring alerts for single-org connection patterns to prevent future pool exhaustion incidents.",
+      "PRB-21537120": "**Problem Type:** SDB Management Plane service instance failure in the esvc/monitoring fault domain with no customer impact.\n\n**Root Cause:** Insufficient technical details provided as this PRB is managed externally through G2G with updates tracked in a separate Google document.\n\n**Resolution:** Resolution details not available in the current PRB record due to external management process.\n\n**Next Steps:** Monitor the associated Google document for technical root cause analysis, resolution details, and preventive measures to avoid future service instance failures."
+    },
+    "prb_analyses": {
+      "PRB-21588931": "# Technical Analysis Report: PRB-21588931\n\n## **Technical Impact**\n\n**Severity Assessment:** Critical service outage with complete application functionality loss\n\n**Primary Impact Vectors:**\n- **Database Connectivity Failure:** Complete severance of application-database connection following accidental schema deletion\n- **Authentication System Breakdown:** Host login failures across the USA1000 instance, preventing user access\n- **Performance Degradation:** Significant elevation in Application Processing Times (APTs) due to failed database queries and connection timeouts\n- **Service Availability:** Total service disruption affecting all users on the USA1000 instance starting at 01:26 UTC\n\n**Downstream Effects:**\n- User session terminations and inability to establish new connections\n- Data transaction failures and potential data integrity concerns\n- Cascading failures in dependent services relying on the affected database schema\n- Operational monitoring and logging disruptions due to database unavailability\n\n## **Root Cause Analysis**\n\n**Primary Root Cause:** Human error during release deployment process\n\n**Technical Failure Chain:**\n1. **Release Execution Error:** During core release deployment, a PL/SQL process incorrectly executed a `DROP DWARF GRUMPY` command\n2. **Schema Deletion:** The command resulted in the deletion of the active 'Grumpy' database schema, which served as the primary data layer for the application\n3. **Connection Severing:** Loss of the active schema immediately broke all existing database connections and prevented new connection establishment\n4. **Authentication Cascade Failure:** Host login system, dependent on database authentication tables within the deleted schema, became non-functional\n\n**Contributing Factors:**\n- **Inadequate Release Validation:** Insufficient pre-deployment testing of PL/SQL scripts\n- **Missing Safeguards:** Absence of schema protection mechanisms during release operations\n- **Process Control Gaps:** Lack of automated validation to prevent destructive commands during deployment\n\n**Technical Analysis:**\n- The `DROP DWARF GRUMPY` command suggests either a scripting error or incorrect parameter substitution during the automated release process\n- The immediate impact on APTs indicates the application lacked graceful database failure handling\n- Authentication system's tight coupling to the database schema created a single point of failure\n\n## **Resolution Applied**\n\n**Immediate Recovery Action:** Core release 260.10.3 deployment\n\n**Resolution Methodology:**\n1. **Schema Restoration:** The 260.10.3 release package included database schema reconstruction components to rebuild the 'Grumpy' schema\n2. **Connection Re-establishment:** New release deployment restored the application's ability to connect to the SDB (Shared Database)\n3. **Service Recovery:** Post-deployment verification confirmed restoration of host login functionality and normalization of APTs\n\n**Technical Implementation:**\n- Deployment of pre-validated release package containing schema recreation scripts\n- Database connection pool reset and re-initialization\n- Application service restart to clear cached connection states\n- Verification of authentication service functionality\n\n**Recovery Time Considerations:**\n- Resolution required full release deployment rather than simple rollback, indicating the severity of the schema loss\n- The use of a subsequent release (260.10.3) suggests the original deployment was not easily reversible\n\n## **Preventive Measures**\n\n**Immediate Technical Controls:**\n1. **Schema Protection Implementation:**\n   - Deploy database-level constraints preventing DROP operations on production schemas during release windows\n   - Implement schema backup automation before any release deployment\n   - Establish read-only periods during critical deployment phases\n\n2. **Release Process Hardening:**\n   - Mandatory PL/SQL script validation and dry-run testing in staging environments\n   - Implementation of deployment approval gates requiring explicit confirmation for destructive operations\n   - Automated syntax and semantic validation of all database scripts before production execution\n\n3. **Monitoring and Alerting Enhancements:**\n   - Real-time schema integrity monitoring with immediate alerting on structural changes\n   - Database connection health monitoring with automatic failover capabilities\n   - APT threshold alerting to detect performance degradation within minutes\n\n**Strategic Process Improvements:**\n1. **Deployment Architecture:**\n   - Implement blue-green deployment strategy to enable rapid rollback capabilities\n   - Establish database connection abstraction layer to reduce tight coupling\n   - Deploy circuit breaker patterns for graceful degradation during database issues\n\n2. **Quality Assurance Framework:**\n   - Mandatory peer review for all database modification scripts\n   - Automated regression testing including schema integrity validation\n   - Production-like staging environment with identical schema structures\n\n3. **Operational Resilience",
+      "PRB-21577064": "# Technical Analysis - PRB-21577064\n\n## **Technical Impact**\n\n**Severity Assessment:** P2-Medium priority incident with significant customer-facing impact\n\n**Affected Infrastructure:**\n- **Primary System:** POD287 database cluster\n- **Failed Component:** Database blade 8-3 (ethernet link failure)\n- **Service Impact:** Multiple customer realms experiencing Business Manager service disruption\n- **Duration:** Initial incident at 04:11 UTC, resurfaced at 06:19 UTC on 03/13/2026\n\n**Business Impact:**\n- Multiple live customers on POD287 experienced feature degradation/disruption\n- Business Manager functionality compromised across affected realms\n- Service availability reduced during peak business hours\n- Customer experience degraded until full mitigation at 07:01+ UTC\n\n## **Root Cause Analysis**\n\n**Primary Root Cause:** Hardware failure - Ethernet link degradation/failure on database blade 8-3\n\n**Technical Failure Chain:**\n1. **Initial Trigger:** Ethernet connectivity issues on blade 8-3 caused database node instability\n2. **Cascade Effect:** Database cluster experienced partial node failure, impacting data availability\n3. **Service Degradation:** CRM database queries began failing or timing out\n4. **Customer Impact:** Business Manager features became unavailable or severely degraded\n5. **Recurrence Factor:** Initial mitigation was insufficient, causing incident resurgence at 06:19 UTC\n\n**Contributing Factors:**\n- Hardware aging/wear on ethernet components\n- Potential insufficient monitoring of network interface health\n- Initial mitigation strategy was not comprehensive enough to prevent recurrence\n- Database cluster may have lacked sufficient redundancy for this failure mode\n\n**Technical Analysis:**\n- Network interface card (NIC) or ethernet port hardware failure\n- Possible intermittent connectivity causing split-brain scenarios in database cluster\n- Database synchronization issues due to unreliable network connectivity\n\n## **Resolution Applied**\n\n**Immediate Response Strategy:**\n1. **Detection & Triage:** Incident identified at 04:11 UTC through monitoring systems\n2. **Initial Mitigation:** Host reboot attempted at 07:01 UTC to restore connectivity\n3. **Escalation:** When incident resurfaced at 06:19 UTC, more aggressive action taken\n4. **Final Resolution:** Complete removal of faulty database blade 8-3 from cluster\n\n**Technical Resolution Steps:**\n1. **Node Isolation:** Safely removed blade 8-3 from active database cluster\n2. **Traffic Redistribution:** Redirected database queries to healthy cluster nodes\n3. **Service Validation:** Confirmed all customer realms restored to full functionality\n4. **Monitoring Enhancement:** Increased monitoring of remaining cluster nodes\n\n**Recovery Verification:**\n- All affected customer realms confirmed operational\n- Business Manager functionality fully restored\n- Database cluster operating in degraded but stable configuration\n\n## **Preventive Measures**\n\n**Immediate Actions (0-30 days):**\n1. **Hardware Replacement:** Procure and install replacement database blade for POD287\n2. **Enhanced Monitoring:** Implement proactive ethernet link health monitoring\n3. **Cluster Health Assessment:** Comprehensive review of remaining database blades\n4. **Documentation Update:** Revise incident response procedures for hardware failures\n\n**Short-term Improvements (1-3 months):**\n1. **Redundancy Enhancement:** \n   - Evaluate database cluster redundancy levels\n   - Implement additional failover mechanisms\n   - Consider N+2 redundancy model for critical database nodes\n\n2. **Monitoring & Alerting:**\n   - Deploy network interface monitoring with predictive failure detection\n   - Implement ethernet link quality metrics and trending\n   - Create early warning alerts for degrading network performance\n\n3. **Automated Response:**\n   - Develop automated failover procedures for single blade failures\n   - Implement health checks with automatic node isolation capabilities\n\n**Long-term Strategic Measures (3-12 months):**\n1. **Infrastructure Modernization:**\n   - Hardware refresh program for aging database infrastructure\n   - Migration to more resilient network architectures\n   - Implementation of software-defined networking for better fault tolerance\n\n2. **Operational Excellence:**\n   - Regular hardware health assessments and preventive maintenance\n   - Enhanced runbook procedures for database cluster management\n   - Cross-training for CRM Database Sustaining Engineering team\n\n3. **Architecture Review:**\n   - Evaluate database cluster architecture for single points of failure\n   - Consider geographic distribution",
+      "PRB-21532089": "# Comprehensive Technical Analysis - PRB-21532089\n\n## **Technical Impact**\n\n### Severity Assessment\n- **Impact Level:** Medium-High (P2 priority with multi-host degradation)\n- **Scope:** 13 application hosts on na253 pod affected\n- **Duration:** 5-minute active incident window (19:42-19:47 UTC)\n- **Service Degradation:** General performance degradation across database-dependent operations\n\n### System Components Affected\n- **Primary:** Database connection pool management system\n- **Secondary:** Application layer performance on 13 hosts\n- **Tertiary:** End-user experience for database-intensive operations\n\n### Performance Metrics Impact\n- High connection pool utilization leading to resource starvation\n- Elevated database active session counts\n- Potential query queuing and timeout scenarios\n- Reduced application throughput during incident window\n\n## **Root Cause Analysis**\n\n### Primary Root Cause\n**Inefficient SQL Query Execution Pattern**\n- A specific SQL query generated excessive database active sessions\n- Query likely exhibited one or more of the following characteristics:\n  - Missing or suboptimal indexing\n  - Inefficient join operations\n  - Large result set processing without proper pagination\n  - Blocking operations causing session accumulation\n\n### Contributing Factors\n1. **Connection Pool Sizing:** Pool configuration may be insufficient for peak load scenarios\n2. **Query Optimization Gap:** Lack of proactive query performance monitoring\n3. **Resource Contention:** Multiple concurrent executions of the problematic query\n4. **Monitoring Lag:** 20-minute delay between auto-remediation trigger (19:22) and incident start (19:42)\n\n### Technical Chain of Events\n1. Problematic SQL query execution initiated\n2. Database active sessions accumulated beyond normal thresholds\n3. Connection pool utilization spiked across na253 pod\n4. Application hosts experienced resource starvation\n5. Performance degradation manifested across affected services\n\n## **Resolution Applied**\n\n### Immediate Mitigation\n**CSP (Cloud Service Provider) Throttle Implementation**\n- **Rule ID:** 08790e35-fb0b-4029-8112-352f84bf2e9c\n- **Target URI:** `/aura/#aura.ApexAction.execute/#ApexActionController.execute`\n- **Application Time:** 19:22 UTC (20 minutes before incident peak)\n- **Mechanism:** Request rate limiting to reduce database load\n\n### Auto-Remediation Effectiveness\n- **Response Time:** Proactive (triggered before peak impact)\n- **Resolution Duration:** 5 minutes from peak to resolution\n- **Method:** Traffic throttling rather than query optimization (temporary fix)\n\n### Resolution Methodology\n1. **Detection:** Automated monitoring identified elevated database sessions\n2. **Analysis:** System correlated high sessions with connection pool utilization\n3. **Mitigation:** Applied URI-specific throttling rules\n4. **Monitoring:** Continued observation until metrics normalized\n\n## **Preventive Measures**\n\n### Immediate Actions (0-30 days)\n1. **Query Performance Audit**\n   - Identify and analyze the specific problematic SQL query\n   - Implement query execution plan optimization\n   - Add appropriate database indexes if missing\n\n2. **Enhanced Monitoring**\n   - Implement real-time query performance alerts\n   - Set up connection pool utilization thresholds\n   - Deploy database session monitoring dashboards\n\n3. **Connection Pool Optimization**\n   - Review and adjust pool sizing parameters\n   - Implement dynamic pool scaling capabilities\n   - Configure connection timeout and retry policies\n\n### Medium-term Improvements (30-90 days)\n1. **Automated Query Analysis**\n   - Deploy query performance profiling tools\n   - Implement automated slow query detection\n   - Set up query execution plan change alerts\n\n2. **Capacity Planning Enhancement**\n   - Establish baseline performance metrics\n   - Implement predictive scaling algorithms\n   - Create load testing scenarios for database stress testing\n\n3. **Circuit Breaker Implementation**\n   - Deploy application-level circuit breakers\n   - Implement graceful degradation patterns\n   - Create fallback mechanisms for database unavailability\n\n### Long-term Strategic Measures (90+ days)\n1. **Database Architecture Review**\n   - Evaluate read replica implementation\n   - Consider database sharding strategies\n   - Assess caching layer optimization opportunities\n\n2. **Performance Engineering Culture**\n   - Establish query review processes in development lifecycle",
+      "PRB-21520890": "# Technical Analysis Report: PRB-21520890\n\n## **Technical Impact**\n\n### Primary Impact Assessment\n- **Service Affected**: AWS Production Database Cell (ind2s, aws-prod2-apsouth1)\n- **Impact Type**: Connection pool exhaustion leading to cascading performance degradation\n- **Severity**: P2-Medium with potential for escalation to P1 if unresolved\n- **Duration**: Initiated at 2026-03-10 05:50:04.000 (self-resolved, exact duration not specified)\n\n### System-Level Consequences\n- **Connection Pool Burn Rate**: Exceeded established thresholds, indicating rapid connection consumption\n- **Database Contention**: SQL query-level contention resulting in lock timeouts\n- **Service Availability**: Intermittent service disruptions affecting customer operations\n- **Resource Utilization**: Abnormal spike in database connection utilization patterns\n- **Monitoring Alert**: Fawkes detection system triggered automated alerting\n\n## **Root Cause Analysis**\n\n### Primary Root Cause\n**Connection Pool Exhaustion due to Single Customer Activity Burst**\n\n### Technical Breakdown\n1. **Trigger Event**: Customer 00D710000015s41 generated an unexpected burst of database connections\n2. **Resource Contention**: Sudden connection spike overwhelmed the connection pool capacity for the ind2s cell\n3. **Lock Escalation**: High connection volume led to increased contention on specific SQL queries\n4. **Timeout Cascade**: Lock timeouts created a cascading effect, further degrading performance\n5. **System Stress**: The Falcon instance (aws-prod2-apsouth1) experienced resource pressure\n\n### Contributing Factors\n- **Capacity Planning**: Potential gap in connection pool sizing for burst scenarios\n- **Query Optimization**: Specific SQL queries may lack proper optimization for high-concurrency scenarios\n- **Customer Usage Pattern**: Unexpected or abnormal usage pattern from the identified customer\n- **Resource Isolation**: Insufficient isolation between customer workloads\n\n## **Resolution Applied**\n\n### Immediate Resolution\n- **Self-Resolution**: The issue resolved automatically, indicating either:\n  - Customer activity returned to normal levels\n  - Connection pool pressure naturally subsided\n  - Automatic timeout mechanisms cleared stuck connections\n  - Database recovery mechanisms activated successfully\n\n### Resolution Methodology\n1. **Monitoring Detection**: Fawkes system successfully identified the anomaly\n2. **Automated Response**: System-level automatic recovery mechanisms engaged\n3. **Natural Recovery**: Connection pool pressure decreased as customer activity normalized\n4. **No Manual Intervention**: Issue resolved without requiring manual database operations\n\n## **Preventive Measures**\n\n### Immediate Actions (0-30 days)\n1. **Enhanced Monitoring**\n   - Implement customer-specific connection monitoring dashboards\n   - Set up predictive alerting for connection pool utilization trends\n   - Deploy real-time query contention monitoring\n\n2. **Capacity Optimization**\n   - Review and potentially increase connection pool limits for ind2s cell\n   - Implement dynamic connection pool scaling based on demand\n   - Establish connection pool burst capacity reserves\n\n### Short-term Improvements (30-90 days)\n1. **Query Performance Optimization**\n   - Identify and optimize the specific SQL queries causing contention\n   - Implement query timeout optimizations\n   - Deploy query execution plan analysis for high-traffic patterns\n\n2. **Customer Activity Management**\n   - Implement customer-specific rate limiting mechanisms\n   - Deploy connection throttling for abnormal usage patterns\n   - Establish customer communication protocols for planned high-activity periods\n\n### Long-term Strategic Measures (90+ days)\n1. **Architecture Enhancements**\n   - Implement improved customer workload isolation\n   - Deploy connection pool federation across multiple cells\n   - Establish automatic failover mechanisms for connection pool exhaustion\n\n2. **Predictive Analytics**\n   - Develop machine learning models for connection usage prediction\n   - Implement proactive capacity scaling based on usage patterns\n   - Deploy customer behavior analysis for anomaly detection\n\n3. **Process Improvements**\n   - Establish formal capacity planning reviews for database resources\n   - Implement regular performance testing with burst scenarios\n   - Create customer engagement protocols for high-usage activities\n\n### Monitoring and Validation\n- **KPIs to Track**: Connection pool utilization, query response times, lock timeout frequency\n- **Alert Thresholds**: Refined based on this incident's learnings\n- **Regular Reviews**: Monthly capacity and performance assessment cycles",
+      "PRB-21537120": "# Technical Analysis Report: PRB-21537120\n\n## **Technical Impact**\n\n**Service Availability Impact:**\n- **Primary Impact:** Complete service unavailability of SDB Management Plane service instance in the esvc/monitoring fault domain (FD)\n- **Scope:** Internal infrastructure component failure with no direct customer-facing impact\n- **Monitoring Blind Spot:** Loss of management plane visibility for SDB (Structured Database) operations within the affected fault domain\n- **Operational Risk:** Reduced operational oversight and potential delayed response to future issues in the monitored environment\n- **Infrastructure Resilience:** Single point of failure exposed in the monitoring infrastructure, indicating potential architectural vulnerability\n\n**Business Continuity Assessment:**\n- **Customer Services:** No disruption to customer-facing services (confirmed zero customer impact)\n- **Internal Operations:** Monitoring and management capabilities compromised for SDB components\n- **SLA Compliance:** No SLA breaches due to isolated internal system failure\n- **Risk Exposure:** Increased risk window for undetected issues in SDB infrastructure\n\n## **Root Cause Analysis**\n\n**Primary Investigation Areas:**\n\n1. **Service Instance Failure Modes:**\n   - Process termination due to resource exhaustion (memory leaks, CPU starvation)\n   - Configuration corruption or invalid parameter updates\n   - Dependency service failures (database connections, authentication services)\n   - Network connectivity issues within the fault domain\n\n2. **Infrastructure-Level Causes:**\n   - Host system failures (hardware, OS-level issues)\n   - Container orchestration problems (Kubernetes pod failures, resource limits)\n   - Storage subsystem failures affecting service persistence\n   - Network segmentation or routing issues within esvc/monitoring FD\n\n3. **Software-Related Factors:**\n   - Recent deployment artifacts causing service instability\n   - Memory management issues in SDB MP service code\n   - Incompatible library dependencies or version conflicts\n   - Race conditions in service initialization or shutdown procedures\n\n**Systematic Investigation Approach:**\n- Service logs analysis for error patterns and exception traces\n- Resource utilization metrics review (CPU, memory, disk I/O)\n- Network connectivity validation between service dependencies\n- Configuration drift analysis comparing current vs. baseline settings\n\n## **Resolution Applied**\n\n**Immediate Response Strategy:**\n\n1. **Service Recovery Protocol:**\n   - Execute service restart procedures following established runbooks\n   - Validate service health checks and dependency connectivity\n   - Implement temporary monitoring alternatives if primary service remains unstable\n   - Escalate to infrastructure teams for host-level diagnostics if service-level recovery fails\n\n2. **Diagnostic Data Collection:**\n   - Capture core dumps and memory snapshots before service restart\n   - Extract comprehensive logs from the failure timeframe\n   - Document system state and resource utilization at failure point\n   - Preserve configuration snapshots for comparison analysis\n\n3. **Validation and Verification:**\n   - Confirm service functionality through synthetic transaction testing\n   - Validate monitoring data flow and alerting mechanisms\n   - Verify integration points with dependent SDB components\n   - Execute end-to-end health checks across the fault domain\n\n**Recovery Timeline Optimization:**\n- Implement parallel diagnostic and recovery tracks to minimize downtime\n- Utilize automated recovery scripts where available\n- Engage cross-functional teams for complex dependency issues\n\n## **Preventive Measures**\n\n**Short-Term Improvements (0-30 days):**\n\n1. **Enhanced Monitoring Implementation:**\n   - Deploy redundant monitoring instances across multiple fault domains\n   - Implement proactive health checks with predictive failure detection\n   - Configure automated failover mechanisms for critical monitoring services\n   - Establish real-time alerting for service degradation indicators\n\n2. **Operational Resilience:**\n   - Create detailed incident response playbooks specific to SDB MP failures\n   - Implement automated service recovery procedures with manual override capabilities\n   - Establish cross-training programs for SDB MP service management\n   - Deploy configuration management tools to prevent drift-related failures\n\n**Medium-Term Strategic Initiatives (30-90 days):**\n\n1. **Architecture Hardening:**\n   - Design and implement multi-region monitoring service deployment\n   - Establish service mesh architecture for improved observability and resilience\n   - Implement circuit breaker patterns for dependency management\n   - Deploy chaos engineering practices to identify and address failure modes\n\n2. **Process and Governance:**\n   - Establish regular service health assessments and capacity planning reviews\n   - Implement automated testing for service deployment and configuration changes\n   - Create comprehensive disaster recovery procedures with regular testing cycles"
+    }
+  }
+}
