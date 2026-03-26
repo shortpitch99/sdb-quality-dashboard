@@ -1,0 +1,26 @@
+# Active Production Bugs
+# Format: Each bug block should contain Bug, Title, Severity, Status, Description, Component, Reported
+
+Bug: BUG-2024-001
+Title: Memory leak in user session handler
+Severity: High
+Status: Open
+Description: Gradual memory increase in session management service leading to restarts
+Component: Authentication Service
+Reported: 2024-01-15
+
+Bug: BUG-2024-002
+Title: Race condition in payment processing
+Severity: Critical
+Status: In Progress
+Description: Concurrent payment requests causing duplicate charges
+Component: Payment Gateway
+Reported: 2024-01-14
+
+Bug: BUG-2024-003
+Title: UI button misalignment on mobile
+Severity: Low
+Status: Open
+Description: Submit buttons not properly aligned on screens smaller than 375px
+Component: Mobile UI
+Reported: 2024-01-13
