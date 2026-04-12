@@ -49,6 +49,103 @@ def get_report_dates(custom_end_date=None):
         'period_end_full': last_sunday.strftime('%Y-%m-%d')
     }
 
+
+# Default local git clone paths per report --component (code churn). Override: --git-repo-path or env vars below.
+DEFAULT_GIT_REPO_BY_COMPONENT: Dict[str, str] = {
+    'Engine': '/Users/rchowdhuri/SDB',
+    'Store': '/Users/rchowdhuri/bookkeeper',
+    'SDD': '/Users/rchowdhuri/sdd',
+    'Core App Efficiency': '/Users/rchowdhuri/SDB',
+}
+
+
+def resolve_git_repo_path(component: str, cli_override: Optional[str] = None) -> str:
+    """Resolve git repo path for code-change statistics.
+
+    Precedence: --git-repo-path (cli_override) > env vars > DEFAULT_GIT_REPO_BY_COMPONENT.
+
+    Env: QC_GIT_REPO_ENGINE, QC_GIT_REPO_STORE, QC_GIT_REPO_SDD (SDD),
+    QC_GIT_REPO_CORE (Core App Efficiency).
+    """
+    if cli_override:
+        return cli_override
+    env_by_component = {
+        'Engine': os.getenv('QC_GIT_REPO_ENGINE'),
+        'Store': os.getenv('QC_GIT_REPO_STORE'),
+        'SDD': os.getenv('QC_GIT_REPO_SDD'),
+        'Core App Efficiency': os.getenv('QC_GIT_REPO_CORE'),
+    }
+    env_path = env_by_component.get(component)
+    if env_path:
+        return env_path
+    return DEFAULT_GIT_REPO_BY_COMPONENT.get(
+        component,
+        DEFAULT_GIT_REPO_BY_COMPONENT['Engine'],
+    )
+
+
+# Salesforce report IDs for --use-salesforce-reports, keyed like streamlit_app.py GUS maps (P0/P1 + backlogs).
+# CLI flags --sf-report-* override these when provided.
+_ENG_SF: Dict[str, str] = {
+    'bugs': '00OEE0000030kAn2AI',
+    'ci': '00OEE000002WjvJ2AS',
+    'leftshift': '00OEE000002Wjld2AC',
+    'abs': '00OEE000002bDht2AE',
+    'security': '00OB0000002qWjvMAE',
+    'alltime_backlog': '00OEE000002XRUv2AO',
+    'prb_backlog': '00OEE000002ZnZN2A0',
+}
+SALESFORCE_REPORT_IDS_BY_COMPONENT: Dict[str, Dict[str, str]] = {
+    'Engine': _ENG_SF,
+    'Store': {
+        'bugs': '00OEE0000030lLN2AY',
+        'ci': '00OEE0000030lWf2AI',
+        'leftshift': '00OEE0000030m7l2AA',
+        'abs': '00OEE0000030o6L2AQ',
+        'security': '00OEE0000030lwT2AQ',
+        'alltime_backlog': '00OEE0000030oHd2AI',
+        'prb_backlog': '00OEE0000030oCn2AI',
+    },
+    'SDD': {
+        'bugs': '00OEE0000030lOb2AI',
+        'ci': '00OEE0000030lej2AA',
+        'leftshift': '00OEE0000030m9N2AQ',
+        'abs': '00OEE0000030o7x2AA',
+        'security': '00OEE0000030lzh2AA',
+        'alltime_backlog': '00OEE0000030oKr2AI',
+        'prb_backlog': '00OEE0000030oEP2AY',
+    },
+    'Core App Efficiency': _ENG_SF,
+}
+
+
+def apply_salesforce_report_ids_for_component(args: argparse.Namespace) -> None:
+    """Fill --sf-report-* from --component when flags were omitted (None). Keeps dashboard JSON aligned with GUS."""
+    if not getattr(args, 'use_salesforce_reports', False):
+        return
+    m = SALESFORCE_REPORT_IDS_BY_COMPONENT.get(args.component) or SALESFORCE_REPORT_IDS_BY_COMPONENT['Engine']
+    if getattr(args, 'sf_report_bugs', None) is None:
+        args.sf_report_bugs = m['bugs']
+    if getattr(args, 'sf_report_ci', None) is None:
+        args.sf_report_ci = m['ci']
+    if getattr(args, 'sf_report_leftshift', None) is None:
+        args.sf_report_leftshift = m['leftshift']
+    if getattr(args, 'sf_report_abs', None) is None:
+        args.sf_report_abs = m['abs']
+    if getattr(args, 'sf_report_security', None) is None:
+        args.sf_report_security = m['security']
+    if getattr(args, 'sf_report_alltime_backlog', None) is None:
+        args.sf_report_alltime_backlog = m['alltime_backlog']
+    if getattr(args, 'sf_report_prb_backlog', None) is None:
+        args.sf_report_prb_backlog = m['prb_backlog']
+    print(
+        f"📎 Salesforce reports for component={args.component}: "
+        f"bugs={args.sf_report_bugs} ci={args.sf_report_ci} security={args.sf_report_security} "
+        f"leftshift={args.sf_report_leftshift} abs={args.sf_report_abs} "
+        f"alltime={args.sf_report_alltime_backlog} prb_backlog={args.sf_report_prb_backlog}"
+    )
+
+
 @dataclass
 class RiskItem:
     feature: str
@@ -175,6 +272,7 @@ class GitStats:
     most_changed_files: List[dict]
     commit_frequency: float  # commits per day
     code_churn_risk: str  # Low, Medium, High
+    repository_path: str = ""
 
 class QualityDataCollector:
     """Collects data from various sources for quality reporting."""
@@ -2268,7 +2366,8 @@ Next week: Planning production rollout to P0-P3 stages pending final validation 
                 authors=authors,
                 most_changed_files=most_changed_files,
                 commit_frequency=commit_frequency,
-                code_churn_risk=code_churn_risk
+                code_churn_risk=code_churn_risk,
+                repository_path=os.path.abspath(repo_path),
             )
             
             self.data['git_stats'] = vars(git_stats)
@@ -2297,7 +2396,8 @@ Next week: Planning production rollout to P0-P3 stages pending final validation 
             authors=[],
             most_changed_files=[],
             commit_frequency=0.0,
-            code_churn_risk="Unknown"
+            code_churn_risk="Unknown",
+            repository_path="",
         )
     
     def _assess_code_churn_risk(self, commits: int, lines_changed: int, files_changed: set, days: int) -> str:
@@ -2526,11 +2626,14 @@ Reported: 2024-01-13
         new_code_cov = cov_summary.get('new_code', {}) if isinstance(cov_summary, dict) else {}
         overall_cov = cov_summary.get('overall', {}) if isinstance(cov_summary, dict) else {}
 
+        gs = self.data.get('git_stats') or {}
         metadata = {
             'generated_at': datetime.now().isoformat(),
             'report_period_start': dates['period_start_full'],
             'report_period_end': dates['period_end_full'],
             'report_period_display': dates['period_full'],
+            'report_component': self.data.get('report_component', ''),
+            'git_repository': gs.get('repository_path', ''),
             'generator_version': '2.0',
             'data_sources': {
                 'risks': len(self.data.get('risks', [])),
@@ -3157,7 +3260,11 @@ def main():
     parser.add_argument('--leftshift-file', default='leftshift.txt', help='LeftShift issues file')
     parser.add_argument('--abs-file', default='abs.txt', help='ABS issues file')
     parser.add_argument('--security-file', default='security.txt', help='Security issues file')
-    parser.add_argument('--git-repo-path', default='/Users/rchowdhuri/SDB', help='Local git repository path for code analysis')
+    parser.add_argument(
+        '--git-repo-path',
+        default=None,
+        help='Force this git repo for code stats (overrides per-component defaults). If omitted, path is chosen from --component.',
+    )
     parser.add_argument('--allbugs-file', default='allbugs.txt', help='All-time bug backlog file (Salesforce export)')
     parser.add_argument('--prb-bugs-file', default='prb-bugs.txt', help='PRB-derived bug backlog file (Salesforce export)')
     parser.add_argument('--availability-file', default='avail.txt', help='System Availability file (avail.txt with single number like 99.99)')
@@ -3167,20 +3274,25 @@ def main():
     parser.add_argument('--skip-confirmation', action='store_true', help='Skip data readiness confirmation prompt')
     parser.add_argument('--report-end-date', help='Custom report end date (YYYY-MM-DD). Report will cover the week ending on the Sunday before this date.')
     parser.add_argument('--week', help='Calendar week (e.g., cw37, cw38). Automatically sets subdirectory path and report-end-date for historical weeks.')
-    parser.add_argument('--component', default='Engine', choices=['Engine', 'Store', 'Archival', 'SDD', 'msSDB', 'Core App Efficiency'], help='Component to generate report for (default: Engine)')
+    parser.add_argument('--component', default='Engine', choices=['Engine', 'Store', 'SDD', 'Core App Efficiency'], help='Report output folder (default: Engine). Use SDD for the unified SDD area; Core Optimizer tab uses Core App Efficiency.')
     # New: Salesforce Reports API integration flags and defaults
     parser.add_argument('--use-salesforce-reports', action='store_true', help='Fetch PRBs and issues from Salesforce Reports API instead of local text files')
     parser.add_argument('--sf-api-version', default='v62.0', help='Salesforce API version to use for Reports API calls')
     parser.add_argument('--sf-report-prb', default='00OEE000001TXjB2AW', help='Report ID for PRBs (last week)')
-    parser.add_argument('--sf-report-bugs', default='00OEE0000014M4b2AE', help='Report ID for Production Bugs')
-    parser.add_argument('--sf-report-ci', default='00OEE000002WjvJ2AS', help='Report ID for CI Issues')
-    parser.add_argument('--sf-report-leftshift', default='00OEE000002Wjld2AC', help='Report ID for LeftShift Issues')
-    parser.add_argument('--sf-report-abs', default='00OEE000002bDht2AE', help='Report ID for ABS Issues')
-    parser.add_argument('--sf-report-security', default='00OB0000002qWjvMAE', help='Report ID for Security Issues')
-    parser.add_argument('--sf-report-alltime-backlog', default='00OEE000002XRUv2AO', help='Report ID for All-time Bug Backlog')
-    parser.add_argument('--sf-report-prb-backlog', default='00OEE000002ZnZN2A0', help='Report ID for Backlog from PRB')
+    parser.add_argument(
+        '--sf-report-bugs',
+        default=None,
+        help='Report ID for production/P0-P1 bugs (default: per --component, aligned with dashboard GUS)',
+    )
+    parser.add_argument('--sf-report-ci', default=None, help='Report ID for CI Issues (default: per --component)')
+    parser.add_argument('--sf-report-leftshift', default=None, help='Report ID for LeftShift Issues (default: per --component)')
+    parser.add_argument('--sf-report-abs', default=None, help='Report ID for ABS Issues (default: per --component)')
+    parser.add_argument('--sf-report-security', default=None, help='Report ID for Security Issues (default: per --component)')
+    parser.add_argument('--sf-report-alltime-backlog', default=None, help='Report ID for All-time Bug Backlog (default: per --component)')
+    parser.add_argument('--sf-report-prb-backlog', default=None, help='Report ID for Backlog from PRB (default: per --component)')
     
     args = parser.parse_args()
+    apply_salesforce_report_ids_for_component(args)
     
     # Handle calendar week and component arguments
     if args.week:
@@ -3237,6 +3349,7 @@ def main():
     
     # Initialize data collector
     collector = QualityDataCollector(args.config)
+    collector.data['report_component'] = args.component
     
     # Collect data from all sources
     print("Collecting risk data...")
@@ -3334,13 +3447,15 @@ def main():
             return 1
     
     # Analyze git repository for code churn
+    git_repo_resolved = resolve_git_repo_path(args.component, args.git_repo_path)
     print("Analyzing git repository for code changes...")
+    print(f"📂 Git repository: {git_repo_resolved} (component={args.component})")
     dates = get_report_dates(custom_end_date)
     print(f"📊 Report period: {dates['period_full']}")
     collector.analyze_git_repository(
-        args.git_repo_path, 
-        dates['period_start_full'], 
-        dates['period_end_full']
+        git_repo_resolved,
+        dates['period_start_full'],
+        dates['period_end_full'],
     )
     
     # Create output directory

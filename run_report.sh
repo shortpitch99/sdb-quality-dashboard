@@ -7,19 +7,30 @@
 # Examples:
 #   ./run_report.sh cw40 Engine
 #   ./run_report.sh cw40 Store api            # use Salesforce Reports API (no local PRB/bugs/ci/leftshift/security files)
-#   ./run_report.sh cw40 Archival --use-salesforce-reports
+#   ./run_report.sh cw40 SDD --use-salesforce-reports
 #
-# Components: Engine, Store, Archival, SDD, msSDB, "Core App Efficiency"
+# Components (output folders): Engine, Store, SDD, "Core App Efficiency"
+# Dashboard: four tabs — Engine, Store, SDD, Core Optimizer and SFSQL
+#
+# Git code-churn stats (per component; see quality_report_generator.DEFAULT_GIT_REPO_BY_COMPONENT):
+#   Engine → ~/SDB, Store → ~/bookkeeper, SDD → ~/sdd, Core App Efficiency → ~/SDB
+#   Override: QC_GIT_REPO_ENGINE, QC_GIT_REPO_STORE, QC_GIT_REPO_SDD, QC_GIT_REPO_CORE or --git-repo-path
 #
 # DATA SOURCE URLs (Reports API when enabled):
 # - PRB Report:      00OEE000001TXjB2AW
 # - Fleet Bugs:      00OEE0000014M4b2AE
 # - CI Issues:       00OEE000002WjvJ2AS
 # - LeftShift:       00OEE000002Wjld2AC
-# - ABS Issues:      00OEE000002bDht2AE
+# - ABS Issues (Engine): 00OEE000002bDht2AE
+# - ABS Issues (Store):  00OEE0000030o6L2AQ
+# - ABS Issues (SDD): 00OEE0000030o7x2AA
 # - Security:        00OB0000002qWjvMAE
-# - All-time Backlog: 00OEE000002XRUv2AO
-# - PRB Backlog:     00OEE000002ZnZN2A0
+# - All-time Backlog (Engine): 00OEE000002XRUv2AO
+# - All-time Backlog (Store):  00OEE0000030oHd2AI
+# - All-time Backlog (SDD): 00OEE0000030oKr2AI
+# - PRB Backlog (Engine): 00OEE000002ZnZN2A0
+# - PRB Backlog (Store):  00OEE0000030oCn2AI
+# - PRB Backlog (SDD): 00OEE0000030oEP2AY
 # - SonarQube:     https://sonarqube.sfcq.buildndeliver-s.aws-esvc1-useast2.aws.sfdc.cl/component_measures?id=sayonara.sayonaradb.sdb&metric=uncovered_lines&view=list
 
 # Parse arguments
@@ -42,12 +53,10 @@ if [ -z "$WEEK" ] || [ -z "$COMPONENT" ]; then
     echo "Examples:"
     echo "  $0 cw40 Engine"
     echo "  $0 cw40 Store"
-    echo "  $0 cw40 Archival"
     echo "  $0 cw40 SDD"
-    echo "  $0 cw40 msSDB"
     echo "  $0 cw40 \"Core App Efficiency\""
     echo ""
-    echo "Available components: Engine, Store, Archival, SDD, msSDB, Core App Efficiency"
+    echo "Available components: Engine, Store, SDD, Core App Efficiency"
     exit 1
 fi
 
@@ -161,11 +170,12 @@ echo "📊 Generating comprehensive quality report..."
 # Generate report with mandatory week and component parameters
 echo "📅 Using calendar week: $WEEK"
 echo "🔧 Using component: $COMPONENT"
+# Git code stats: per-component repo (see DEFAULT_GIT_REPO_BY_COMPONENT in quality_report_generator.py).
+# Override all: GEN_CMD+=(--git-repo-path /path/to/repo)
 GEN_CMD=(
   python3 quality_report_generator.py
   --week "$WEEK"
   --component "$COMPONENT"
-  --git-repo-path /Users/rchowdhuri/SDB
   --report-type comprehensive
   --skip-confirmation
 )

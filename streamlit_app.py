@@ -24,7 +24,7 @@ load_dotenv()
 # Import our quality report components
 import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from quality_report_generator import QualityDataCollector, QualityReportGenerator
+from quality_report_generator import QualityDataCollector, QualityReportGenerator, resolve_git_repo_path
 
 # Configure Streamlit page
 st.set_page_config(
@@ -511,6 +511,10 @@ class QualityReportDashboard:
             current_ls_bugs = current_data.get('leftshift_issues', [])
             current_ls_score = sum(4 if 'P0' in str(bug.get('priority', '')) or 'P1' in str(bug.get('priority', '')) else 1 for bug in current_ls_bugs)
             changes['ls_score'] = "±0%"  # Placeholder
+
+            current_abs_bugs = current_data.get('abs_issues', [])
+            current_abs_score = sum(4 if 'P0' in str(bug.get('priority', '')) or 'P1' in str(bug.get('priority', '')) else 1 for bug in current_abs_bugs)
+            changes['abs_score'] = "±0%"  # Placeholder
             
             # Bug Backlog (critical bugs and total bugs)
             current_bugs = current_data.get('bugs', [])
@@ -562,9 +566,351 @@ class QualityReportDashboard:
             return {}
         
         return changes
+
+    def inject_metric_dashboard_styles(self) -> None:
+        """CSS for metric KPI cards (safe to call multiple times)."""
+        st.markdown("""
+        <style>
+        .metric-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .metric-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .metric-card-clickable {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .metric-card-clickable:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border-color: #007bff;
+        }
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 0.3rem 0;
+            line-height: 1;
+            color: #000000;
+        }
+        .metric-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 0.25rem;
+        }
+        .metric-delta {
+            font-size: 0.7rem;
+            margin-top: 0.3rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 8px;
+            display: inline-block;
+            background: #f8f9fa;
+            color: #495057;
+            border: 1px solid #dee2e6;
+        }
+        .metric-delta-green {
+            background: #d4f6d4 !important;
+            color: #155724 !important;
+            border: 1px solid #c3e6cb !important;
+        }
+        .metric-delta-yellow {
+            background: #fff3cd !important;
+            color: #856404 !important;
+            border: 1px solid #ffeaa7 !important;
+        }
+        .metric-delta-red {
+            background: #f8d7da !important;
+            color: #721c24 !important;
+            border: 1px solid #f5c6cb !important;
+        }
+        .metric-total {
+            font-size: 0.875rem;
+            color: #495057;
+            font-weight: 400;
+            margin-top: 0.2rem;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+    def render_production_kpi_row_hybrid(
+        self,
+        shared_data: Optional[Dict[str, Any]],
+        tab_data: Dict[str, Any],
+        tab_component: str,
+        level_label: Optional[str] = None,
+    ) -> None:
+        """Production metrics: fleet-wide row (Engine) + {label}-level row (component report)."""
+        self.inject_metric_dashboard_styles()
+        st.markdown('<h4 id="production-metrics">🏭 Production Metrics</h4>', unsafe_allow_html=True)
+
+        name = level_label if level_label is not None else tab_component
+        eng = PRODUCTION_METRICS_SOURCE
+        shared_changes = (
+            self.calculate_week_over_week_changes(shared_data, eng)
+            if shared_data is not None
+            else {}
+        )
+        tab_changes = self.calculate_week_over_week_changes(tab_data, tab_component)
+
+        risks_tab = tab_data.get('risks', [])
+        risk_status_count: Dict[str, int] = {}
+        for risk in risks_tab:
+            status = risk.get('status', 'Unknown')
+            risk_status_count[status] = risk_status_count.get(status, 0) + 1
+        at_risk_count = risk_status_count.get('At Risk', 0)
+        total_risks = len(risks_tab)
+
+        bugs_tab = tab_data.get('bugs', [])
+        p0_bugs = len([b for b in bugs_tab if 'P0' in str(b.get('severity', ''))])
+        p1_bugs = len([b for b in bugs_tab if 'P1' in str(b.get('severity', ''))])
+        p2_plus_bugs = len(
+            [b for b in bugs_tab if any(p in str(b.get('severity', '')) for p in ['P2', 'P3', 'P4'])]
+        )
+        critical_prod_bugs = p0_bugs + p1_bugs
+        bug_score = (critical_prod_bugs * 4) + (p2_plus_bugs * 1)
+        if bug_score > 32:
+            prod_bug_status = "RED"
+        elif bug_score > 16:
+            prod_bug_status = "YELLOW"
+        else:
+            prod_bug_status = "GREEN"
+        total_bugs = len(bugs_tab)
+
+        changes = dict(shared_changes)
+        if tab_changes.get('at_risk'):
+            changes['at_risk'] = tab_changes['at_risk']
+        if tab_changes.get('prod_bugs'):
+            changes['prod_bugs'] = tab_changes['prod_bugs']
+
+        if shared_data is not None:
+            prbs = shared_data.get('prbs', [])
+            p0_prbs = len([p for p in prbs if 'P0' in str(p.get('priority', '')) or 'Sev0' in str(p.get('priority', ''))])
+            p1_prbs = len([p for p in prbs if 'P1' in str(p.get('priority', '')) or 'Sev1' in str(p.get('priority', ''))])
+            critical_prbs = p0_prbs + p1_prbs
+            if p0_prbs > 0:
+                prb_status = "CRITICAL"
+            elif critical_prbs > 4:
+                prb_status = "HIGH RISK"
+            elif critical_prbs > 2:
+                prb_status = "ELEVATED"
+            else:
+                prb_status = "GREEN"
+            total_prbs = len(prbs)
+
+            deployments = self.get_deployment_data(shared_data)
+            dominant_version = "N/A"
+            second_version = "N/A"
+            dominant_percentage = 0.0
+            second_percentage = 0.0
+            if deployments:
+                version_counts: Dict[str, int] = {}
+                total_cells = 0
+                for deployment in deployments:
+                    version = deployment.get('version', 'Unknown')
+                    count = deployment.get('count', deployment.get('cells', 0))
+                    if count > 0 and version != 'Unknown':
+                        version_counts[version] = version_counts.get(version, 0) + count
+                        total_cells += count
+                if version_counts:
+                    sorted_versions = sorted(version_counts.items(), key=lambda x: x[1], reverse=True)
+                    dominant_version_data = sorted_versions[0]
+                    dominant_version = f"v{dominant_version_data[0]}"
+                    dominant_percentage = (dominant_version_data[1] / total_cells * 100) if total_cells > 0 else 0
+                    if len(sorted_versions) > 1:
+                        second_version_data = sorted_versions[1]
+                        second_version = f"v{second_version_data[0]}"
+                        second_percentage = (second_version_data[1] / total_cells * 100) if total_cells > 0 else 0
+
+            availability_data = shared_data.get('system_availability', {})
+            availability_achieved = availability_data.get('achieved', 0.0)
+            availability_slo = availability_data.get('slo', 99.9)
+        else:
+            critical_prbs = 0
+            prb_status = "—"
+            total_prbs = 0
+            dominant_version = "—"
+            second_version = "N/A"
+            dominant_percentage = 0.0
+            second_percentage = 0.0
+            availability_achieved = 0.0
+            availability_slo = 99.9
+
+        st.markdown("##### Fleet-wide metrics")
+        st.caption(
+            f"General fleet signals from the **{eng}** report — same values on every tab for the selected week."
+        )
+        fleet1, fleet2, fleet3 = st.columns(3)
+
+        with fleet1:
+            if shared_data is not None:
+                prb_delta_class = "metric-delta-green" if prb_status == "GREEN" else (
+                    "metric-delta-yellow" if prb_status in ["ELEVATED"] else "metric-delta-red"
+                )
+                critical_prbs_display = f"{critical_prbs}"
+                if changes.get('critical_prbs'):
+                    critical_prbs_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['critical_prbs']})</span>"
+                st.markdown(f"""
+                <a href="#problem-reports-analysis" style="text-decoration: none; color: inherit;">
+                    <div class="metric-card metric-card-clickable">
+                    <div class="metric-label">🚨 Sev 0/1 PRBs</div>
+                    <div class="metric-value">{critical_prbs_display}</div>
+                        <div class="metric-total">of {total_prbs} total</div>
+                        <div class="metric-delta {prb_delta_class}">
+                        {prb_status}
+                    </div>
+                </div>
+                </a>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown("""
+                <div class="metric-card">
+                    <div class="metric-label">🚨 Sev 0/1 PRBs</div>
+                    <div class="metric-value">—</div>
+                    <div class="metric-total">No Engine report</div>
+                    <div class="metric-delta metric-delta-yellow">N/A</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+        with fleet2:
+            if shared_data is not None:
+                second_line = f"2nd: {second_version} ({second_percentage:.1f}%)" if second_version != "N/A" else "Single version"
+                st.markdown(f"""
+                <a href="#deployment-analysis" style="text-decoration: none; color: inherit;">
+                    <div class="metric-card metric-card-clickable">
+                        <div class="metric-label">🚀 Prod Deployment</div>
+                    <div class="metric-value">{dominant_version}</div>
+                        <div class="metric-total">Dominant in fleet ({dominant_percentage:.1f}%)</div>
+                    <div class="metric-delta">
+                            {second_line}
+                        </div>
+                    </div>
+                </a>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown("""
+                <div class="metric-card">
+                    <div class="metric-label">🚀 Prod Deployment</div>
+                    <div class="metric-value">—</div>
+                    <div class="metric-total">No Engine report</div>
+                    <div class="metric-delta metric-delta-yellow">N/A</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+        with fleet3:
+            if shared_data is not None:
+                availability_display = f"{availability_achieved:.2f}%"
+                if changes.get('availability'):
+                    availability_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['availability']})</span>"
+                if availability_achieved >= availability_slo:
+                    availability_delta_class = "metric-delta-green"
+                    availability_status = "MEETS SLO"
+                elif availability_achieved >= (availability_slo - 0.1):
+                    availability_delta_class = "metric-delta-yellow"
+                    availability_status = "NEAR SLO"
+                else:
+                    availability_delta_class = "metric-delta-red"
+                    availability_status = "BELOW SLO"
+                st.markdown(f"""
+                <div class="metric-card">
+                    <div class="metric-label">⚡ System Availability</div>
+                    <div class="metric-value">{availability_display}</div>
+                    <div class="metric-total">SLO: {availability_slo}%</div>
+                    <div class="metric-delta {availability_delta_class}">
+                        {availability_status}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown("""
+                <div class="metric-card">
+                    <div class="metric-label">⚡ System Availability</div>
+                    <div class="metric-value">—</div>
+                    <div class="metric-total">No Engine report</div>
+                    <div class="metric-delta metric-delta-yellow">N/A</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+        st.markdown("")
+        st.markdown(f"##### {name}-level metrics")
+        st.caption(
+            f"Component-specific production signals for **{name}** — change when you switch tabs."
+        )
+        tab1, tab2 = st.columns(2)
+
+        with tab1:
+            risk_delta_class = "metric-delta-green" if at_risk_count == 0 else (
+                "metric-delta-yellow" if at_risk_count <= 2 else "metric-delta-red"
+            )
+            at_risk_display = f"{at_risk_count}"
+            if changes.get('at_risk'):
+                at_risk_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['at_risk']})</span>"
+            st.markdown(f"""
+            <a href="#risk-assessment" style="text-decoration: none; color: inherit;">
+                <div class="metric-card metric-card-clickable">
+                    <div class="metric-label">🚀 Feature Rollout Risk</div>
+                <div class="metric-value">{at_risk_display}</div>
+                    <div class="metric-total">of {total_risks} total</div>
+                    <div class="metric-delta {risk_delta_class}">
+                        {"GREEN" if at_risk_count == 0 else ("YELLOW" if at_risk_count <= 2 else "RED")}
+                </div>
+            </div>
+            </a>
+            """, unsafe_allow_html=True)
+
+        with tab2:
+            prod_delta_class = "metric-delta-green" if prod_bug_status == "GREEN" else (
+                "metric-delta-yellow" if prod_bug_status == "YELLOW" else "metric-delta-red"
+            )
+            critical_prod_bugs_display = f"{critical_prod_bugs}"
+            if changes.get('prod_bugs'):
+                critical_prod_bugs_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['prod_bugs']})</span>"
+            p0p1_href = p0p1_prod_bugs_metric_href(tab_component)
+            p0p1_extra = ' target="_blank" rel="noopener noreferrer"' if p0p1_href.startswith('https') else ''
+            st.markdown(f"""
+            <a href="{p0p1_href}"{p0p1_extra} style="text-decoration: none; color: inherit;">
+                <div class="metric-card metric-card-clickable">
+                    <div class="metric-label">🐛 P0/P1 Prod Bugs</div>
+                <div class="metric-value">{critical_prod_bugs_display}</div>
+                    <div class="metric-total">of {total_bugs} total</div>
+                    <div class="metric-delta {prod_delta_class}">
+                        {prod_bug_status}
+                </div>
+            </div>
+            </a>
+            """, unsafe_allow_html=True)
+
+        engine_tab_note = (
+            " On the **Engine** tab, both rows still read one Engine JSON—different fields for fleet vs rollout/bugs."
+            if tab_component == eng
+            else ""
+        )
+        st.caption(
+            f"**Fleet-wide row:** PRBs, deployment, availability (**{eng}**). "
+            f"**{name}-level row:** rollout risk and P0/P1 prod bugs (report folder **`{tab_component}`**)."
+            f"{engine_tab_note}"
+        )
     
-    def create_metrics_dashboard(self, data: Dict[str, Any], component: str = None):
-        """Create professional metrics dashboard with multiple styling options."""
+    def create_metrics_dashboard(
+        self,
+        data: Dict[str, Any],
+        component: str = None,
+        kpi_scope: str = 'all',
+        development_heading_suffix: Optional[str] = None,
+    ):
+        """Render KPI cards. kpi_scope: 'all' | 'production' | 'development'."""
         
         # Calculate week-over-week changes if component is provided
         changes = {}
@@ -698,12 +1044,73 @@ class QualityReportDashboard:
         else:
             ls_bug_status = "GREEN"
         
+        # Calculate ABS bug metrics (same scoring as Left Shift)
+        abs_issues = data.get('abs_issues', [])
+        abs_p0_bugs = len([b for b in abs_issues if 'P0' in str(b.get('severity', '') + str(b.get('priority', ''))).upper()])
+        abs_p1_bugs = len([b for b in abs_issues if 'P1' in str(b.get('severity', '') + str(b.get('priority', ''))).upper()])
+        abs_p2_plus_bugs = len([b for b in abs_issues if any(p in str(b.get('severity', '') + str(b.get('priority', ''))).upper() for p in ['P2', 'P3', 'P4'])])
+        critical_abs_bugs = abs_p0_bugs + abs_p1_bugs
+        abs_bug_score = critical_abs_bugs * 4 + abs_p2_plus_bugs * 1
+        if abs_bug_score > 50:
+            abs_bug_status = "RED"
+        elif abs_bug_score > 25:
+            abs_bug_status = "YELLOW"
+        else:
+            abs_bug_status = "GREEN"
+        
         # Display professional metric cards
-        self.create_two_line_metric_cards(at_risk_count, len(risks), critical_prbs, prb_status, prb_color, prb_bg_color, critical_prod_bugs, prod_bug_status, avg_coverage, data, ci_bug_score, ci_bug_status, critical_sec_bugs, sec_bug_status, ls_bug_score, ls_bug_status, changes)
+        self.create_two_line_metric_cards(
+            at_risk_count,
+            len(risks),
+            critical_prbs,
+            prb_status,
+            prb_color,
+            prb_bg_color,
+            critical_prod_bugs,
+            prod_bug_status,
+            avg_coverage,
+            data,
+            ci_bug_score,
+            ci_bug_status,
+            critical_sec_bugs,
+            sec_bug_status,
+            ls_bug_score,
+            ls_bug_status,
+            abs_bug_score,
+            abs_bug_status,
+            changes,
+            kpi_scope=kpi_scope,
+            development_heading_suffix=development_heading_suffix,
+            prod_bugs_link_folder=component,
+        )
 
 
-    def create_two_line_metric_cards(self, at_risk_count, total_risks, critical_prbs, prb_status, prb_color, prb_bg_color, critical_prod_bugs, prod_bug_status, avg_coverage, data, ci_bug_score, ci_bug_status, critical_sec_bugs, sec_bug_status, ls_bug_score, ls_bug_status, changes: Dict[str, str] = None):
-        """Two-line professional dashboard: Production metrics (top) and Development metrics (bottom)."""
+    def create_two_line_metric_cards(
+        self,
+        at_risk_count,
+        total_risks,
+        critical_prbs,
+        prb_status,
+        prb_color,
+        prb_bg_color,
+        critical_prod_bugs,
+        prod_bug_status,
+        avg_coverage,
+        data,
+        ci_bug_score,
+        ci_bug_status,
+        critical_sec_bugs,
+        sec_bug_status,
+        ls_bug_score,
+        ls_bug_status,
+        abs_bug_score,
+        abs_bug_status,
+        changes: Dict[str, str] = None,
+        kpi_scope: str = 'all',
+        development_heading_suffix: Optional[str] = None,
+        prod_bugs_link_folder: Optional[str] = None,
+    ):
+        """KPI cards: production row, development rows, or both (kpi_scope)."""
         
         # Use empty dict if no changes provided
         if changes is None:
@@ -720,6 +1127,12 @@ class QualityReportDashboard:
         ls_p0_bugs = len([b for b in leftshift_issues if 'P0' in str(b.get('severity', '') + str(b.get('priority', ''))).upper()])
         ls_p1_bugs = len([b for b in leftshift_issues if 'P1' in str(b.get('severity', '') + str(b.get('priority', ''))).upper()])
         ls_p0_p1_count = ls_p0_bugs + ls_p1_bugs
+        
+        # ABS bugs P0/P1 counts for display
+        abs_issues = data.get('abs_issues', [])
+        abs_p0_bugs = len([b for b in abs_issues if 'P0' in str(b.get('severity', '') + str(b.get('priority', ''))).upper()])
+        abs_p1_bugs = len([b for b in abs_issues if 'P1' in str(b.get('severity', '') + str(b.get('priority', ''))).upper()])
+        abs_p0_p1_count = abs_p0_bugs + abs_p1_bugs
         
         # Calculate deployment metrics
         deployments = self.get_deployment_data(data)
@@ -758,427 +1171,385 @@ class QualityReportDashboard:
                     second_version = f"v{second_version_data[0]}"
                     second_percentage = (second_version_data[1] / total_cells * 100) if total_cells > 0 else 0
         
-        # CSS for professional black & white cards
-        st.markdown("""
-        <style>
-        .metric-card {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 1rem;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            min-height: 140px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .metric-card:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        }
-        .metric-card-clickable {
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .metric-card-clickable:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            border-color: #007bff;
-        }
-        .metric-value {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin: 0.3rem 0;
-            line-height: 1;
-            color: #000000;
-        }
-        .metric-label {
-            font-size: 0.8rem;
-            color: #6c757d;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            margin-bottom: 0.25rem;
-        }
-        .metric-delta {
-            font-size: 0.7rem;
-            margin-top: 0.3rem;
-            padding: 0.2rem 0.4rem;
-            border-radius: 8px;
-            display: inline-block;
-            background: #f8f9fa;
-            color: #495057;
-            border: 1px solid #dee2e6;
-        }
-        .metric-delta-green {
-            background: #d4f6d4 !important;
-            color: #155724 !important;
-            border: 1px solid #c3e6cb !important;
-        }
-        .metric-delta-yellow {
-            background: #fff3cd !important;
-            color: #856404 !important;
-            border: 1px solid #ffeaa7 !important;
-        }
-        .metric-delta-red {
-            background: #f8d7da !important;
-            color: #721c24 !important;
-            border: 1px solid #f5c6cb !important;
-        }
-        .metric-total {
-            font-size: 0.875rem;
-            color: #495057;
-            font-weight: 400;
-            margin-top: 0.2rem;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-        
+        self.inject_metric_dashboard_styles()
+
+        show_production = kpi_scope in ('all', 'production')
+        show_development = kpi_scope in ('all', 'development')
+
+        if not show_production and not show_development:
+            return
+
         # Production Metrics (Top Row)
-        st.markdown('<h4 id="production-metrics">🏭 Production Metrics</h4>', unsafe_allow_html=True)
-        col1, col2, col3, col4, col5_prod = st.columns(5)
+        if show_production:
+            st.markdown('<h4 id="production-metrics">🏭 Production Metrics</h4>', unsafe_allow_html=True)
+            col1, col2, col3, col4, col5_prod = st.columns(5)
         
-        with col1:
-            # Feature Rollout Risk color logic: green if 0, yellow if 1-2, red if >2
-            risk_delta_class = "metric-delta-green" if at_risk_count == 0 else ("metric-delta-yellow" if at_risk_count <= 2 else "metric-delta-red")
-            # Format the value with week-over-week change
-            at_risk_display = f"{at_risk_count}"
-            if changes.get('at_risk'):
-                at_risk_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['at_risk']})</span>"
-            
-            st.markdown(f"""
-            <a href="#risk-assessment" style="text-decoration: none; color: inherit;">
-                <div class="metric-card metric-card-clickable">
-                    <div class="metric-label">🚀 Feature Rollout Risk</div>
-                <div class="metric-value">{at_risk_display}</div>
-                    <div class="metric-total">of {total_risks} total</div>
-                    <div class="metric-delta {risk_delta_class}">
-                        {"GREEN" if at_risk_count == 0 else ("YELLOW" if at_risk_count <= 2 else "RED")}
-                </div>
-            </div>
-            </a>
-            """, unsafe_allow_html=True)
-        
-        with col2:
-            total_prbs = len(data.get('prbs', []))
-            prb_delta_class = "metric-delta-green" if prb_status == "GREEN" else ("metric-delta-yellow" if prb_status in ["ELEVATED", "YELLOW"] else "metric-delta-red")
-            
-            # Format the value with week-over-week change
-            critical_prbs_display = f"{critical_prbs}"
-            if changes.get('critical_prbs'):
-                critical_prbs_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['critical_prbs']})</span>"
-            
-            st.markdown(f"""
-            <a href="#problem-reports-analysis" style="text-decoration: none; color: inherit;">
-                <div class="metric-card metric-card-clickable">
-                <div class="metric-label">🚨 Sev 0/1 PRBs</div>
-                <div class="metric-value">{critical_prbs_display}</div>
-                    <div class="metric-total">of {total_prbs} total</div>
-                    <div class="metric-delta {prb_delta_class}">
-                    {prb_status}
-                </div>
-            </div>
-            </a>
-            """, unsafe_allow_html=True)
-        
-        with col3:
-            total_bugs = len(data.get('bugs', []))
-            prod_delta_class = "metric-delta-green" if prod_bug_status == "GREEN" else ("metric-delta-yellow" if prod_bug_status == "YELLOW" else "metric-delta-red")
-            
-            # Format the value with week-over-week change
-            critical_prod_bugs_display = f"{critical_prod_bugs}"
-            if changes.get('prod_bugs'):
-                critical_prod_bugs_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['prod_bugs']})</span>"
-            
-            st.markdown(f"""
-            <a href="#production-bug-analysis" style="text-decoration: none; color: inherit;">
-                <div class="metric-card metric-card-clickable">
-                    <div class="metric-label">🐛 P0/P1 Prod Bugs</div>
-                <div class="metric-value">{critical_prod_bugs_display}</div>
-                    <div class="metric-total">of {total_bugs} total</div>
-                    <div class="metric-delta {prod_delta_class}">
-                        {prod_bug_status}
-                </div>
-            </div>
-            </a>
-            """, unsafe_allow_html=True)
-        
-        with col4:
-            second_line = f"2nd: {second_version} ({second_percentage:.1f}%)" if second_version != "N/A" else "Single version"
-            st.markdown(f"""
-            <a href="#deployment-analysis" style="text-decoration: none; color: inherit;">
-                <div class="metric-card metric-card-clickable">
-                    <div class="metric-label">🚀 Prod Deployment</div>
-                <div class="metric-value">{dominant_version}</div>
-                    <div class="metric-total">Dominant in fleet ({dominant_percentage:.1f}%)</div>
-                <div class="metric-delta">
-                        {second_line}
-                    </div>
-                </div>
-            </a>
-            """, unsafe_allow_html=True)
-        
-        with col5_prod:
-            # System Availability - use real data from avail.txt
-            availability_data = data.get('system_availability', {})
-            availability_achieved = availability_data.get('achieved', 0.0)
-            availability_slo = availability_data.get('slo', 99.9)
-            
-            # Format the value with week-over-week change
-            availability_display = f"{availability_achieved:.2f}%"
-            if changes.get('availability'):
-                availability_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['availability']})</span>"
-            
-            # Determine color based on SLO achievement
-            if availability_achieved >= availability_slo:
-                availability_delta_class = "metric-delta-green"
-                availability_status = "MEETS SLO"
-            elif availability_achieved >= (availability_slo - 0.1):
-                availability_delta_class = "metric-delta-yellow" 
-                availability_status = "NEAR SLO"
-            else:
-                availability_delta_class = "metric-delta-red"
-                availability_status = "BELOW SLO"
-            
-            st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-label">⚡ System Availability</div>
-                <div class="metric-value">{availability_display}</div>
-                <div class="metric-total">SLO: {availability_slo}%</div>
-                <div class="metric-delta {availability_delta_class}">
-                    {availability_status}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        # Development Metrics (Bottom Row)  
-        st.markdown("#### 💻 Development Metrics")
-        col5, col6, col7, col8, col9 = st.columns(5)
-        
-        with col5:            
-            # Coverage color logic: green if >= 80%, yellow if >= 70%, red if < 70%
-            coverage_delta_class = "metric-delta-green" if avg_coverage >= 80 else ("metric-delta-yellow" if avg_coverage >= 70 else "metric-delta-red")
-            
-            # Format the value with week-over-week change
-            coverage_display = f"{avg_coverage:.1f}%"
-            if changes.get('coverage'):
-                coverage_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['coverage']})</span>"
-            
-            st.markdown(f"""
-            <a href="#code-coverage-analysis" style="text-decoration: none; color: inherit;">
-                <div class="metric-card metric-card-clickable">
-                <div class="metric-label">📊 Overall Line Coverage</div>
-                <div class="metric-value">{coverage_display}</div>
-                    <div class="metric-total">Overall Coverage 67.8%</div>
-                    <div class="metric-delta {coverage_delta_class}">
-                    Target: 80%
-                </div>
-            </div>
-            </a>
-            """, unsafe_allow_html=True)
-            
-        with col6:
-            total_ci_issues = len(data.get('ci_issues', []))
-            ci_p0_p1_count = ci_p0_bugs + ci_p1_bugs
-            ci_delta_class = "metric-delta-green" if ci_bug_status == "GREEN" else ("metric-delta-yellow" if ci_bug_status == "YELLOW" else "metric-delta-red")
-            
-            # Format the value with week-over-week change
-            ci_p0_p1_display = f"{ci_p0_p1_count}"
-            if changes.get('ci_score'):
-                ci_p0_p1_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['ci_score']})</span>"
-            
-            st.markdown(f"""
-            <a href="#ci-issues-analysis" style="text-decoration: none; color: inherit;">
-                <div class="metric-card metric-card-clickable">
-                    <div class="metric-label">🔧 P0/P1 CI Issues</div>
-                    <div class="metric-value">{ci_p0_p1_display}</div>
-                    <div class="metric-total">{total_ci_issues} issues</div>
-                    <div class="metric-delta {ci_delta_class}">
-                        {ci_bug_status}
-                </div>
-            </div>
-            </a>
-            """, unsafe_allow_html=True)
-            
-        with col7:
-            total_security_bugs = len(data.get('security_issues', []))
-            sec_delta_class = "metric-delta-green" if sec_bug_status == "GREEN" else ("metric-delta-yellow" if sec_bug_status == "YELLOW" else "metric-delta-red")
-            
-            # Format the value with week-over-week change
-            critical_sec_bugs_display = f"{critical_sec_bugs}"
-            if changes.get('sec_score'):
-                critical_sec_bugs_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['sec_score']})</span>"
-            
-            st.markdown(f"""
-            <a href="#security-analysis" style="text-decoration: none; color: inherit;">
-                <div class="metric-card metric-card-clickable">
-                    <div class="metric-label">🔒 P0/P1 Security Bugs</div>
-                <div class="metric-value">{critical_sec_bugs_display}</div>
-                    <div class="metric-total">of {total_security_bugs} total</div>
-                    <div class="metric-delta {sec_delta_class}">
-                        {sec_bug_status}
-                </div>
-            </div>
-            </a>
-            """, unsafe_allow_html=True)
-            
-        with col8:
-            total_leftshift_bugs = len(data.get('leftshift_issues', []))
-            ls_delta_class = "metric-delta-green" if ls_bug_status == "GREEN" else ("metric-delta-yellow" if ls_bug_status == "YELLOW" else "metric-delta-red")
-            
-            # Format the value with week-over-week change
-            ls_p0_p1_display = f"{ls_p0_p1_count}"
-            if changes.get('ls_score'):
-                ls_p0_p1_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['ls_score']})</span>"
-            
-            st.markdown(f"""
-            <a href="#left-shift-bugs" style="text-decoration: none; color: inherit;">
-                <div class="metric-card metric-card-clickable">
-                    <div class="metric-label">⬅️ P0/P1 Left Shift</div>
-                    <div class="metric-value">{ls_p0_p1_display}</div>
-                    <div class="metric-total">{total_leftshift_bugs} bugs</div>
-                    <div class="metric-delta {ls_delta_class}">
-                        {ls_bug_status}
-                    </div>
-                </div>
-            </a>
-            """, unsafe_allow_html=True)
-            
-        with col9:
-            # Calculate code changes metrics using archived git stats
-            git_stats = data.get('git_stats', {})
-            
-            if git_stats:
-                # Use pre-computed git stats from archive
-                current_week_changes = git_stats.get('lines_changed', 0)
-                total_commits = git_stats.get('total_commits', 0)
-                
-                # Code Changes thresholds
-                # GREEN: < 10000 lines, YELLOW: 10000-19999 lines, RED: >= 20000 lines
-                if current_week_changes < 10000:
-                    change_status = "GREEN"
-                    change_delta_class = "metric-delta-green"
-                elif current_week_changes < 20000:
-                    change_status = "YELLOW" 
-                    change_delta_class = "metric-delta-yellow"
-                else:
-                    change_status = "RED"
-                    change_delta_class = "metric-delta-red"
-            else:
-                # Fallback when no git stats available
-                current_week_changes = 0
-                change_status = "UNKNOWN"
-                change_delta_class = "metric-delta-gray"
-            
-            # Format the value with week-over-week change
-            code_changes_display = f"{current_week_changes:,}"
-            if changes.get('code_changes'):
-                code_changes_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['code_changes']})</span>"
-            
-            st.markdown(f"""
-            <a href="#code-changes-analysis" style="text-decoration: none; color: inherit;">
-                <div class="metric-card metric-card-clickable">
-                    <div class="metric-label">📈 Code Changes</div>
-                    <div class="metric-value">{code_changes_display}</div>
-                    <div class="metric-total">lines changed</div>
-                    <div class="metric-delta {change_delta_class}">
-                        {change_status}
-                    </div>
-                </div>
-            </a>
-            """, unsafe_allow_html=True)
-        
-        # Additional Development Metrics (Second Row)
-        st.markdown("")  # Add some spacing
-        col10, col11, col12, col13, col14 = st.columns(5)
-        
-        with col10:
-            # All-time Bug Backlog - use real data from Salesforce report
-            alltime_backlog = data.get('alltime_backlog', [])
-            if alltime_backlog:
-                # Use data from Salesforce All-time Backlog report
-                critical_backlog_bugs = len([b for b in alltime_backlog if 'P0' in str(b.get('severity', '')) or 'P1' in str(b.get('severity', ''))])
-                total_backlog_bugs = len(alltime_backlog)
-            else:
-                # Fallback to bugs data if alltime_backlog not available
-                bugs = data.get('bugs', [])
-                critical_backlog_bugs = len([b for b in bugs if 'P0' in str(b.get('severity', '')) or 'P1' in str(b.get('severity', ''))])
-                total_backlog_bugs = len(bugs)
-            
-            # Format the value with week-over-week change
-            critical_backlog_display = f"{critical_backlog_bugs}"
-            if alltime_backlog and changes.get('alltime_backlog'):
-                critical_backlog_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['alltime_backlog']})</span>"
-            elif changes.get('critical_backlog'):
-                critical_backlog_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['critical_backlog']})</span>"
-            
-            # Determine color based on critical bugs
-            backlog_delta_class = "metric-delta-green" if critical_backlog_bugs == 0 else ("metric-delta-yellow" if critical_backlog_bugs <= 5 else "metric-delta-red")
-            backlog_status = "GREEN" if critical_backlog_bugs == 0 else ("YELLOW" if critical_backlog_bugs <= 5 else "RED")
-            
-            st.markdown(f"""
-            <a href="https://gus.lightning.force.com/lightning/r/Report/00OEE000002XRUv2AO/view" target="_blank" style="text-decoration: none; color: inherit;">
-                <div class="metric-card metric-card-clickable">
-                    <div class="metric-label">🐛 All-time Bug Backlog</div>
-                    <div class="metric-value">{critical_backlog_display}</div>
-                    <div class="metric-total">{total_backlog_bugs} bugs</div>
-                    <div class="metric-delta {backlog_delta_class}">
-                        {backlog_status}
-                    </div>
-                </div>
-            </a>
-            """, unsafe_allow_html=True)
-        
-        with col11:
-            # Backlog from PRB - use real data from Salesforce report
-            prb_backlog = data.get('prb_backlog', [])
-            if prb_backlog:
-                # Use data from Salesforce PRB Backlog report
-                critical_prb_backlog = len([b for b in prb_backlog if 'P0' in str(b.get('priority', '')) or 'P1' in str(b.get('priority', ''))])
-                total_prb_backlog = len(prb_backlog)
-                
-                # Determine color based on critical PRB backlog items
-                prb_backlog_delta_class = "metric-delta-green" if critical_prb_backlog == 0 else ("metric-delta-yellow" if critical_prb_backlog <= 3 else "metric-delta-red")
-                prb_backlog_status = "GREEN" if critical_prb_backlog == 0 else ("YELLOW" if critical_prb_backlog <= 3 else "RED")
-                
-                # Format the value with week-over-week change
-                critical_prb_backlog_display = f"{critical_prb_backlog}"
-                if changes.get('prb_backlog'):
-                    critical_prb_backlog_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['prb_backlog']})</span>"
-                
+            with col1:
+                # Feature Rollout Risk color logic: green if 0, yellow if 1-2, red if >2
+                risk_delta_class = "metric-delta-green" if at_risk_count == 0 else ("metric-delta-yellow" if at_risk_count <= 2 else "metric-delta-red")
+                at_risk_display = f"{at_risk_count}"
+                if changes.get('at_risk'):
+                    at_risk_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['at_risk']})</span>"
                 st.markdown(f"""
-                <a href="https://gus.lightning.force.com/lightning/r/Report/00OEE000002ZnZN2A0/view" target="_blank" style="text-decoration: none; color: inherit;">
+                <a href="#risk-assessment" style="text-decoration: none; color: inherit;">
                     <div class="metric-card metric-card-clickable">
-                        <div class="metric-label">📋 Backlog from PRB</div>
-                        <div class="metric-value">{critical_prb_backlog_display}</div>
-                        <div class="metric-total">{total_prb_backlog} items</div>
-                        <div class="metric-delta {prb_backlog_delta_class}">
-                            {prb_backlog_status}
+                        <div class="metric-label">🚀 Feature Rollout Risk</div>
+                    <div class="metric-value">{at_risk_display}</div>
+                        <div class="metric-total">of {total_risks} total</div>
+                        <div class="metric-delta {risk_delta_class}">
+                            {"GREEN" if at_risk_count == 0 else ("YELLOW" if at_risk_count <= 2 else "RED")}
+                    </div>
+                </div>
+                </a>
+                """, unsafe_allow_html=True)
+
+            with col2:
+                total_prbs = len(data.get('prbs', []))
+                prb_delta_class = "metric-delta-green" if prb_status == "GREEN" else ("metric-delta-yellow" if prb_status in ["ELEVATED", "YELLOW"] else "metric-delta-red")
+                critical_prbs_display = f"{critical_prbs}"
+                if changes.get('critical_prbs'):
+                    critical_prbs_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['critical_prbs']})</span>"
+                st.markdown(f"""
+                <a href="#problem-reports-analysis" style="text-decoration: none; color: inherit;">
+                    <div class="metric-card metric-card-clickable">
+                    <div class="metric-label">🚨 Sev 0/1 PRBs</div>
+                    <div class="metric-value">{critical_prbs_display}</div>
+                        <div class="metric-total">of {total_prbs} total</div>
+                        <div class="metric-delta {prb_delta_class}">
+                        {prb_status}
+                    </div>
+                </div>
+                </a>
+                """, unsafe_allow_html=True)
+
+            with col3:
+                total_bugs = len(data.get('bugs', []))
+                prod_delta_class = "metric-delta-green" if prod_bug_status == "GREEN" else ("metric-delta-yellow" if prod_bug_status == "YELLOW" else "metric-delta-red")
+                critical_prod_bugs_display = f"{critical_prod_bugs}"
+                if changes.get('prod_bugs'):
+                    critical_prod_bugs_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['prod_bugs']})</span>"
+                p0p1_href = p0p1_prod_bugs_metric_href(prod_bugs_link_folder)
+                p0p1_extra = ' target="_blank" rel="noopener noreferrer"' if p0p1_href.startswith('https') else ''
+                st.markdown(f"""
+                <a href="{p0p1_href}"{p0p1_extra} style="text-decoration: none; color: inherit;">
+                    <div class="metric-card metric-card-clickable">
+                        <div class="metric-label">🐛 P0/P1 Prod Bugs</div>
+                    <div class="metric-value">{critical_prod_bugs_display}</div>
+                        <div class="metric-total">of {total_bugs} total</div>
+                        <div class="metric-delta {prod_delta_class}">
+                            {prod_bug_status}
+                    </div>
+                </div>
+                </a>
+                """, unsafe_allow_html=True)
+
+            with col4:
+                second_line = f"2nd: {second_version} ({second_percentage:.1f}%)" if second_version != "N/A" else "Single version"
+                st.markdown(f"""
+                <a href="#deployment-analysis" style="text-decoration: none; color: inherit;">
+                    <div class="metric-card metric-card-clickable">
+                        <div class="metric-label">🚀 Prod Deployment</div>
+                    <div class="metric-value">{dominant_version}</div>
+                        <div class="metric-total">Dominant in fleet ({dominant_percentage:.1f}%)</div>
+                    <div class="metric-delta">
+                            {second_line}
                         </div>
                     </div>
                 </a>
                 """, unsafe_allow_html=True)
-            else:
-                # Fallback when no PRB backlog data available
+
+            with col5_prod:
+                availability_data = data.get('system_availability', {})
+                availability_achieved = availability_data.get('achieved', 0.0)
+                availability_slo = availability_data.get('slo', 99.9)
+                availability_display = f"{availability_achieved:.2f}%"
+                if changes.get('availability'):
+                    availability_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['availability']})</span>"
+                if availability_achieved >= availability_slo:
+                    availability_delta_class = "metric-delta-green"
+                    availability_status = "MEETS SLO"
+                elif availability_achieved >= (availability_slo - 0.1):
+                    availability_delta_class = "metric-delta-yellow"
+                    availability_status = "NEAR SLO"
+                else:
+                    availability_delta_class = "metric-delta-red"
+                    availability_status = "BELOW SLO"
                 st.markdown(f"""
                 <div class="metric-card">
-                    <div class="metric-label">📋 Backlog from PRB</div>
-                    <div class="metric-value">--</div>
-                    <div class="metric-total">No Data</div>
-                    <div class="metric-delta metric-delta-gray">
-                        PENDING
+                    <div class="metric-label">⚡ System Availability</div>
+                    <div class="metric-value">{availability_display}</div>
+                    <div class="metric-total">SLO: {availability_slo}%</div>
+                    <div class="metric-delta {availability_delta_class}">
+                        {availability_status}
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
+
+        if show_development:
+            dev_heading = "#### 💻 Development Metrics"
+            if development_heading_suffix:
+                dev_heading += f" — {development_heading_suffix}"
+            st.markdown(dev_heading)
+            col5, col6, col7, col8, col9, col10 = st.columns(6)
         
-        # Leave remaining columns empty for future expansion
-        with col12:
-            st.markdown("")
-        with col13:
-            st.markdown("")
-        with col14:
-            st.markdown("")
+            with col5:            
+                # Coverage color logic: green if >= 80%, yellow if >= 70%, red if < 70%
+                coverage_delta_class = "metric-delta-green" if avg_coverage >= 80 else ("metric-delta-yellow" if avg_coverage >= 70 else "metric-delta-red")
+                
+                # Format the value with week-over-week change
+                coverage_display = f"{avg_coverage:.1f}%"
+                if changes.get('coverage'):
+                    coverage_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['coverage']})</span>"
+                
+                st.markdown(f"""
+                <a href="#code-coverage-analysis" style="text-decoration: none; color: inherit;">
+                    <div class="metric-card metric-card-clickable">
+                    <div class="metric-label">📊 Overall Line Coverage</div>
+                    <div class="metric-value">{coverage_display}</div>
+                        <div class="metric-total">Overall Coverage 67.8%</div>
+                        <div class="metric-delta {coverage_delta_class}">
+                        Target: 80%
+                    </div>
+                </div>
+                </a>
+                """, unsafe_allow_html=True)
+                
+            with col6:
+                total_ci_issues = len(data.get('ci_issues', []))
+                ci_p0_p1_count = ci_p0_bugs + ci_p1_bugs
+                ci_delta_class = "metric-delta-green" if ci_bug_status == "GREEN" else ("metric-delta-yellow" if ci_bug_status == "YELLOW" else "metric-delta-red")
+                
+                # Format the value with week-over-week change
+                ci_p0_p1_display = f"{ci_p0_p1_count}"
+                if changes.get('ci_score'):
+                    ci_p0_p1_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['ci_score']})</span>"
+                
+                ci_href = p0p1_ci_issues_metric_href(prod_bugs_link_folder)
+                ci_extra = ' target="_blank" rel="noopener noreferrer"' if ci_href.startswith('https') else ''
+                st.markdown(f"""
+                <a href="{ci_href}"{ci_extra} style="text-decoration: none; color: inherit;">
+                    <div class="metric-card metric-card-clickable">
+                        <div class="metric-label">🔧 P0/P1 CI Issues</div>
+                        <div class="metric-value">{ci_p0_p1_display}</div>
+                        <div class="metric-total">{total_ci_issues} issues</div>
+                        <div class="metric-delta {ci_delta_class}">
+                            {ci_bug_status}
+                    </div>
+                </div>
+                </a>
+                """, unsafe_allow_html=True)
+                
+            with col7:
+                total_security_bugs = len(data.get('security_issues', []))
+                sec_delta_class = "metric-delta-green" if sec_bug_status == "GREEN" else ("metric-delta-yellow" if sec_bug_status == "YELLOW" else "metric-delta-red")
+                
+                # Format the value with week-over-week change
+                critical_sec_bugs_display = f"{critical_sec_bugs}"
+                if changes.get('sec_score'):
+                    critical_sec_bugs_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['sec_score']})</span>"
+                
+                sec_href = p0p1_security_bugs_metric_href(prod_bugs_link_folder)
+                sec_extra = ' target="_blank" rel="noopener noreferrer"' if sec_href.startswith('https') else ''
+                st.markdown(f"""
+                <a href="{sec_href}"{sec_extra} style="text-decoration: none; color: inherit;">
+                    <div class="metric-card metric-card-clickable">
+                        <div class="metric-label">🔒 P0/P1 Security Bugs</div>
+                    <div class="metric-value">{critical_sec_bugs_display}</div>
+                        <div class="metric-total">of {total_security_bugs} total</div>
+                        <div class="metric-delta {sec_delta_class}">
+                            {sec_bug_status}
+                    </div>
+                </div>
+                </a>
+                """, unsafe_allow_html=True)
+                
+            with col8:
+                total_leftshift_bugs = len(data.get('leftshift_issues', []))
+                ls_delta_class = "metric-delta-green" if ls_bug_status == "GREEN" else ("metric-delta-yellow" if ls_bug_status == "YELLOW" else "metric-delta-red")
+                
+                # Format the value with week-over-week change
+                ls_p0_p1_display = f"{ls_p0_p1_count}"
+                if changes.get('ls_score'):
+                    ls_p0_p1_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['ls_score']})</span>"
+                
+                ls_href = p0p1_left_shift_metric_href(prod_bugs_link_folder)
+                ls_extra = ' target="_blank" rel="noopener noreferrer"' if ls_href.startswith('https') else ''
+                st.markdown(f"""
+                <a href="{ls_href}"{ls_extra} style="text-decoration: none; color: inherit;">
+                    <div class="metric-card metric-card-clickable">
+                        <div class="metric-label">⬅️ P0/P1 Left Shift</div>
+                        <div class="metric-value">{ls_p0_p1_display}</div>
+                        <div class="metric-total">{total_leftshift_bugs} bugs</div>
+                        <div class="metric-delta {ls_delta_class}">
+                            {ls_bug_status}
+                        </div>
+                    </div>
+                </a>
+                """, unsafe_allow_html=True)
+                
+            with col9:
+                total_abs_bugs = len(data.get('abs_issues', []))
+                abs_delta_class = "metric-delta-green" if abs_bug_status == "GREEN" else ("metric-delta-yellow" if abs_bug_status == "YELLOW" else "metric-delta-red")
+                abs_p0_p1_display = f"{abs_p0_p1_count}"
+                if changes.get('abs_score'):
+                    abs_p0_p1_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['abs_score']})</span>"
+                abs_href = p0p1_abs_bugs_metric_href(prod_bugs_link_folder)
+                abs_extra = ' target="_blank" rel="noopener noreferrer"' if abs_href.startswith('https') else ''
+                st.markdown(f"""
+                <a href="{abs_href}"{abs_extra} style="text-decoration: none; color: inherit;">
+                    <div class="metric-card metric-card-clickable">
+                        <div class="metric-label">🔷 P0/P1 ABS Bugs</div>
+                        <div class="metric-value">{abs_p0_p1_display}</div>
+                        <div class="metric-total">{total_abs_bugs} bugs</div>
+                        <div class="metric-delta {abs_delta_class}">
+                            {abs_bug_status}
+                        </div>
+                    </div>
+                </a>
+                """, unsafe_allow_html=True)
+                
+            with col10:
+                # Calculate code changes metrics using archived git stats
+                git_stats = data.get('git_stats', {})
+                
+                if git_stats:
+                    # Use pre-computed git stats from archive
+                    current_week_changes = git_stats.get('lines_changed', 0)
+                    total_commits = git_stats.get('total_commits', 0)
+                    
+                    # Code Changes thresholds
+                    # GREEN: < 10000 lines, YELLOW: 10000-19999 lines, RED: >= 20000 lines
+                    if current_week_changes < 10000:
+                        change_status = "GREEN"
+                        change_delta_class = "metric-delta-green"
+                    elif current_week_changes < 20000:
+                        change_status = "YELLOW" 
+                        change_delta_class = "metric-delta-yellow"
+                    else:
+                        change_status = "RED"
+                        change_delta_class = "metric-delta-red"
+                else:
+                    # Fallback when no git stats available
+                    current_week_changes = 0
+                    change_status = "UNKNOWN"
+                    change_delta_class = "metric-delta-gray"
+                
+                # Format the value with week-over-week change
+                code_changes_display = f"{current_week_changes:,}"
+                if changes.get('code_changes'):
+                    code_changes_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['code_changes']})</span>"
+                
+                st.markdown(f"""
+                <a href="#code-changes-analysis" style="text-decoration: none; color: inherit;">
+                    <div class="metric-card metric-card-clickable">
+                        <div class="metric-label">📈 Code Changes</div>
+                        <div class="metric-value">{code_changes_display}</div>
+                        <div class="metric-total">lines changed</div>
+                        <div class="metric-delta {change_delta_class}">
+                            {change_status}
+                        </div>
+                    </div>
+                </a>
+                """, unsafe_allow_html=True)
+            
+            # Additional Development Metrics (Second Row)
+            st.markdown("")  # Add some spacing
+            col10, col11, col12, col13, col14 = st.columns(5)
+            
+            with col10:
+                # All-time Bug Backlog - use real data from Salesforce report
+                alltime_backlog = data.get('alltime_backlog', [])
+                if alltime_backlog:
+                    # Use data from Salesforce All-time Backlog report
+                    critical_backlog_bugs = len([b for b in alltime_backlog if 'P0' in str(b.get('severity', '')) or 'P1' in str(b.get('severity', ''))])
+                    total_backlog_bugs = len(alltime_backlog)
+                else:
+                    # Fallback to bugs data if alltime_backlog not available
+                    bugs = data.get('bugs', [])
+                    critical_backlog_bugs = len([b for b in bugs if 'P0' in str(b.get('severity', '')) or 'P1' in str(b.get('severity', ''))])
+                    total_backlog_bugs = len(bugs)
+                
+                # Format the value with week-over-week change
+                critical_backlog_display = f"{critical_backlog_bugs}"
+                if alltime_backlog and changes.get('alltime_backlog'):
+                    critical_backlog_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['alltime_backlog']})</span>"
+                elif changes.get('critical_backlog'):
+                    critical_backlog_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['critical_backlog']})</span>"
+                
+                # Determine color based on critical bugs
+                backlog_delta_class = "metric-delta-green" if critical_backlog_bugs == 0 else ("metric-delta-yellow" if critical_backlog_bugs <= 5 else "metric-delta-red")
+                backlog_status = "GREEN" if critical_backlog_bugs == 0 else ("YELLOW" if critical_backlog_bugs <= 5 else "RED")
+                
+                atbl_href = all_time_bug_backlog_metric_href(prod_bugs_link_folder)
+                atbl_extra = ' target="_blank" rel="noopener noreferrer"' if atbl_href.startswith('https') else ''
+                st.markdown(f"""
+                <a href="{atbl_href}"{atbl_extra} style="text-decoration: none; color: inherit;">
+                    <div class="metric-card metric-card-clickable">
+                        <div class="metric-label">🐛 All-time Bug Backlog</div>
+                        <div class="metric-value">{critical_backlog_display}</div>
+                        <div class="metric-total">{total_backlog_bugs} bugs</div>
+                        <div class="metric-delta {backlog_delta_class}">
+                            {backlog_status}
+                        </div>
+                    </div>
+                </a>
+                """, unsafe_allow_html=True)
+            
+            with col11:
+                # Backlog from PRB - use real data from Salesforce report
+                prb_backlog = data.get('prb_backlog', [])
+                if prb_backlog:
+                    # Use data from Salesforce PRB Backlog report
+                    critical_prb_backlog = len([b for b in prb_backlog if 'P0' in str(b.get('priority', '')) or 'P1' in str(b.get('priority', ''))])
+                    total_prb_backlog = len(prb_backlog)
+                    
+                    # Determine color based on critical PRB backlog items
+                    prb_backlog_delta_class = "metric-delta-green" if critical_prb_backlog == 0 else ("metric-delta-yellow" if critical_prb_backlog <= 3 else "metric-delta-red")
+                    prb_backlog_status = "GREEN" if critical_prb_backlog == 0 else ("YELLOW" if critical_prb_backlog <= 3 else "RED")
+                    
+                    # Format the value with week-over-week change
+                    critical_prb_backlog_display = f"{critical_prb_backlog}"
+                    if changes.get('prb_backlog'):
+                        critical_prb_backlog_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['prb_backlog']})</span>"
+                    
+                    bfp_href = backlog_from_prb_metric_href(prod_bugs_link_folder)
+                    bfp_extra = ' target="_blank" rel="noopener noreferrer"' if bfp_href.startswith('https') else ''
+                    st.markdown(f"""
+                    <a href="{bfp_href}"{bfp_extra} style="text-decoration: none; color: inherit;">
+                        <div class="metric-card metric-card-clickable">
+                            <div class="metric-label">📋 Backlog from PRB</div>
+                            <div class="metric-value">{critical_prb_backlog_display}</div>
+                            <div class="metric-total">{total_prb_backlog} items</div>
+                            <div class="metric-delta {prb_backlog_delta_class}">
+                                {prb_backlog_status}
+                            </div>
+                        </div>
+                    </a>
+                    """, unsafe_allow_html=True)
+                else:
+                    # Fallback when no PRB backlog data available (still link to GUS report)
+                    bfp_href = backlog_from_prb_metric_href(prod_bugs_link_folder)
+                    bfp_extra = ' target="_blank" rel="noopener noreferrer"' if bfp_href.startswith('https') else ''
+                    st.markdown(f"""
+                    <a href="{bfp_href}"{bfp_extra} style="text-decoration: none; color: inherit;">
+                        <div class="metric-card metric-card-clickable">
+                            <div class="metric-label">📋 Backlog from PRB</div>
+                            <div class="metric-value">--</div>
+                            <div class="metric-total">No Data</div>
+                            <div class="metric-delta metric-delta-gray">
+                                PENDING
+                            </div>
+                        </div>
+                    </a>
+                    """, unsafe_allow_html=True)
+            
+            # Leave remaining columns empty for future expansion
+            with col12:
+                st.markdown("")
+            with col13:
+                st.markdown("")
+            with col14:
+                st.markdown("")
     
     def categorize_file_change(self, filepath: str) -> str:
         """Categorize file changes with deeper SDB-specific analysis."""
@@ -1246,6 +1617,31 @@ class QualityReportDashboard:
         
         return 'SKIP'
     
+    def categorize_file_change_generic(self, filepath: str) -> str:
+        """Bucket changes by extension / tests for non-SDB repositories (bookkeeper, sdd, etc.)."""
+        fp = filepath.replace('\\', '/').lower()
+        if '/node_modules/' in fp or '/.git/' in fp:
+            return 'SKIP'
+        parts = fp.split('/')
+        if 'test' in parts or 'tests' in parts or fp.endswith('_test.go'):
+            return 'Tests'
+        ext = os.path.splitext(filepath)[1].lower()
+        if ext in ('.java', '.jj', '.jjt'):
+            return 'Java'
+        if ext in ('.cpp', '.cc', '.cxx', '.h', '.hpp'):
+            return 'C/C++'
+        if ext == '.py':
+            return 'Python'
+        if ext == '.go':
+            return 'Go'
+        if ext in ('.sql',):
+            return 'SQL'
+        if ext in ('.yml', '.yaml', '.json', '.xml', '.gradle', '.properties'):
+            return 'Config / build'
+        if ext:
+            return ext[1:].upper()
+        return 'Other'
+    
     def analyze_changes_with_llm(self, file_changes: list, dates: dict) -> str:
         """Get pre-generated code change risk analysis from LLM content or show unavailable message."""
         # Check if we have pre-generated LLM content
@@ -1257,7 +1653,7 @@ class QualityReportDashboard:
         # No LLM content available
         return "**Code Change Risk Analysis:** Content not available - requires LLM generation during report creation"
     
-    def create_code_changes_analysis(self, data: Dict[str, Any]):
+    def create_code_changes_analysis(self, data: Dict[str, Any], component: Optional[str] = None):
         """Create comprehensive code changes analysis with visualization and risk assessment."""
         import subprocess
         import os
@@ -1265,22 +1661,23 @@ class QualityReportDashboard:
         from quality_report_generator import get_report_dates
         
         dates = get_report_dates()
+        comp = component or (data.get('metadata') or {}).get('report_component') or 'Engine'
+        git_stats_pre = data.get('git_stats') or {}
+        repo_path = git_stats_pre.get('repository_path') or resolve_git_repo_path(comp)
+        is_sdb_repo = os.path.basename(os.path.normpath(repo_path)).lower() == 'sdb'
         
-        def get_git_changes_by_path(start_date, end_date):
-            """Get git changes focused on SDB-related components."""
+        def get_git_changes_by_path(start_date, end_date, git_root: str, sdb_style: bool):
+            """Get git changes; SDB uses deep categorization, other repos use extension buckets."""
             try:
-                sdb_path = "/Users/rchowdhuri/SDB"
-                if not os.path.exists(sdb_path):
-                    return {}
+                if not os.path.exists(git_root) or not os.path.exists(os.path.join(git_root, '.git')):
+                    return {}, []
                 
-                # Get detailed file changes with line counts, focusing on SDB
-                cmd = f'cd {sdb_path} && git log --since="{start_date}" --until="{end_date}" --numstat --pretty=format:"" | grep -v "^$"'
+                cmd = f'cd {git_root} && git log --since="{start_date}" --until="{end_date}" --numstat --pretty=format:"" | grep -v "^$"'
                 result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
                 
                 if result.returncode != 0:
-                    return {}
+                    return {}, []
                 
-                # SDB-related keywords and patterns for deeper categorization
                 excluded_modules = ['sfstore', 'zookeeper', 'kafka', 'redis', 'memcache']
                 
                 changes_by_path = {}
@@ -1295,14 +1692,13 @@ class QualityReportDashboard:
                             filepath = parts[2].lower()
                             original_filepath = parts[2]
                             
-                            # Skip excluded modules
-                            if any(excluded in filepath for excluded in excluded_modules):
-                                continue
+                            if sdb_style:
+                                if any(excluded in filepath for excluded in excluded_modules):
+                                    continue
+                                category = self.categorize_file_change(original_filepath)
+                            else:
+                                category = self.categorize_file_change_generic(original_filepath)
                             
-                            # Detailed categorization based on file paths and extensions
-                            category = self.categorize_file_change(original_filepath)
-                            
-                            # Skip if not relevant to SDB
                             if category == 'SKIP':
                                 continue
                             
@@ -1337,6 +1733,7 @@ class QualityReportDashboard:
         if git_stats:
             # Use pre-computed git stats from the archive
             st.markdown("#### 📊 Code Changes Summary")
+            st.caption(f"Git repository: `{git_stats.get('repository_path') or repo_path}` · component: **{comp}**")
             col1, col2 = st.columns(2)
             with col1:
                 st.metric("Total Commits", git_stats.get('total_commits', 0))
@@ -1384,10 +1781,12 @@ class QualityReportDashboard:
         try:
             current_week_start = dates['period_start_full']
             current_week_end = dates['period_end_full']
-            changes_data, file_changes_for_llm = get_git_changes_by_path(current_week_start, current_week_end)
+            changes_data, file_changes_for_llm = get_git_changes_by_path(
+                current_week_start, current_week_end, repo_path, is_sdb_repo
+            )
         except Exception as e:
             st.info("📊 Code changes analysis not available (git repository not accessible)")
-            st.info("💡 This feature works when running locally with access to the SDB repository")
+            st.info(f"💡 Expected clone at: `{repo_path}` (component **{comp}**)")
             return
         
         if not changes_data:
@@ -1398,7 +1797,8 @@ class QualityReportDashboard:
         col1, col2 = st.columns([3, 2])
         
         with col1:
-            st.markdown("#### 📈 SDB-Focused Code Changes")
+            chart_title = "SDB-focused code changes" if is_sdb_repo else "Repository code changes"
+            st.markdown(f"#### 📈 {chart_title}")
             
             # Prepare data for chart
             categories = list(changes_data.keys())
@@ -1432,7 +1832,7 @@ class QualityReportDashboard:
             ))
             
             fig.update_layout(
-                title=f"SDB-Related Changes ({dates['period_start']} - {dates['period_end']})",
+                title=f"{chart_title} ({dates['period_start']} - {dates['period_end']}) · `{os.path.basename(repo_path)}`",
                 barmode='stack',
                 xaxis_title="Component Category",
                 yaxis_title="Lines Changed",
@@ -2538,6 +2938,61 @@ class QualityReportDashboard:
         
         st.plotly_chart(fig, use_container_width=True, key="leftshift_bugs_chart")
     
+    def create_abs_bugs_chart(self, data: Dict[str, Any]):
+        """Create ABS bugs stacked bar chart by team and priority."""
+        abs_data = data.get('abs_issues', [])
+        
+        if not abs_data:
+            st.info("🔷 No ABS bugs data available")
+            return
+        
+        team_priority_counts = {}
+        for bug in abs_data:
+            team = bug.get('team', 'Unknown Team')
+            priority = bug.get('priority', 'P2')
+            
+            if team not in team_priority_counts:
+                team_priority_counts[team] = {}
+            if priority not in team_priority_counts[team]:
+                team_priority_counts[team][priority] = 0
+            team_priority_counts[team][priority] += 1
+        
+        if not team_priority_counts:
+            st.info("📊 No ABS bugs found")
+            return
+        
+        teams = list(team_priority_counts.keys())
+        priorities = set()
+        for team_data in team_priority_counts.values():
+            priorities.update(team_data.keys())
+        priorities = sorted(list(priorities))
+        
+        fig = go.Figure()
+        
+        priority_colors = {
+            'P0': '#C0392B', 'P1': '#E67E22', 'P2': '#F39C12', 'P3': '#27AE60', 'P4': '#8E44AD'
+        }
+        
+        for priority in priorities:
+            values = [team_priority_counts[team].get(priority, 0) for team in teams]
+            fig.add_trace(go.Bar(
+                name=priority,
+                x=teams,
+                y=values,
+                marker_color=priority_colors.get(priority, '#6c757d')
+            ))
+        
+        fig.update_layout(
+            title="ABS Bugs by Team (Stacked by Priority)",
+            barmode='stack',
+            xaxis_title="Team",
+            yaxis_title="Number of Bugs",
+            xaxis={'tickangle': -45},
+            legend_title="Priority"
+        )
+        
+        st.plotly_chart(fig, use_container_width=True, key="abs_bugs_chart")
+    
     def create_trend_analysis(self, data: Dict[str, Any]):
         """Get pre-generated trend analysis from LLM content or show unavailable message."""
         # Check if we have pre-generated LLM content
@@ -2612,7 +3067,14 @@ class QualityReportDashboard:
                 ls_p2_plus_bugs = len([b for b in leftshift_issues if any(p in str(b.get('severity', '') + str(b.get('priority', ''))).upper() for p in ['P2', 'P3', 'P4'])])
                 leftshift_score = (ls_p0_bugs + ls_p1_bugs) * 4 + ls_p2_plus_bugs * 1
                 
-                # 7. Total Line Coverage (extract from coverage_summary)
+                # 7. ABS bugs score (P0/P1 × 4 + P2+ × 1)
+                abs_issues_hist = data.get('abs_issues', [])
+                abs_p0_bugs = len([b for b in abs_issues_hist if 'P0' in str(b.get('severity', '') + str(b.get('priority', ''))).upper()])
+                abs_p1_bugs = len([b for b in abs_issues_hist if 'P1' in str(b.get('severity', '') + str(b.get('priority', ''))).upper()])
+                abs_p2_plus_bugs = len([b for b in abs_issues_hist if any(p in str(b.get('severity', '') + str(b.get('priority', ''))).upper() for p in ['P2', 'P3', 'P4'])])
+                abs_score = (abs_p0_bugs + abs_p1_bugs) * 4 + abs_p2_plus_bugs * 1
+                
+                # 8. Total Line Coverage (extract from coverage_summary)
                 coverage_summary = data.get('coverage_summary', {})
                 overall_coverage = coverage_summary.get('overall', {})
                 total_line_coverage = overall_coverage.get('line_coverage', 0)
@@ -2626,6 +3088,7 @@ class QualityReportDashboard:
                     'P0/P1 CI Issues': ci_score,
                     'P0/P1 Security Issues': security_score,
                     'P0/P1 Left Shift': leftshift_score,
+                    'P0/P1 ABS Bugs': abs_score,
                     'Total Line Coverage %': total_line_coverage
                 })
                 
@@ -2641,7 +3104,7 @@ class QualityReportDashboard:
         
         # Define score metrics (left Y-axis)
         score_cols = ['Feature Rollout Risk', 'Sev 0/1 PRBs', 'P0/P1 Production Bugs', 
-                     'P0/P1 CI Issues', 'P0/P1 Security Issues', 'P0/P1 Left Shift']
+                     'P0/P1 CI Issues', 'P0/P1 Security Issues', 'P0/P1 Left Shift', 'P0/P1 ABS Bugs']
         
         
         # Create dual-axis chart
@@ -2655,6 +3118,7 @@ class QualityReportDashboard:
             'P0/P1 CI Issues': '#3498DB',          # Bright Blue (CI/CD)
             'P0/P1 Security Issues': '#27AE60',     # Green (security)
             'P0/P1 Left Shift': '#E67E22',         # Dark Orange (development)
+            'P0/P1 ABS Bugs': '#1ABC9C',           # Teal (ABS)
             'Total Line Coverage %': '#2C3E50'      # Dark Blue-Gray (coverage metric)
         }
 
@@ -3432,61 +3896,230 @@ class QualityReportDashboard:
                     except Exception as e:
                         st.error(f"❌ Error generating report: {e}")
 
-def render_component_dashboard(component: str):
-    """Render dashboard for a specific component."""
+# Report output directory names (must match quality_report_generator / run_report.sh)
+REPORT_FOLDER_COMPONENTS = (
+    'Engine', 'Store', 'SDD', 'Core App Efficiency',
+)
+
+# Shared production KPIs use this report for the selected week (fleet-wide view)
+PRODUCTION_METRICS_SOURCE = 'Engine'
+
+# GUS Salesforce report IDs for P0/P1 production bugs (metric card + detail link), keyed by report folder name
+P0P1_PROD_BUGS_REPORT_ID_BY_COMPONENT: Dict[str, str] = {
+    'Engine': '00OEE0000030kAn2AI',
+    'Store': '00OEE0000030lLN2AY',
+    'SDD': '00OEE0000030lOb2AI',
+}
+
+# GUS Salesforce report IDs for P0/P1 CI issues (metric card + detail links)
+P0P1_CI_ISSUES_REPORT_ID_BY_COMPONENT: Dict[str, str] = {
+    'Engine': '00OEE000002WjvJ2AS',
+    'Store': '00OEE0000030lWf2AI',
+    'SDD': '00OEE0000030lej2AA',
+}
+
+# GUS Salesforce report IDs for P0/P1 security bugs (metric card + detail links)
+P0P1_SECURITY_BUGS_REPORT_ID_BY_COMPONENT: Dict[str, str] = {
+    'Engine': '00OB0000002qWjvMAE',
+    'Store': '00OEE0000030lwT2AQ',
+    'SDD': '00OEE0000030lzh2AA',
+}
+
+# GUS Salesforce report IDs for P0/P1 left shift (metric card + detail links)
+P0P1_LEFT_SHIFT_REPORT_ID_BY_COMPONENT: Dict[str, str] = {
+    'Engine': '00OEE000002Wjld2AC',
+    'Store': '00OEE0000030m7l2AA',
+    'SDD': '00OEE0000030m9N2AQ',
+}
+
+# GUS Salesforce report IDs for P0/P1 ABS bugs (metric card + detail links)
+P0P1_ABS_BUGS_REPORT_ID_BY_COMPONENT: Dict[str, str] = {
+    'Engine': '00OEE000002bDht2AE',
+    'Store': '00OEE0000030o6L2AQ',
+    'SDD': '00OEE0000030o7x2AA',
+}
+
+# GUS Salesforce report IDs for All-time Bug Backlog (second dev metrics row)
+ALL_TIME_BUG_BACKLOG_REPORT_ID_BY_COMPONENT: Dict[str, str] = {
+    'Engine': '00OEE000002XRUv2AO',
+    'Store': '00OEE0000030oHd2AI',
+    'SDD': '00OEE0000030oKr2AI',
+}
+
+# GUS Salesforce report IDs for Backlog from PRB (second dev metrics row)
+BACKLOG_FROM_PRB_REPORT_ID_BY_COMPONENT: Dict[str, str] = {
+    'Engine': '00OEE000002ZnZN2A0',
+    'Store': '00OEE0000030oCn2AI',
+    'SDD': '00OEE0000030oEP2AY',
+}
+
+
+def gus_report_view_url(report_id: str) -> str:
+    return f"https://gus.lightning.force.com/lightning/r/Report/{report_id}/view"
+
+
+def p0p1_prod_bugs_report_url(tab_folder: Optional[str]) -> Optional[str]:
+    if not tab_folder:
+        return None
+    rid = P0P1_PROD_BUGS_REPORT_ID_BY_COMPONENT.get(tab_folder)
+    return gus_report_view_url(rid) if rid else None
+
+
+def p0p1_prod_bugs_metric_href(tab_folder: Optional[str]) -> str:
+    """Metric card link: GUS report when configured, else in-page anchor."""
+    url = p0p1_prod_bugs_report_url(tab_folder)
+    return url if url else '#production-bug-analysis'
+
+
+def p0p1_ci_issues_report_url(tab_folder: Optional[str]) -> Optional[str]:
+    if not tab_folder:
+        return None
+    rid = P0P1_CI_ISSUES_REPORT_ID_BY_COMPONENT.get(tab_folder)
+    return gus_report_view_url(rid) if rid else None
+
+
+def p0p1_ci_issues_metric_href(tab_folder: Optional[str]) -> str:
+    """P0/P1 CI Issues metric card: GUS report when configured, else in-page anchor."""
+    url = p0p1_ci_issues_report_url(tab_folder)
+    return url if url else '#ci-issues-analysis'
+
+
+def p0p1_security_bugs_report_url(tab_folder: Optional[str]) -> Optional[str]:
+    if not tab_folder:
+        return None
+    rid = P0P1_SECURITY_BUGS_REPORT_ID_BY_COMPONENT.get(tab_folder)
+    return gus_report_view_url(rid) if rid else None
+
+
+def p0p1_security_bugs_metric_href(tab_folder: Optional[str]) -> str:
+    """P0/P1 Security Bugs metric card: GUS report when configured, else in-page anchor."""
+    url = p0p1_security_bugs_report_url(tab_folder)
+    return url if url else '#security-analysis'
+
+
+def p0p1_left_shift_report_url(tab_folder: Optional[str]) -> Optional[str]:
+    if not tab_folder:
+        return None
+    rid = P0P1_LEFT_SHIFT_REPORT_ID_BY_COMPONENT.get(tab_folder)
+    return gus_report_view_url(rid) if rid else None
+
+
+def p0p1_left_shift_metric_href(tab_folder: Optional[str]) -> str:
+    """P0/P1 Left Shift metric card: GUS report when configured, else in-page anchor."""
+    url = p0p1_left_shift_report_url(tab_folder)
+    return url if url else '#left-shift-bugs'
+
+
+def p0p1_abs_bugs_report_url(tab_folder: Optional[str]) -> Optional[str]:
+    if not tab_folder:
+        return None
+    rid = P0P1_ABS_BUGS_REPORT_ID_BY_COMPONENT.get(tab_folder)
+    return gus_report_view_url(rid) if rid else None
+
+
+def p0p1_abs_bugs_metric_href(tab_folder: Optional[str]) -> str:
+    """P0/P1 ABS bugs metric card: GUS report when configured, else in-page anchor."""
+    url = p0p1_abs_bugs_report_url(tab_folder)
+    return url if url else '#abs-bugs'
+
+
+def all_time_bug_backlog_report_url(tab_folder: Optional[str]) -> Optional[str]:
+    if not tab_folder:
+        return None
+    rid = ALL_TIME_BUG_BACKLOG_REPORT_ID_BY_COMPONENT.get(tab_folder)
+    return gus_report_view_url(rid) if rid else None
+
+
+def all_time_bug_backlog_metric_href(tab_folder: Optional[str]) -> str:
+    """All-time Bug Backlog card: GUS report when configured, else in-page anchor."""
+    url = all_time_bug_backlog_report_url(tab_folder)
+    return url if url else '#production-metrics'
+
+
+def backlog_from_prb_report_url(tab_folder: Optional[str]) -> Optional[str]:
+    if not tab_folder:
+        return None
+    rid = BACKLOG_FROM_PRB_REPORT_ID_BY_COMPONENT.get(tab_folder)
+    return gus_report_view_url(rid) if rid else None
+
+
+def backlog_from_prb_metric_href(tab_folder: Optional[str]) -> str:
+    """Backlog from PRB card: GUS report when configured, else in-page anchor."""
+    url = backlog_from_prb_report_url(tab_folder)
+    return url if url else '#production-metrics'
+
+
+def render_engine_weekly_trends(dashboard: QualityReportDashboard) -> None:
+    """Week-over-week KPI trends from Engine report history (below all tabs)."""
+    src = PRODUCTION_METRICS_SOURCE
+    st.markdown("---")
+    st.markdown("### 📊 Weekly Trends")
+    st.caption(f"Trends use **{src}** report history.")
+    component_reports = dashboard.get_component_reports(src)
+    if len(component_reports) > 1:
+        st.markdown("#### Week-over-Week KPI Trends")
+        dashboard.create_weekly_trends(component_reports)
+    else:
+        st.info("📈 Weekly trends require multiple Engine reports. Generate more reports to see trend analysis.")
+
+
+def render_component_development_metrics(component: str, display_name: Optional[str] = None):
+    """Development-only sections for a component (report folder name).
+
+    display_name: optional label for headings (e.g. **Store** for the Store tab).
+    """
     dashboard = QualityReportDashboard()
-    
-    # Check if there's a selected week with reports
+    label = display_name if display_name is not None else component
+
     selected_week_reports = getattr(st.session_state, 'selected_week_reports', {})
     selected_week = getattr(st.session_state, 'selected_week', None)
-    
-    
-    # Check if the selected week has a report for this component
-    if component in selected_week_reports:
-        report_to_use = selected_week_reports[component]
-        st.subheader(f"📊 {component} Production Metrics")
-    else:
-        # No report for this component in selected week
-        st.subheader(f"📊 {component} Production Metrics")
+
+    if component not in selected_week_reports:
+        st.subheader(f"📈 {label} Development Metrics")
         if selected_week:
             st.info(f"📅 Selected week: {selected_week}")
-            st.warning(f"No {component} report available for the selected week.")
+            st.warning(f"No {label} report available for the selected week.")
         else:
             st.info("No week selected.")
-        
-        # Check if there are any reports for this component at all
+
         component_reports = dashboard.get_component_reports(component)
         if component_reports:
-            st.info(f"💡 {component} has {len(component_reports)} reports available. Select a week from the sidebar that includes {component} data.")
+            st.info(
+                f"💡 {label} has {len(component_reports)} reports available. "
+                f"Select a week from the sidebar that includes data for `{component}`."
+            )
         else:
-            st.info(f"💡 No reports found for {component} component. Use `./run_report.sh <week> {component}` to generate reports.")
+            st.info(
+                f"💡 No reports found for `{component}`. "
+                f"Use `./run_report.sh <week> {component}` to generate reports."
+            )
         return
-    
+
     try:
+        report_to_use = selected_week_reports[component]
         with open(report_to_use['path'], 'r') as f:
             data = json.load(f)
-        
-        # Load LLM content from the report data
+
         dashboard.llm_content = data.get('llm_content', {})
-        
-        # Create metrics dashboard
-        dashboard.create_metrics_dashboard(data, component)
-        
-        # Weekly Trends Analysis (right after KPI metrics)
+
+        eng_key = PRODUCTION_METRICS_SOURCE
+        engine_data = None
+        if eng_key in selected_week_reports:
+            try:
+                with open(selected_week_reports[eng_key]['path'], 'r') as ef:
+                    engine_data = json.load(ef)
+            except Exception:
+                engine_data = None
+
+        dashboard.render_production_kpi_row_hybrid(engine_data, data, component, level_label=label)
+        dashboard.create_metrics_dashboard(
+            data,
+            component,
+            kpi_scope='development',
+            development_heading_suffix=label,
+        )
         st.markdown("---")
-        st.markdown("### 📊 Weekly Trends")
-        component_reports = dashboard.get_component_reports(component)
-        if len(component_reports) > 1:
-            st.markdown("#### Week-over-Week KPI Trends")
-            dashboard.create_weekly_trends(component_reports)
-        else:
-            st.info("📈 Weekly trends require multiple reports. Generate more reports to see trend analysis.")
-        
-        st.markdown("---")
-        
-        # Component-specific analysis sections
-        st.subheader(f"📈 {component} Development Metrics")
-        
+
         # PRB Analysis
         st.markdown('<h3 id="problem-reports-analysis">🚨 Problem Reports Analysis</h3>', unsafe_allow_html=True)
         st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
@@ -3498,6 +4131,13 @@ def render_component_dashboard(component: str):
         
         # Bug Analysis
         st.markdown('<h3 id="production-bug-analysis">🐛 Production Bug Analysis</h3>', unsafe_allow_html=True)
+        p0p1_gus = p0p1_prod_bugs_report_url(component)
+        if p0p1_gus:
+            st.markdown(
+                f'<p style="margin: -4px 0 10px 0;"><a href="{p0p1_gus}" target="_blank" rel="noopener noreferrer">'
+                f'📋 P0/P1 production bugs — GUS report</a></p>',
+                unsafe_allow_html=True,
+            )
         st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         col1, col2 = st.columns([1, 1])
         with col1:
@@ -3516,12 +4156,22 @@ def render_component_dashboard(component: str):
         
         # CI Issues
         st.markdown('<h3 id="ci-issues-analysis">🔧 CI Issues Analysis</h3>', unsafe_allow_html=True)
+        ci_issues_gus = p0p1_ci_issues_report_url(component)
+        if ci_issues_gus:
+            st.markdown(
+                f'<p style="margin: -4px 0 10px 0;"><a href="{ci_issues_gus}" target="_blank" rel="noopener noreferrer">'
+                f'🔧 P0/P1 CI issues — GUS report</a></p>',
+                unsafe_allow_html=True,
+            )
         st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         col1, col2 = st.columns([1, 1])
         with col1:
             dashboard.create_ci_issues_chart(data)
         with col2:
-            st.markdown("#### 📊 [CI Issues Insights](https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=report&wave__assetId=00OEE000002WjvJ2AS)")
+            if ci_issues_gus:
+                st.markdown(f"#### 📊 [CI Issues Insights]({ci_issues_gus})")
+            else:
+                st.markdown("#### 📊 CI Issues Insights")
             ci_data = data.get('ci_issues', [])
             if ci_data:
                 total_ci_issues = len(ci_data)
@@ -3549,7 +4199,14 @@ def render_component_dashboard(component: str):
         
         # Security Analysis
         st.markdown("---")
-        st.markdown('<h3 id="security-analysis">🔒 <a href="https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=lightningdashboard&wave__assetId=01ZEE000001BaVp2AK" target="_blank">Security Bugs</a></h3>', unsafe_allow_html=True)
+        st.markdown('<h3 id="security-analysis">🔒 Security Bugs</h3>', unsafe_allow_html=True)
+        security_gus = p0p1_security_bugs_report_url(component)
+        if security_gus:
+            st.markdown(
+                f'<p style="margin: -4px 0 10px 0;"><a href="{security_gus}" target="_blank" rel="noopener noreferrer">'
+                f'🔒 P0/P1 security bugs — GUS report</a></p>',
+                unsafe_allow_html=True,
+            )
         st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         st.markdown("*Source: Coverity and 3PP Scan*")
         col1, col2 = st.columns([1, 1])
@@ -3591,13 +4248,23 @@ def render_component_dashboard(component: str):
 
         # Left Shift Analysis
         st.markdown("---")
-        st.markdown('<h3 id="left-shift-bugs">⬅️ <a href="https://gus.lightning.force.com/lightning/page/analytics?wave__assetType=lightningdashboard&wave__assetId=01ZEE000001BaVp2AK" target="_blank">Left Shift Bugs</a></h3>', unsafe_allow_html=True)
+        st.markdown('<h3 id="left-shift-bugs">⬅️ Left Shift Bugs</h3>', unsafe_allow_html=True)
+        left_shift_gus = p0p1_left_shift_report_url(component)
+        if left_shift_gus:
+            st.markdown(
+                f'<p style="margin: -4px 0 10px 0;"><a href="{left_shift_gus}" target="_blank" rel="noopener noreferrer">'
+                f'⬅️ P0/P1 left shift — GUS report</a></p>',
+                unsafe_allow_html=True,
+            )
         st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         col1, col2 = st.columns([1, 1])
         with col1:
             dashboard.create_leftshift_bugs_chart(data)
         with col2:
-            st.markdown("#### 📈 Left Shift Insights")
+            if left_shift_gus:
+                st.markdown(f"#### 📈 [Left Shift Insights]({left_shift_gus})")
+            else:
+                st.markdown("#### 📈 Left Shift Insights")
             leftshift_data = data.get('leftshift_issues', [])
             if leftshift_data:
                 total_leftshift_bugs = len(leftshift_data)
@@ -3620,6 +4287,44 @@ def render_component_dashboard(component: str):
                     st.write(f"• {team}: {subject}")
             else:
                 st.info("No left shift bugs data available")
+
+        # ABS bugs
+        st.markdown("---")
+        st.markdown('<h3 id="abs-bugs">🔷 ABS Bugs</h3>', unsafe_allow_html=True)
+        abs_gus = p0p1_abs_bugs_report_url(component)
+        if abs_gus:
+            st.markdown(
+                f'<p style="margin: -4px 0 10px 0;"><a href="{abs_gus}" target="_blank" rel="noopener noreferrer">'
+                f'🔷 P0/P1 ABS bugs — GUS report</a></p>',
+                unsafe_allow_html=True,
+            )
+        st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            dashboard.create_abs_bugs_chart(data)
+        with col2:
+            if abs_gus:
+                st.markdown(f"#### 📈 [ABS Insights]({abs_gus})")
+            else:
+                st.markdown("#### 📈 ABS Insights")
+            abs_list = data.get('abs_issues', [])
+            if abs_list:
+                total_abs = len(abs_list)
+                priority_counts = {}
+                for bug in abs_list:
+                    priority = bug.get('priority', 'Unknown')
+                    priority_counts[priority] = priority_counts.get(priority, 0) + 1
+                priority_breakdown = ", ".join([f"{p}:{count}" for p, count in sorted(priority_counts.items())])
+                st.metric("Total ABS Bugs", f"{total_abs} ({priority_breakdown})")
+                teams = list(set(bug.get('team', 'Unknown') for bug in abs_list))
+                st.metric("Teams Affected", len(teams))
+                st.markdown("**Recent activity:**")
+                for bug in abs_list[:3]:
+                    subject = bug.get('subject', 'Unknown Issue')[:50] + "..."
+                    team = bug.get('team', 'Unknown Team')
+                    st.write(f"• {team}: {subject}")
+            else:
+                st.info("No ABS bugs data available")
 
         # Deployment Analysis
         st.markdown("---")
@@ -3648,7 +4353,7 @@ def render_component_dashboard(component: str):
         st.markdown("---")
         st.markdown('<h3 id="code-changes-analysis">📊 Code Changes Analysis</h3>', unsafe_allow_html=True)
         st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
-        dashboard.create_code_changes_analysis(data)
+        dashboard.create_code_changes_analysis(data, component=component)
 
         # Trend Analysis
         st.markdown("---")
@@ -3660,7 +4365,8 @@ def render_component_dashboard(component: str):
             dashboard.create_trend_insights(data)
             
     except Exception as e:
-        st.error(f"Error loading {component} data: {e}")
+        st.error(f"Error loading {label} data: {e}")
+
 
 def main():
     """Main Streamlit application."""
@@ -3756,12 +4462,12 @@ def main():
     dashboard = QualityReportDashboard()
     
     # Sidebar for report selection (MUST run before component tabs)
-    components = ['Engine', 'Store', 'Archival', 'SDD', 'msSDB', 'Core App Efficiency']
+    components = list(REPORT_FOLDER_COMPONENTS)
     st.sidebar.title("📋 Quality Reports")
-    
+
     # Get all reports from all components and group by week
     all_reports = []
-    
+
     for component in components:
         component_reports = dashboard.get_component_reports(component)
         for report in component_reports:
@@ -3825,39 +4531,61 @@ def main():
     
     st.sidebar.markdown("---")
     
-    # Show component report counts
+    # Show report counts (aligned with four dashboard tabs)
     st.sidebar.markdown("### 📊 Available Reports")
-    component_icons = {'Engine': '🔧', 'Store': '📦', 'Archival': '🗄️', 'SDD': '💾', 'msSDB': '🔄', 'Core App Efficiency': '⚡'}
-    
-    for component in components:
-        component_reports = dashboard.get_component_reports(component)
-        count = len(component_reports)
-        icon = component_icons.get(component, '📊')
-        if count > 0:
-            st.sidebar.write(f"{icon} **{component}**: {count} reports")
-        else:
-            st.sidebar.write(f"{icon} {component}: No reports")
-    
+    eng = dashboard.get_component_reports('Engine')
+    st.sidebar.write(f"🔧 **Engine**: {len(eng)} reports" if eng else "🔧 Engine: No reports")
+
+    store_reports = dashboard.get_component_reports('Store')
+    st.sidebar.write(f"📦 **Store**: {len(store_reports)} reports" if store_reports else "📦 Store: No reports")
+
+    sdd_reports = dashboard.get_component_reports('SDD')
+    st.sidebar.write(f"💾 **SDD**: {len(sdd_reports)} reports" if sdd_reports else "💾 SDD: No reports")
+
+    core = dashboard.get_component_reports('Core App Efficiency')
+    core_label = "Core Optimizer and SFSQL"
+    if core:
+        st.sidebar.write(f"⚡ **{core_label}**: {len(core)} reports")
+    else:
+        st.sidebar.write(f"⚡ {core_label}: No reports")
+
     st.sidebar.markdown("---")
     st.sidebar.markdown("### 🔄 Actions")
-    st.sidebar.info("📊 Select a report above, then click component tabs to view data")
-    st.sidebar.info("💡 Use `./run_report.sh <week> <component>` to generate new reports")
-    
+    st.sidebar.info("📊 Select a week above, then open a dashboard tab to view data")
+    st.sidebar.info(
+        "💡 Generate reports with `./run_report.sh <week> <component>` "
+        "(`Engine`, `Store`, `SDD`, `Core App Efficiency`)."
+    )
+    st.sidebar.info(
+        "🏭 **Production metrics:** **Fleet-wide** row (Engine) plus a second row named for the open tab "
+        "(e.g. **Engine-level**, **Store-level**): rollout risk & P0/P1 prod bugs from that tab’s report."
+    )
+
     # Display dynamic banner with timestamp information
     dashboard.display_banner_with_timestamp(st.session_state.selected_week_reports)
-    
-    # Component tabs (AFTER sidebar logic runs)
-    component_icons = {'Engine': '🔧', 'Store': '📦', 'Archival': '🗄️', 'SDD': '💾', 'msSDB': '🔄', 'Core App Efficiency': '⚡'}
-    
-    # Create main tabs for components only
-    tab_labels = [f"{component_icons.get(comp, '📊')} {comp}" for comp in components]
-    component_tabs = st.tabs(tab_labels)
-    
-    # Component tabs
-    for i, component in enumerate(components):
-        with component_tabs[i]:
-            render_component_dashboard(component)
-    
+
+    main_tab_labels = [
+        "🔧 Engine",
+        "📦 Store",
+        "💾 SDD",
+        "⚡ Core Optimizer and SFSQL",
+    ]
+    main_tabs = st.tabs(main_tab_labels)
+
+    with main_tabs[0]:
+        render_component_development_metrics("Engine")
+    with main_tabs[1]:
+        render_component_development_metrics("Store", display_name="Store")
+    with main_tabs[2]:
+        render_component_development_metrics("SDD", display_name="SDD")
+    with main_tabs[3]:
+        render_component_development_metrics(
+            "Core App Efficiency",
+            display_name="Core Optimizer and SFSQL",
+        )
+
+    render_engine_weekly_trends(dashboard)
+
     # KPI Legend Section
     st.markdown("---")
     st.markdown("### 📊 KPI Color Definitions")
@@ -3866,7 +4594,7 @@ def main():
     
     with col1:
         st.markdown("""
-        #### 🐛 **Bug Metrics (Production, CI, Security, Left Shift)**
+        #### 🐛 **Bug Metrics (Production, CI, Security, Left Shift, ABS)**
         - **🟢 GREEN**: Low risk - minimal critical issues
         - **🟡 YELLOW**: Moderate risk - standard review needed  
         - **🔴 RED**: High risk - extra scrutiny required
@@ -3876,6 +4604,7 @@ def main():
         - **CI Issues**: Green ≤25, Yellow 26-50, Red >50
         - **Security Issues**: Green ≤16, Yellow 17-32, Red >32
         - **Left Shift**: Green ≤25, Yellow 26-50, Red >50
+        - **ABS Bugs**: Green ≤25, Yellow 26-50, Red >50
         """)
     
     with col2:
