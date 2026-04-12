@@ -3429,6 +3429,13 @@ def main():
     print("Loading PRB-derived backlog (prb-bugs)...")
     if not use_reports:
         collector.load_prb_bugs(args.prb_bugs_file)
+    # Single key for dashboard: prefer API `prb_backlog`, else file `prb_bugs` (may be [])
+    pb_api = collector.data.get('prb_backlog')
+    pb_file = collector.data.get('prb_bugs') or []
+    if pb_api is None:
+        collector.data['prb_backlog'] = list(pb_file)
+    elif not pb_api and pb_file:
+        collector.data['prb_backlog'] = list(pb_file)
     print("Loading system availability from avail.txt...")
     collector.load_system_availability(args.availability_file)
 

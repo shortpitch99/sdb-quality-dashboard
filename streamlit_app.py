@@ -14,7 +14,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 import glob
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional, Tuple
 import re
 from dotenv import load_dotenv
 
@@ -528,19 +528,23 @@ class QualityReportDashboard:
             changes['critical_backlog'] = calc_pct_change(current_critical_backlog, previous_critical_backlog)
             changes['total_backlog'] = calc_pct_change(current_total_backlog, previous_total_backlog)
             
-            # All-time Backlog (from Salesforce report)
-            current_alltime_backlog = current_data.get('alltime_backlog', [])
-            current_critical_alltime = len([b for b in current_alltime_backlog if 'P0' in str(b.get('severity', '')) or 'P1' in str(b.get('severity', ''))])
+            # All-time Backlog (weighted score: 10×P0/P1 + 1×P2+)
+            def _alltime_weighted_for_week(d: Dict[str, Any]) -> int:
+                ab = d.get("alltime_backlog", [])
+                if ab:
+                    return alltime_backlog_weighted_score(ab)
+                bugs = d.get("bugs", [])
+                return alltime_backlog_weighted_score(bugs)
+
+            current_alltime_score = _alltime_weighted_for_week(current_data)
+            previous_alltime_score = _alltime_weighted_for_week(previous_data)
+            changes["alltime_backlog"] = calc_pct_change(current_alltime_score, previous_alltime_score)
             
-            previous_alltime_backlog = previous_data.get('alltime_backlog', [])
-            previous_critical_alltime = len([b for b in previous_alltime_backlog if 'P0' in str(b.get('severity', '')) or 'P1' in str(b.get('severity', ''))])
-            changes['alltime_backlog'] = calc_pct_change(current_critical_alltime, previous_critical_alltime)
-            
-            # PRB Backlog (from Salesforce report)
-            current_prb_backlog = current_data.get('prb_backlog', [])
+            # PRB Backlog (Salesforce `prb_backlog` or file-mode `prb_bugs`)
+            current_prb_backlog = current_data.get('prb_backlog') or current_data.get('prb_bugs') or []
             current_critical_prb_backlog = len([b for b in current_prb_backlog if 'P0' in str(b.get('priority', '')) or 'P1' in str(b.get('priority', ''))])
             
-            previous_prb_backlog = previous_data.get('prb_backlog', [])
+            previous_prb_backlog = previous_data.get('prb_backlog') or previous_data.get('prb_bugs') or []
             previous_critical_prb_backlog = len([b for b in previous_prb_backlog if 'P0' in str(b.get('priority', '')) or 'P1' in str(b.get('priority', ''))])
             changes['prb_backlog'] = calc_pct_change(current_critical_prb_backlog, previous_critical_prb_backlog)
             
@@ -641,6 +645,41 @@ class QualityReportDashboard:
             color: #495057;
             font-weight: 400;
             margin-top: 0.2rem;
+        }
+        .metric-value-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin: 0.3rem 0;
+        }
+        .metric-value-row .metric-value {
+            margin: 0;
+        }
+        .metric-value-row .metric-delta {
+            margin-top: 0;
+        }
+        /* Line Coverage: fill card like other dev KPIs (label + value row + subtitle line) */
+        .metric-card--line-coverage {
+            justify-content: flex-start;
+        }
+        .metric-line-coverage-body {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 0.35rem;
+            width: 100%;
+            min-height: 0;
+        }
+        .metric-line-coverage-body .metric-total {
+            min-height: 1.35em;
+            line-height: 1.35;
+        }
+        .metric-line-coverage-body .metric-delta {
+            margin-top: 0.35rem;
         }
         </style>
         """, unsafe_allow_html=True)
@@ -1295,22 +1334,30 @@ class QualityReportDashboard:
             with col5:            
                 # Coverage color logic: green if >= 80%, yellow if >= 70%, red if < 70%
                 coverage_delta_class = "metric-delta-green" if avg_coverage >= 80 else ("metric-delta-yellow" if avg_coverage >= 70 else "metric-delta-red")
-                
+                if avg_coverage >= 80:
+                    coverage_status = "GREEN"
+                elif avg_coverage >= 70:
+                    coverage_status = "YELLOW"
+                else:
+                    coverage_status = "RED"
+
                 # Format the value with week-over-week change
                 coverage_display = f"{avg_coverage:.1f}%"
                 if changes.get('coverage'):
                     coverage_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['coverage']})</span>"
-                
+
                 st.markdown(f"""
                 <a href="#code-coverage-analysis" style="text-decoration: none; color: inherit;">
-                    <div class="metric-card metric-card-clickable">
-                    <div class="metric-label">📊 Overall Line Coverage</div>
-                    <div class="metric-value">{coverage_display}</div>
-                        <div class="metric-total">Overall Coverage 67.8%</div>
-                        <div class="metric-delta {coverage_delta_class}">
-                        Target: 80%
+                    <div class="metric-card metric-card-clickable metric-card--line-coverage">
+                        <div class="metric-label">📊 Line Coverage</div>
+                        <div class="metric-line-coverage-body">
+                            <div class="metric-value">{coverage_display}</div>
+                            <div class="metric-delta {coverage_delta_class}">
+                                {coverage_status}
+                            </div>
+                            <div class="metric-total">&nbsp;</div>
+                        </div>
                     </div>
-                </div>
                 </a>
                 """, unsafe_allow_html=True)
                 
@@ -1331,7 +1378,7 @@ class QualityReportDashboard:
                     <div class="metric-card metric-card-clickable">
                         <div class="metric-label">🔧 P0/P1 CI Issues</div>
                         <div class="metric-value">{ci_p0_p1_display}</div>
-                        <div class="metric-total">{total_ci_issues} issues</div>
+                        <div class="metric-total">{total_ci_issues} bugs</div>
                         <div class="metric-delta {ci_delta_class}">
                             {ci_bug_status}
                     </div>
@@ -1355,7 +1402,7 @@ class QualityReportDashboard:
                     <div class="metric-card metric-card-clickable">
                         <div class="metric-label">🔒 P0/P1 Security Bugs</div>
                     <div class="metric-value">{critical_sec_bugs_display}</div>
-                        <div class="metric-total">of {total_security_bugs} total</div>
+                        <div class="metric-total">{total_security_bugs} bugs</div>
                         <div class="metric-delta {sec_delta_class}">
                             {sec_bug_status}
                     </div>
@@ -1457,37 +1504,33 @@ class QualityReportDashboard:
             col10, col11, col12, col13, col14 = st.columns(5)
             
             with col10:
-                # All-time Bug Backlog - use real data from Salesforce report
+                # All-time Bug Backlog — weighted score (10× P0/P1 + 1× P2+) drives color
                 alltime_backlog = data.get('alltime_backlog', [])
                 if alltime_backlog:
-                    # Use data from Salesforce All-time Backlog report
-                    critical_backlog_bugs = len([b for b in alltime_backlog if 'P0' in str(b.get('severity', '')) or 'P1' in str(b.get('severity', ''))])
-                    total_backlog_bugs = len(alltime_backlog)
+                    backlog_rows = alltime_backlog
                 else:
-                    # Fallback to bugs data if alltime_backlog not available
-                    bugs = data.get('bugs', [])
-                    critical_backlog_bugs = len([b for b in bugs if 'P0' in str(b.get('severity', '')) or 'P1' in str(b.get('severity', ''))])
-                    total_backlog_bugs = len(bugs)
-                
-                # Format the value with week-over-week change
-                critical_backlog_display = f"{critical_backlog_bugs}"
-                if alltime_backlog and changes.get('alltime_backlog'):
-                    critical_backlog_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['alltime_backlog']})</span>"
-                elif changes.get('critical_backlog'):
-                    critical_backlog_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['critical_backlog']})</span>"
-                
-                # Determine color based on critical bugs
-                backlog_delta_class = "metric-delta-green" if critical_backlog_bugs == 0 else ("metric-delta-yellow" if critical_backlog_bugs <= 5 else "metric-delta-red")
-                backlog_status = "GREEN" if critical_backlog_bugs == 0 else ("YELLOW" if critical_backlog_bugs <= 5 else "RED")
-                
+                    backlog_rows = data.get("bugs", [])
+
+                backlog_weighted_score = alltime_backlog_weighted_score(backlog_rows)
+                backlog_status, backlog_delta_class = alltime_backlog_status_from_score(
+                    backlog_weighted_score
+                )
+                total_alltime_bugs = len(backlog_rows)
+
+                score_display = f"{backlog_weighted_score:,}"
+                if changes.get("alltime_backlog"):
+                    score_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['alltime_backlog']})</span>"
+                elif changes.get("critical_backlog") and not alltime_backlog:
+                    score_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['critical_backlog']})</span>"
+
                 atbl_href = all_time_bug_backlog_metric_href(prod_bugs_link_folder)
                 atbl_extra = ' target="_blank" rel="noopener noreferrer"' if atbl_href.startswith('https') else ''
                 st.markdown(f"""
                 <a href="{atbl_href}"{atbl_extra} style="text-decoration: none; color: inherit;">
                     <div class="metric-card metric-card-clickable">
                         <div class="metric-label">🐛 All-time Bug Backlog</div>
-                        <div class="metric-value">{critical_backlog_display}</div>
-                        <div class="metric-total">{total_backlog_bugs} bugs</div>
+                        <div class="metric-value">{score_display}</div>
+                        <div class="metric-total">{total_alltime_bugs} bugs</div>
                         <div class="metric-delta {backlog_delta_class}">
                             {backlog_status}
                         </div>
@@ -1496,52 +1539,29 @@ class QualityReportDashboard:
                 """, unsafe_allow_html=True)
             
             with col11:
-                # Backlog from PRB - use real data from Salesforce report
-                prb_backlog = data.get('prb_backlog', [])
-                if prb_backlog:
-                    # Use data from Salesforce PRB Backlog report
-                    critical_prb_backlog = len([b for b in prb_backlog if 'P0' in str(b.get('priority', '')) or 'P1' in str(b.get('priority', ''))])
-                    total_prb_backlog = len(prb_backlog)
-                    
-                    # Determine color based on critical PRB backlog items
-                    prb_backlog_delta_class = "metric-delta-green" if critical_prb_backlog == 0 else ("metric-delta-yellow" if critical_prb_backlog <= 3 else "metric-delta-red")
-                    prb_backlog_status = "GREEN" if critical_prb_backlog == 0 else ("YELLOW" if critical_prb_backlog <= 3 else "RED")
-                    
-                    # Format the value with week-over-week change
-                    critical_prb_backlog_display = f"{critical_prb_backlog}"
-                    if changes.get('prb_backlog'):
-                        critical_prb_backlog_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['prb_backlog']})</span>"
-                    
-                    bfp_href = backlog_from_prb_metric_href(prod_bugs_link_folder)
-                    bfp_extra = ' target="_blank" rel="noopener noreferrer"' if bfp_href.startswith('https') else ''
-                    st.markdown(f"""
-                    <a href="{bfp_href}"{bfp_extra} style="text-decoration: none; color: inherit;">
-                        <div class="metric-card metric-card-clickable">
-                            <div class="metric-label">📋 Backlog from PRB</div>
-                            <div class="metric-value">{critical_prb_backlog_display}</div>
-                            <div class="metric-total">{total_prb_backlog} items</div>
-                            <div class="metric-delta {prb_backlog_delta_class}">
-                                {prb_backlog_status}
-                            </div>
+                # API archives use `prb_backlog`; file-only runs may only have `prb_bugs`. Empty list => show 0, not "No Data".
+                prb_backlog = data.get('prb_backlog') or data.get('prb_bugs') or []
+                critical_prb_backlog = len([b for b in prb_backlog if 'P0' in str(b.get('priority', '')) or 'P1' in str(b.get('priority', ''))])
+                total_prb_backlog = len(prb_backlog)
+                prb_backlog_delta_class = "metric-delta-green" if critical_prb_backlog == 0 else ("metric-delta-yellow" if critical_prb_backlog <= 3 else "metric-delta-red")
+                prb_backlog_status = "GREEN" if critical_prb_backlog == 0 else ("YELLOW" if critical_prb_backlog <= 3 else "RED")
+                critical_prb_backlog_display = f"{critical_prb_backlog}"
+                if changes.get('prb_backlog'):
+                    critical_prb_backlog_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['prb_backlog']})</span>"
+                bfp_href = backlog_from_prb_metric_href(prod_bugs_link_folder)
+                bfp_extra = ' target="_blank" rel="noopener noreferrer"' if bfp_href.startswith('https') else ''
+                st.markdown(f"""
+                <a href="{bfp_href}"{bfp_extra} style="text-decoration: none; color: inherit;">
+                    <div class="metric-card metric-card-clickable">
+                        <div class="metric-label">📋 Backlog from PRB</div>
+                        <div class="metric-value">{critical_prb_backlog_display}</div>
+                        <div class="metric-total">{total_prb_backlog} bugs</div>
+                        <div class="metric-delta {prb_backlog_delta_class}">
+                            {prb_backlog_status}
                         </div>
-                    </a>
-                    """, unsafe_allow_html=True)
-                else:
-                    # Fallback when no PRB backlog data available (still link to GUS report)
-                    bfp_href = backlog_from_prb_metric_href(prod_bugs_link_folder)
-                    bfp_extra = ' target="_blank" rel="noopener noreferrer"' if bfp_href.startswith('https') else ''
-                    st.markdown(f"""
-                    <a href="{bfp_href}"{bfp_extra} style="text-decoration: none; color: inherit;">
-                        <div class="metric-card metric-card-clickable">
-                            <div class="metric-label">📋 Backlog from PRB</div>
-                            <div class="metric-value">--</div>
-                            <div class="metric-total">No Data</div>
-                            <div class="metric-delta metric-delta-gray">
-                                PENDING
-                            </div>
-                        </div>
-                    </a>
-                    """, unsafe_allow_html=True)
+                    </div>
+                </a>
+                """, unsafe_allow_html=True)
             
             # Leave remaining columns empty for future expansion
             with col12:
@@ -3007,7 +3027,7 @@ class QualityReportDashboard:
         st.markdown("### 📈 Quality Trends Analysis")
         st.info("**Trend Analysis:** Content not available - requires LLM generation during report creation")
     
-    def create_weekly_trends(self, report_files: List[Dict[str, Any]]):
+    def create_weekly_trends(self, report_files: List[Dict[str, Any]], chart_key_suffix: str = ""):
         """Render week-over-week trends using past reports' metadata counts."""
         if not report_files:
             return
@@ -3204,7 +3224,8 @@ class QualityReportDashboard:
             font=dict(family="Inter, Arial, sans-serif", size=12, color="#2c3e50")
         )
         
-        st.plotly_chart(fig, use_container_width=True, key='weekly_trends_chart_scores')
+        safe_suffix = chart_key_suffix.replace(" ", "_") if chart_key_suffix else "default"
+        st.plotly_chart(fig, use_container_width=True, key=f"weekly_trends_chart_scores_{safe_suffix}")
     
     def create_risk_insights(self, data: Dict[str, Any]):
         """Create risk insights panel based on archived risk data."""
@@ -4023,6 +4044,40 @@ def p0p1_abs_bugs_metric_href(tab_folder: Optional[str]) -> str:
     return url if url else '#abs-bugs'
 
 
+# All-time backlog: 1 P0/P1 counts like 10 P2; P2/P3/P4 (and unknown) count as 1 each.
+ALLTIME_BACKLOG_WEIGHT_P0P1 = 10
+ALLTIME_BACKLOG_WEIGHT_MINOR = 1
+# Bands on weighted score: <10 ≈ under 1× P0/P1 equiv; 10–50 ≈ old 1–5 P0/P1; >50 high
+ALLTIME_BACKLOG_SCORE_GREEN_LT = 10
+ALLTIME_BACKLOG_SCORE_YELLOW_MAX = 50
+
+
+def alltime_backlog_weighted_score(items: List[Dict[str, Any]]) -> int:
+    """Weighted backlog score: each P0/P1 = 10 points, each P2+ / unknown = 1 point."""
+    total = 0
+    for b in items:
+        s = str(b.get("severity", "") or b.get("priority", "")).upper()
+        if (
+            "P0" in s
+            or "P1" in s
+            or "SEV0" in s
+            or "SEV1" in s
+        ):
+            total += ALLTIME_BACKLOG_WEIGHT_P0P1
+        else:
+            total += ALLTIME_BACKLOG_WEIGHT_MINOR
+    return total
+
+
+def alltime_backlog_status_from_score(score: int) -> Tuple[str, str]:
+    """Return (status label, metric-delta CSS class) for weighted all-time backlog score."""
+    if score < ALLTIME_BACKLOG_SCORE_GREEN_LT:
+        return "GREEN", "metric-delta-green"
+    if score <= ALLTIME_BACKLOG_SCORE_YELLOW_MAX:
+        return "YELLOW", "metric-delta-yellow"
+    return "RED", "metric-delta-red"
+
+
 def all_time_bug_backlog_report_url(tab_folder: Optional[str]) -> Optional[str]:
     if not tab_folder:
         return None
@@ -4049,18 +4104,25 @@ def backlog_from_prb_metric_href(tab_folder: Optional[str]) -> str:
     return url if url else '#production-metrics'
 
 
-def render_engine_weekly_trends(dashboard: QualityReportDashboard) -> None:
-    """Week-over-week KPI trends from Engine report history (below all tabs)."""
-    src = PRODUCTION_METRICS_SOURCE
-    st.markdown("---")
+def render_component_weekly_trends(
+    dashboard: QualityReportDashboard,
+    component: str,
+    display_label: str,
+) -> None:
+    """Week-over-week KPI trends for this component (before Problem Reports Analysis)."""
     st.markdown("### 📊 Weekly Trends")
-    st.caption(f"Trends use **{src}** report history.")
-    component_reports = dashboard.get_component_reports(src)
+    st.caption(
+        f"Week-over-week trends for **{display_label}** from archived reports under `{component}`."
+    )
+    component_reports = dashboard.get_component_reports(component)
     if len(component_reports) > 1:
         st.markdown("#### Week-over-Week KPI Trends")
-        dashboard.create_weekly_trends(component_reports)
+        dashboard.create_weekly_trends(component_reports, chart_key_suffix=component)
     else:
-        st.info("📈 Weekly trends require multiple Engine reports. Generate more reports to see trend analysis.")
+        st.info(
+            f"📈 Weekly trends need multiple {display_label} reports. "
+            f"Generate more with `./run_report.sh <week> {component}`."
+        )
 
 
 def render_component_development_metrics(component: str, display_name: Optional[str] = None):
@@ -4118,6 +4180,8 @@ def render_component_development_metrics(component: str, display_name: Optional[
             kpi_scope='development',
             development_heading_suffix=label,
         )
+        st.markdown("---")
+        render_component_weekly_trends(dashboard, component, label)
         st.markdown("---")
 
         # PRB Analysis
@@ -4584,8 +4648,6 @@ def main():
             display_name="Core Optimizer and SFSQL",
         )
 
-    render_engine_weekly_trends(dashboard)
-
     # KPI Legend Section
     st.markdown("---")
     st.markdown("### 📊 KPI Color Definitions")
@@ -4623,8 +4685,8 @@ def main():
         - Count of features with Red/At Risk/Critical status
         
         #### 🐛 **All-time Bug Backlog**
-        - **🟡 BACKLOG**: Accumulated bugs requiring attention
-        - Shows P0/P1 critical bugs vs total backlog count
+        - **Weighted score**: 10 points per P0/P1 bug, 1 point per P2+ (1 P0/P1 ≈ 10 P2)
+        - **🟢 GREEN**: score under 10 · **🟡 YELLOW**: 10–50 · **🔴 RED**: over 50
         
         #### 📋 **Backlog from PRB**
         - **🔘 PENDING**: PRB-related followup items
