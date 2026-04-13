@@ -1329,9 +1329,9 @@ class QualityReportDashboard:
             if development_heading_suffix:
                 dev_heading += f" — {development_heading_suffix}"
             st.markdown(dev_heading)
-            col5, col6, col7, col8, col9, col10 = st.columns(6)
-        
-            with col5:            
+            dev_r1_a, dev_r1_b, dev_r1_c, dev_r1_d = st.columns(4)
+
+            with dev_r1_a:
                 # Coverage color logic: green if >= 80%, yellow if >= 70%, red if < 70%
                 coverage_delta_class = "metric-delta-green" if avg_coverage >= 80 else ("metric-delta-yellow" if avg_coverage >= 70 else "metric-delta-red")
                 if avg_coverage >= 80:
@@ -1360,8 +1360,8 @@ class QualityReportDashboard:
                     </div>
                 </a>
                 """, unsafe_allow_html=True)
-                
-            with col6:
+
+            with dev_r1_b:
                 total_ci_issues = len(data.get('ci_issues', []))
                 ci_p0_p1_count = ci_p0_bugs + ci_p1_bugs
                 ci_delta_class = "metric-delta-green" if ci_bug_status == "GREEN" else ("metric-delta-yellow" if ci_bug_status == "YELLOW" else "metric-delta-red")
@@ -1385,8 +1385,8 @@ class QualityReportDashboard:
                 </div>
                 </a>
                 """, unsafe_allow_html=True)
-                
-            with col7:
+
+            with dev_r1_c:
                 total_security_bugs = len(data.get('security_issues', []))
                 sec_delta_class = "metric-delta-green" if sec_bug_status == "GREEN" else ("metric-delta-yellow" if sec_bug_status == "YELLOW" else "metric-delta-red")
                 
@@ -1409,8 +1409,8 @@ class QualityReportDashboard:
                 </div>
                 </a>
                 """, unsafe_allow_html=True)
-                
-            with col8:
+
+            with dev_r1_d:
                 total_leftshift_bugs = len(data.get('leftshift_issues', []))
                 ls_delta_class = "metric-delta-green" if ls_bug_status == "GREEN" else ("metric-delta-yellow" if ls_bug_status == "YELLOW" else "metric-delta-red")
                 
@@ -1433,8 +1433,11 @@ class QualityReportDashboard:
                     </div>
                 </a>
                 """, unsafe_allow_html=True)
-                
-            with col9:
+
+            st.markdown("")
+            dev_r2_a, dev_r2_b, dev_r2_c, dev_r2_d = st.columns(4)
+
+            with dev_r2_a:
                 total_abs_bugs = len(data.get('abs_issues', []))
                 abs_delta_class = "metric-delta-green" if abs_bug_status == "GREEN" else ("metric-delta-yellow" if abs_bug_status == "YELLOW" else "metric-delta-red")
                 abs_p0_p1_display = f"{abs_p0_p1_count}"
@@ -1454,8 +1457,8 @@ class QualityReportDashboard:
                     </div>
                 </a>
                 """, unsafe_allow_html=True)
-                
-            with col10:
+
+            with dev_r2_b:
                 # Calculate code changes metrics using archived git stats
                 git_stats = data.get('git_stats', {})
                 
@@ -1498,12 +1501,8 @@ class QualityReportDashboard:
                     </div>
                 </a>
                 """, unsafe_allow_html=True)
-            
-            # Additional Development Metrics (Second Row)
-            st.markdown("")  # Add some spacing
-            col10, col11, col12, col13, col14 = st.columns(5)
-            
-            with col10:
+
+            with dev_r2_c:
                 # All-time Bug Backlog — weighted score (10× P0/P1 + 1× P2+) drives color
                 alltime_backlog = data.get('alltime_backlog', [])
                 if alltime_backlog:
@@ -1537,8 +1536,8 @@ class QualityReportDashboard:
                     </div>
                 </a>
                 """, unsafe_allow_html=True)
-            
-            with col11:
+
+            with dev_r2_d:
                 # API archives use `prb_backlog`; file-only runs may only have `prb_bugs`. Empty list => show 0, not "No Data".
                 prb_backlog = data.get('prb_backlog') or data.get('prb_bugs') or []
                 critical_prb_backlog = len([b for b in prb_backlog if 'P0' in str(b.get('priority', '')) or 'P1' in str(b.get('priority', ''))])
@@ -1562,15 +1561,7 @@ class QualityReportDashboard:
                     </div>
                 </a>
                 """, unsafe_allow_html=True)
-            
-            # Leave remaining columns empty for future expansion
-            with col12:
-                st.markdown("")
-            with col13:
-                st.markdown("")
-            with col14:
-                st.markdown("")
-    
+
     def categorize_file_change(self, filepath: str) -> str:
         """Categorize file changes with deeper SDB-specific analysis."""
         filepath_lower = filepath.lower()
