@@ -575,76 +575,119 @@ class QualityReportDashboard:
         """CSS for metric KPI cards (safe to call multiple times)."""
         st.markdown("""
         <style>
+        /* KPI panels — modern card UI (gradient accent, depth, refined type) */
         .metric-card {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 1rem;
+            position: relative;
+            overflow: hidden;
+            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(165deg, #ffffff 0%, #f8fafc 45%, #f1f5f9 100%);
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            border-radius: 16px;
+            padding: 1.125rem 1.25rem;
             text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            min-height: 140px;
+            box-shadow:
+                0 1px 2px rgba(15, 23, 42, 0.04),
+                0 8px 28px rgba(15, 23, 42, 0.07);
+            min-height: 148px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.28s ease,
+                border-color 0.25s ease;
+        }
+        .metric-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #2563eb, #7c3aed, #0891b2);
+            opacity: 0.92;
+            z-index: 0;
+        }
+        .metric-card > * {
+            position: relative;
+            z-index: 1;
         }
         .metric-card:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+            box-shadow:
+                0 4px 12px rgba(15, 23, 42, 0.08),
+                0 16px 40px rgba(15, 23, 42, 0.1);
+            border-color: rgba(148, 163, 184, 0.65);
         }
         .metric-card-clickable {
             cursor: pointer;
-            transition: all 0.2s ease;
         }
         .metric-card-clickable:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            border-color: #007bff;
+            transform: translateY(-4px);
+            box-shadow:
+                0 8px 24px rgba(37, 99, 235, 0.14),
+                0 20px 48px rgba(15, 23, 42, 0.12);
+            border-color: rgba(59, 130, 246, 0.55);
+        }
+        .metric-card-clickable:active {
+            transform: translateY(-1px);
+            transition-duration: 0.1s;
         }
         .metric-value {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin: 0.3rem 0;
-            line-height: 1;
-            color: #000000;
+            font-size: 2.1rem;
+            font-weight: 800;
+            margin: 0.35rem 0;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            font-variant-numeric: tabular-nums;
+            color: #0f172a;
         }
         .metric-label {
-            font-size: 0.8rem;
-            color: #6c757d;
-            font-weight: 500;
+            font-size: 0.7rem;
+            color: #64748b;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
-            margin-bottom: 0.25rem;
+            letter-spacing: 0.14em;
+            margin-bottom: 0.2rem;
         }
         .metric-delta {
-            font-size: 0.7rem;
-            margin-top: 0.3rem;
-            padding: 0.2rem 0.4rem;
-            border-radius: 8px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            margin-top: 0.35rem;
+            padding: 0.42rem 1rem;
+            border-radius: 9999px;
             display: inline-block;
-            background: #f8f9fa;
-            color: #495057;
-            border: 1px solid #dee2e6;
+            letter-spacing: 0.08em;
+            border: none;
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            color: #475569;
+            box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.35), 0 2px 6px rgba(15, 23, 42, 0.06);
         }
         .metric-delta-green {
-            background: #d4f6d4 !important;
-            color: #155724 !important;
-            border: 1px solid #c3e6cb !important;
+            background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%) !important;
+            color: #047857 !important;
+            box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.35), 0 2px 10px rgba(16, 185, 129, 0.18) !important;
         }
         .metric-delta-yellow {
-            background: #fff3cd !important;
-            color: #856404 !important;
-            border: 1px solid #ffeaa7 !important;
+            background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 100%) !important;
+            color: #b45309 !important;
+            box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.4), 0 2px 10px rgba(245, 158, 11, 0.15) !important;
         }
         .metric-delta-red {
-            background: #f8d7da !important;
-            color: #721c24 !important;
-            border: 1px solid #f5c6cb !important;
+            background: linear-gradient(180deg, #fef2f2 0%, #fecaca 100%) !important;
+            color: #b91c1c !important;
+            box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.35), 0 2px 10px rgba(239, 68, 68, 0.15) !important;
+        }
+        .metric-delta-gray {
+            background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%) !important;
+            color: #64748b !important;
+            box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.45), 0 2px 6px rgba(15, 23, 42, 0.05) !important;
         }
         .metric-total {
-            font-size: 0.875rem;
-            color: #495057;
-            font-weight: 400;
-            margin-top: 0.2rem;
+            font-size: 0.8125rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-top: 0.25rem;
+            letter-spacing: 0.01em;
         }
         .metric-value-row {
             display: flex;
@@ -680,6 +723,9 @@ class QualityReportDashboard:
         }
         .metric-line-coverage-body .metric-delta {
             margin-top: 0.35rem;
+        }
+        .metric-card--line-coverage::before {
+            background: linear-gradient(90deg, #0ea5e9, #6366f1, #a855f7);
         }
         </style>
         """, unsafe_allow_html=True)
