@@ -8,6 +8,7 @@
 #   ./run_report.sh cw40 Engine
 #   ./run_report.sh cw40 Store api            # use Salesforce Reports API (no local PRB/bugs/ci/leftshift/security files)
 #   ./run_report.sh cw40 SDD --use-salesforce-reports
+#   ./run_report.sh cw40 sdd --use-salesforce-reports   # lowercase ok → SDD
 #
 # Components (output folders): Engine, Store, SDD, "Core App Efficiency"
 # Dashboard: four tabs — Engine, Store, SDD, Core Optimizer and SFSQL
@@ -35,8 +36,21 @@
 
 # Parse arguments
 WEEK="$1"
-COMPONENT="$2"
+COMPONENT_INPUT="$2"
 API_FLAG_RAW="$3"
+
+# Canonical component names (must match quality_report_generator --component choices)
+# Accept common aliases: sdd→SDD, engine→Engine, etc.
+_c_lower=$(echo "$COMPONENT_INPUT" | tr '[:upper:]' '[:lower:]')
+case "$_c_lower" in
+  engine) COMPONENT="Engine" ;;
+  store) COMPONENT="Store" ;;
+  sdd) COMPONENT="SDD" ;;
+  "core app efficiency") COMPONENT="Core App Efficiency" ;;
+  *)
+    COMPONENT="$COMPONENT_INPUT"
+    ;;
+esac
 
 # Enable Reports API if third arg is provided (api/--use-salesforce-reports/true/1) or env USE_SF_REPORTS=1
 USE_SF_REPORTS=0
@@ -45,7 +59,7 @@ if [ "$API_FLAG_RAW" = "api" ] || [ "$API_FLAG_RAW" = "--use-salesforce-reports"
 fi
 
 # Check if both parameters are provided
-if [ -z "$WEEK" ] || [ -z "$COMPONENT" ]; then
+if [ -z "$WEEK" ] || [ -z "$COMPONENT_INPUT" ]; then
     echo "❌ Error: Both week and component parameters are required"
     echo ""
     echo "Usage: $0 <week> <component>"
@@ -56,13 +70,22 @@ if [ -z "$WEEK" ] || [ -z "$COMPONENT" ]; then
     echo "  $0 cw40 SDD"
     echo "  $0 cw40 \"Core App Efficiency\""
     echo ""
-    echo "Available components: Engine, Store, SDD, Core App Efficiency"
+    echo "Available components: Engine, Store, SDD, Core App Efficiency (case-insensitive: e.g. sdd → SDD)"
     exit 1
+fi
+
+# Week data folder may be lowercase (e.g. weeks/cw15/sdd); prefer existing path
+if [ -d "weeks/$WEEK/$COMPONENT_INPUT" ]; then
+  DATA_DIR="weeks/$WEEK/$COMPONENT_INPUT"
+elif [ -d "weeks/$WEEK/$COMPONENT" ]; then
+  DATA_DIR="weeks/$WEEK/$COMPONENT"
+else
+  DATA_DIR="weeks/$WEEK/$COMPONENT"
 fi
 
 echo "🚀 Starting SDB Quality Report Generation..."
 echo "📅 Week: $WEEK"
-echo "📊 Component: $COMPONENT"
+echo "📊 Component: $COMPONENT (input: $COMPONENT_INPUT)"
 echo "==============================================="
 if [ "$USE_SF_REPORTS" = "1" ]; then
   echo "🛰️  Mode: Salesforce Reports API (no local PRB/bugs/CI/leftshift/security files required)"
@@ -87,8 +110,8 @@ echo "🔍 Checking required data files..."
 
 missing_files=()
 
-# Determine data directory based on week and component parameters
-data_dir="weeks/$WEEK/$COMPONENT"
+# Data directory (resolved above for lowercase folder names)
+data_dir="$DATA_DIR"
 echo "📂 Looking for data files in: $data_dir/"
 
 if [ ! -f "$data_dir/risks.txt" ]; then

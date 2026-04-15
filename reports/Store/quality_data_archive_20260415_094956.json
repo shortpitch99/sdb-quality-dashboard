@@ -1,0 +1,603 @@
+{
+  "risks": [
+    {
+      "feature": "Read your own writes(RYOW)",
+      "status": "Yellow",
+      "priority": "Medium",
+      "description": "Performance enhancement feature for Write Scaling. TLE dark launch mode has been rolled out to multiple cells. However, when rolling out the live mode, we ran into an issue on a couple of cells including the UHG sandbox cell (USA804s) where it seems to run into a possible data corruption issue. However, the guardrails that we implemented in the LSM layer helped detect and prevent those corruptions from persisting. Folowing this, we disabled the rollout of the live mode for RYOW functionality and it has been disabled since mid August when the problem was detected.",
+      "last_updated": "2024-01-15"
+    },
+    {
+      "feature": "Allocated Extent Pool",
+      "status": "Green",
+      "priority": "Medium",
+      "description": "Allocated Extent Pools have been running stably in production for 3 months since enabling on usa16s and usa18s on 08/15. This feature continues to deliver on its primary goal of reducing storage catalog writes while maintaining a minimal and stable storage footprint. This post provides a detailed analysis of the feature's behavior and stability over the past 30 days.",
+      "last_updated": "2025-11-21"
+    }
+  ],
+  "prbs": [
+    {
+      "id": "PRB-21983672",
+      "title": "PRB-21983672: User Experience:\n\nThe destroy pipeline was run successfully\n\nQ: Was this an external customer impacting event?\nA:\n\nQ: User retry may have succeeded?\nA:\n\nImpact Quantification:\n\nQ: What # or % of users/tenants/requests got impacted? (aggregated across all...",
+      "priority": "P2-Medium",
+      "status": "Under Investigation",
+      "description": "Team: SDB DB Management | Impact: User Experience:\n\nThe destroy pipeline was run successfully\n\nQ: Was this an external customer impacting event?\nA:\n\nQ: User retry may have succeeded?\nA:\n\nImpact Quantification:\n\nQ: What # or % of users/tenants/requests got impacted? (aggregated across all...",
+      "created_date": "2026-04-10",
+      "what_happened": "[THIS PRB IS MANAGED BY G2G. Updates should be made in Google doc]\nRun sdb-destroy pipeline aws-prod24-apsouth2 ecom1 sdb-1-ind1h1\nhttps://salesforce-internal.slack.com/archives/C0132JPQXH7/p1775771603085409",
+      "customer_experience": "User Experience:\n\nThe destroy pipeline was run successfully\n\nQ: Was this an external customer impacting event?\nA:\n\nQ: User retry may have succeeded?\nA:\n\nImpact Quantification:\n\nQ: What # or % of users/tenants/requests got impacted? (aggregated across all...",
+      "proximate_cause": "The destroy pipeline was run successfully",
+      "how_resolved": "The destroy pipeline was run successfully",
+      "team": "SDB DB Management",
+      "customer_impact": "User Experience:\n\nThe destroy pipeline was run successfully\n\nQ: Was this an external customer impacting event?\nA:\n\nQ: User retry may have succeeded?\nA:\n\nImpact Quantification:\n\nQ: What # or % of users/tenants/requests got impacted? (aggregated across all..."
+    }
+  ],
+  "bugs": [],
+  "critical_issues": [],
+  "deployments": [
+    {
+      "stagger": "R0.1",
+      "version": "262.15",
+      "count": 2,
+      "stage": "R0.1",
+      "cells": 2
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "260.1",
+      "count": 1,
+      "stage": "SB1.2",
+      "cells": 1
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.9",
+      "count": 33,
+      "stage": "R2b.2",
+      "cells": 33
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.3",
+      "count": 5,
+      "stage": "R2b.2",
+      "cells": 5
+    },
+    {
+      "stagger": "SB2.1",
+      "version": "262.9",
+      "count": 16,
+      "stage": "SB2.1",
+      "cells": 16
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "262.9",
+      "count": 110,
+      "stage": "R2a.2",
+      "cells": 110
+    },
+    {
+      "stagger": "R0.2",
+      "version": "262.9",
+      "count": 3,
+      "stage": "R0.2",
+      "cells": 3
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "260.15",
+      "count": 1,
+      "stage": "SB1.2",
+      "cells": 1
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.7",
+      "count": 21,
+      "stage": "R2b.2",
+      "cells": 21
+    },
+    {
+      "stagger": "R2b.1",
+      "version": "262.7",
+      "count": 9,
+      "stage": "R2b.1",
+      "cells": 9
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.14",
+      "count": 1,
+      "stage": "SB0",
+      "cells": 1
+    },
+    {
+      "stagger": "SB2.1",
+      "version": "262.11",
+      "count": 6,
+      "stage": "SB2.1",
+      "cells": 6
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.3",
+      "count": 1,
+      "stage": "SB0",
+      "cells": 1
+    },
+    {
+      "stagger": "R2b.1",
+      "version": "262.9",
+      "count": 16,
+      "stage": "R2b.1",
+      "cells": 16
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.11",
+      "count": 2,
+      "stage": "SB2.2",
+      "cells": 2
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.15",
+      "count": 2,
+      "stage": "SB0",
+      "cells": 2
+    },
+    {
+      "stagger": "R1.2",
+      "version": "262.7",
+      "count": 6,
+      "stage": "R1.2",
+      "cells": 6
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.9",
+      "count": 37,
+      "stage": "SB1.2",
+      "cells": 37
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.9",
+      "count": 15,
+      "stage": "SB2.2",
+      "cells": 15
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.11",
+      "count": 44,
+      "stage": "SB1.1",
+      "cells": 44
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.11",
+      "count": 23,
+      "stage": "SB1.2",
+      "cells": 23
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.7",
+      "count": 93,
+      "stage": "R2a.1",
+      "cells": 93
+    },
+    {
+      "stagger": "R0.1",
+      "version": "262.9",
+      "count": 5,
+      "stage": "R0.1",
+      "cells": 5
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "262.3",
+      "count": 1,
+      "stage": "R2a.2",
+      "cells": 1
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.14",
+      "count": 2,
+      "stage": "SB1.1",
+      "cells": 2
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.3",
+      "count": 1,
+      "stage": "SB2.2",
+      "cells": 1
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "262.7",
+      "count": 112,
+      "stage": "R2a.2",
+      "cells": 112
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.9",
+      "count": 19,
+      "stage": "SB1.1",
+      "cells": 19
+    },
+    {
+      "stagger": "R1.1",
+      "version": "262.9",
+      "count": 47,
+      "stage": "R1.1",
+      "cells": 47
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.15",
+      "count": 2,
+      "stage": "SB1.1",
+      "cells": 2
+    },
+    {
+      "stagger": "R1.2",
+      "version": "262.9",
+      "count": 41,
+      "stage": "R1.2",
+      "cells": 41
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.3",
+      "count": 2,
+      "stage": "SB1.2",
+      "cells": 2
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.9",
+      "count": 91,
+      "stage": "R2a.1",
+      "cells": 91
+    },
+    {
+      "stagger": "R1.1",
+      "version": "262.7",
+      "count": 11,
+      "stage": "R1.1",
+      "cells": 11
+    }
+  ],
+  "deployment_summary": "Weekly Deployment Summary - Week of September 15, 2025\n\nThis week's deployment activities proceeded smoothly across all stagger groups. \nSDB version 258.11 was successfully deployed to sandbox environments (SB0-SB2) \nwith no major issues reported.\n\nKey highlights:\n- Version 258.11 rolled out to 150 sandbox cells\n- Zero failed deployments\n- Average deployment time: 12 minutes\n- All post-deployment validations passed\n\nNext week: Planning production rollout to P0-P3 stages pending final validation results.",
+  "coverage": [],
+  "new_code_coverage": [
+    {
+      "component": "SDB Engine",
+      "new_code_coverage": 77.6,
+      "overall_coverage": 82.3,
+      "new_code_line_coverage": 80.0,
+      "overall_line_coverage": 84.1,
+      "lines_to_cover": 3159,
+      "uncovered_lines": 633,
+      "overall_lines_to_cover": 47458,
+      "overall_uncovered_lines": 7549
+    }
+  ],
+  "ci_issues": [
+    {
+      "work_id": "W-21607485",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDB-Engine-SFStore-JUS-WS-AR-S-Coverage times out in testProxyStartWithNoZK",
+      "status": "New",
+      "build_version": "sdb.262.16",
+      "created_date": "2026-03-16",
+      "issue_type": "CI"
+    }
+  ],
+  "leftshift_issues": [],
+  "abs_issues": [],
+  "security_issues": [],
+  "all_bugs": [],
+  "prb_bugs": [],
+  "system_availability": {
+    "period": "",
+    "slo": 99.9,
+    "achieved": 99.99,
+    "incidents": []
+  },
+  "kpis": {
+    "all_time_bug_backlog_total": 0,
+    "all_time_bug_backlog_p0": 0,
+    "all_time_bug_backlog_p1": 0,
+    "all_time_bug_backlog_p0_p1": 0,
+    "prb_backlog_total": 0,
+    "prb_backlog_p0_p1": 0
+  },
+  "git_stats": {
+    "reporting_period_start": "2026-04-06",
+    "reporting_period_end": "2026-04-12",
+    "total_commits": 12,
+    "lines_added": 2544,
+    "lines_deleted": 737,
+    "lines_changed": 3281,
+    "files_changed": 40,
+    "authors": [
+      "Anup Ghatage",
+      "Arundhati Tambe",
+      "Charan Reddy Guttapalem",
+      "Chirag Malhan",
+      "Karan Mehta",
+      "Satish Bhat",
+      "Senthil Narayan",
+      "tok-sfci124"
+    ],
+    "most_changed_files": [
+      {
+        "file": "cloud-store/src/main/java/org/apache/bookkeeper/cloudstore/store/MultiStreamExtentReader.java",
+        "lines_added": 994,
+        "lines_deleted": 0,
+        "total_changes": 994
+      },
+      {
+        "file": "sfci/bin/proxy-build-and-test.sh",
+        "lines_added": 192,
+        "lines_deleted": 192,
+        "total_changes": 384
+      },
+      {
+        "file": "sfci/bin/proxy-precheckin.sh",
+        "lines_added": 183,
+        "lines_deleted": 183,
+        "total_changes": 366
+      },
+      {
+        "file": ".strata.yml",
+        "lines_added": 114,
+        "lines_deleted": 114,
+        "total_changes": 228
+      },
+      {
+        "file": "sfci/bin/precheckin-build.sh",
+        "lines_added": 90,
+        "lines_deleted": 90,
+        "total_changes": 180
+      },
+      {
+        "file": "fss/docker/buildFss.sh",
+        "lines_added": 106,
+        "lines_deleted": 62,
+        "total_changes": 168
+      },
+      {
+        "file": "cloudstore-stress/src/main/java/org/apache/bookkeeper/cloudstorestress/ExtentMultiStreamReadsScenario.java",
+        "lines_added": 111,
+        "lines_deleted": 0,
+        "total_changes": 111
+      },
+      {
+        "file": "cloudstore-stress/src/main/java/org/apache/bookkeeper/cloudstorestress/ExtentMultiStreamReadsTask.java",
+        "lines_added": 109,
+        "lines_deleted": 0,
+        "total_changes": 109
+      },
+      {
+        "file": "cloud-store/src/main/java/org/apache/bookkeeper/cloudstore/CloudStoreImpl.java",
+        "lines_added": 96,
+        "lines_deleted": 3,
+        "total_changes": 99
+      },
+      {
+        "file": "bookkeeper-server/src/main/java/org/apache/bookkeeper/replication/Auditor.java",
+        "lines_added": 80,
+        "lines_deleted": 17,
+        "total_changes": 97
+      }
+    ],
+    "commit_frequency": 1.7142857142857142,
+    "code_churn_risk": "Low",
+    "repository_path": "/Users/rchowdhuri/bookkeeper"
+  },
+  "generated_at": "2026-04-15T09:49:49.367086",
+  "report_component": "Store",
+  "coverage_summary": {
+    "new_code": {
+      "coverage": 77.6,
+      "line_coverage": 80.0,
+      "condition_coverage": 66.3,
+      "lines_to_cover": 3159,
+      "uncovered_lines": 633,
+      "conditions_to_cover": 644,
+      "uncovered_conditions": 217
+    },
+    "overall": {
+      "coverage": 82.3,
+      "line_coverage": 84.1,
+      "condition_coverage": 75.2,
+      "lines_to_cover": 47458,
+      "uncovered_lines": 7549,
+      "conditions_to_cover": 11922,
+      "uncovered_conditions": 2953
+    }
+  },
+  "alltime_backlog": [
+    {
+      "work_id": "Bug_1",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-15",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_2",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-15",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_3",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-15",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_4",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-15",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_5",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-15",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_6",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-15",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_7",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-15",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_8",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-15",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_9",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-15",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_10",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-15",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_11",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-15",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_12",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-15",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_13",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-15",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_14",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-15",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_15",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-15",
+      "type": "backlog_bug"
+    }
+  ],
+  "prb_backlog": [],
+  "metadata": {
+    "generated_at": "2026-04-15T09:49:58.140109",
+    "report_period_start": "2026-04-06",
+    "report_period_end": "2026-04-12",
+    "report_period_display": "April 06-12, 2026",
+    "report_component": "Store",
+    "git_repository": "/Users/rchowdhuri/bookkeeper",
+    "generator_version": "2.0",
+    "data_sources": {
+      "risks": 2,
+      "prbs": 1,
+      "bugs": 0,
+      "deployments": 34,
+      "has_llm_content": true,
+      "ci_total": 1,
+      "ci_p0_p1": 0,
+      "security_total": 0,
+      "security_p0_p1": 0,
+      "leftshift_total": 0,
+      "leftshift_p0_p1": 0,
+      "coverage_overall": 82.3,
+      "coverage_overall_line": 84.1,
+      "coverage_new_code": 77.6,
+      "coverage_new_code_line": 80.0
+    }
+  },
+  "llm_content": {
+    "trend_analysis": "Content not available - LLM API error",
+    "risk_analysis": "Content not available - LLM API error",
+    "prb_narratives": {
+      "PRB-21983672": "Content not available - LLM API error"
+    },
+    "prb_analyses": {
+      "PRB-21983672": "Content not available - LLM API error"
+    }
+  }
+}

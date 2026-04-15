@@ -2932,20 +2932,50 @@ class QualityReportGenerator:
             "max_tokens": 1000,
             "temperature": 0.3
         }
-        
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                self.api_url,
-                headers=self.headers,
-                json=payload,
-                timeout=aiohttp.ClientTimeout(total=30)
-            ) as response:
-                if response.status == 200:
-                    result = await response.json()
-                    if "choices" in result and len(result["choices"]) > 0:
-                        return result["choices"][0]["message"]["content"].strip()
-                
-                return "Content not available - LLM API error"
+        if self.openai_user_id:
+            payload["user"] = self.openai_user_id
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(
+                    self.api_url,
+                    headers=self.headers,
+                    json=payload,
+                    timeout=aiohttp.ClientTimeout(total=120),
+                ) as response:
+                    body_text = await response.text()
+                    if response.status == 200:
+                        try:
+                            result = json.loads(body_text)
+                        except json.JSONDecodeError:
+                            print(f"⚠️ LLM Gateway returned non-JSON (200): {body_text[:500]}")
+                            return (
+                                "Content not available - LLM Gateway returned invalid JSON. "
+                                "See console log during report generation."
+                            )
+                        if "choices" in result and len(result["choices"]) > 0:
+                            return result["choices"][0]["message"]["content"].strip()
+                        print(f"⚠️ LLM Gateway 200 but no choices; keys={list(result.keys())} body={body_text[:800]}")
+                        return (
+                            "Content not available - LLM Gateway response had no choices (unexpected format). "
+                            "See console log during report generation."
+                        )
+                    # Non-200: log body so operators can fix auth/model/network
+                    snippet = body_text.replace("\n", " ")[:600]
+                    print(f"⚠️ LLM Gateway HTTP {response.status}: {snippet}")
+                    hint = (
+                        "Verify LLM_GW_EXPRESS_KEY in .env, corporate VPN if required, and that the model "
+                        f"({self.model}) is allowed for this gateway."
+                    )
+                    if response.status in (401, 403):
+                        hint = "Check LLM_GW_EXPRESS_KEY (expired or wrong) and OPENAI_USER_ID if your gateway requires it."
+                    return f"Content not available - LLM API HTTP {response.status}. {hint}"
+        except asyncio.TimeoutError:
+            print("⚠️ LLM Gateway request timed out after 120s")
+            return "Content not available - LLM request timed out (try again or increase load)."
+        except aiohttp.ClientError as e:
+            print(f"⚠️ LLM Gateway connection error: {e}")
+            return f"Content not available - LLM connection error: {e}"
 
     def generate_report(self, data: Dict[str, Any], report_type: str = "comprehensive") -> str:
         """Generate a quality report using Salesforce LLM Gateway analysis."""
@@ -2984,7 +3014,9 @@ class QualityReportGenerator:
             "temperature": 0.3,
             "top_p": 0.9
         }
-        
+        if self.openai_user_id:
+            payload["user"] = self.openai_user_id
+
         async with aiohttp.ClientSession() as session:
             async with session.post(
                 self.api_url,
