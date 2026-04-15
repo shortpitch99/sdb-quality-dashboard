@@ -77,6 +77,17 @@
       "issue_type": "Bug"
     },
     {
+      "work_id": "W-22049411",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][sdb2h1] [Ryi-GVqXGULjDMV3dD_qNQ:00000050] Req:LedgerOpenRecoverReq StoreId:e3...",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-04-15",
+      "issue_type": "Bug"
+    },
+    {
       "work_id": "W-21931287",
       "team": "Unknown",
       "priority": "P2",
@@ -91,11 +102,53 @@
   "critical_issues": [],
   "deployments": [
     {
-      "stagger": "R0.1",
-      "version": "262.15",
+      "stagger": "R1.1",
+      "version": "262.3",
       "count": 2,
-      "stage": "R0.1",
+      "stage": "R1.1",
       "cells": 2
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.11",
+      "count": 37,
+      "stage": "SB1.1",
+      "cells": 37
+    },
+    {
+      "stagger": "R1.1",
+      "version": "262.9",
+      "count": 39,
+      "stage": "R1.1",
+      "cells": 39
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.9",
+      "count": 40,
+      "stage": "SB1.2",
+      "cells": 40
+    },
+    {
+      "stagger": "R2b.1",
+      "version": "262.9",
+      "count": 16,
+      "stage": "R2b.1",
+      "cells": 16
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.11",
+      "count": 2,
+      "stage": "SB2.2",
+      "cells": 2
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "262.3",
+      "count": 9,
+      "stage": "R2a.2",
+      "cells": 9
     },
     {
       "stagger": "SB1.2",
@@ -105,32 +158,18 @@
       "cells": 1
     },
     {
-      "stagger": "R2b.2",
-      "version": "262.9",
-      "count": 33,
-      "stage": "R2b.2",
-      "cells": 33
-    },
-    {
-      "stagger": "R2b.2",
-      "version": "262.3",
-      "count": 5,
-      "stage": "R2b.2",
-      "cells": 5
-    },
-    {
-      "stagger": "SB2.1",
-      "version": "262.9",
-      "count": 16,
-      "stage": "SB2.1",
-      "cells": 16
-    },
-    {
       "stagger": "R2a.2",
       "version": "262.9",
-      "count": 110,
+      "count": 75,
       "stage": "R2a.2",
-      "cells": 110
+      "cells": 75
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.3",
+      "count": 1,
+      "stage": "SB2.2",
+      "cells": 1
     },
     {
       "stagger": "R0.2",
@@ -140,11 +179,67 @@
       "cells": 3
     },
     {
-      "stagger": "SB1.2",
-      "version": "260.15",
+      "stagger": "R2a.1",
+      "version": "262.7",
+      "count": 108,
+      "stage": "R2a.1",
+      "cells": 108
+    },
+    {
+      "stagger": "R1.2",
+      "version": "262.7",
+      "count": 27,
+      "stage": "R1.2",
+      "cells": 27
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.9",
+      "count": 33,
+      "stage": "R2b.2",
+      "cells": 33
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.9",
+      "count": 72,
+      "stage": "R2a.1",
+      "cells": 72
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.3",
       "count": 1,
-      "stage": "SB1.2",
+      "stage": "SB0",
       "cells": 1
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.3",
+      "count": 2,
+      "stage": "SB1.2",
+      "cells": 2
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.9",
+      "count": 26,
+      "stage": "SB1.1",
+      "cells": 26
+    },
+    {
+      "stagger": "SB2.1",
+      "version": "262.11",
+      "count": 5,
+      "stage": "SB2.1",
+      "cells": 5
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.3",
+      "count": 4,
+      "stage": "R2a.1",
+      "cells": 4
     },
     {
       "stagger": "R2b.2",
@@ -161,60 +256,18 @@
       "cells": 9
     },
     {
-      "stagger": "SB0",
-      "version": "262.14",
-      "count": 1,
-      "stage": "SB0",
-      "cells": 1
-    },
-    {
       "stagger": "SB2.1",
-      "version": "262.11",
-      "count": 6,
-      "stage": "SB2.1",
-      "cells": 6
-    },
-    {
-      "stagger": "SB0",
-      "version": "262.3",
-      "count": 1,
-      "stage": "SB0",
-      "cells": 1
-    },
-    {
-      "stagger": "R2b.1",
       "version": "262.9",
-      "count": 16,
-      "stage": "R2b.1",
-      "cells": 16
-    },
-    {
-      "stagger": "SB2.2",
-      "version": "262.11",
-      "count": 2,
-      "stage": "SB2.2",
-      "cells": 2
-    },
-    {
-      "stagger": "SB0",
-      "version": "262.15",
-      "count": 2,
-      "stage": "SB0",
-      "cells": 2
-    },
-    {
-      "stagger": "R1.2",
-      "version": "262.7",
-      "count": 6,
-      "stage": "R1.2",
-      "cells": 6
+      "count": 17,
+      "stage": "SB2.1",
+      "cells": 17
     },
     {
       "stagger": "SB1.2",
-      "version": "262.9",
-      "count": 37,
+      "version": "262.11",
+      "count": 20,
       "stage": "SB1.2",
-      "cells": 37
+      "cells": 20
     },
     {
       "stagger": "SB2.2",
@@ -224,27 +277,6 @@
       "cells": 15
     },
     {
-      "stagger": "SB1.1",
-      "version": "262.11",
-      "count": 44,
-      "stage": "SB1.1",
-      "cells": 44
-    },
-    {
-      "stagger": "SB1.2",
-      "version": "262.11",
-      "count": 23,
-      "stage": "SB1.2",
-      "cells": 23
-    },
-    {
-      "stagger": "R2a.1",
-      "version": "262.7",
-      "count": 93,
-      "stage": "R2a.1",
-      "cells": 93
-    },
-    {
       "stagger": "R0.1",
       "version": "262.9",
       "count": 5,
@@ -252,81 +284,60 @@
       "cells": 5
     },
     {
-      "stagger": "R2a.2",
-      "version": "262.3",
+      "stagger": "SB1.2",
+      "version": "260.15",
       "count": 1,
-      "stage": "R2a.2",
+      "stage": "SB1.2",
       "cells": 1
     },
     {
       "stagger": "SB1.1",
       "version": "262.14",
-      "count": 2,
+      "count": 4,
       "stage": "SB1.1",
-      "cells": 2
+      "cells": 4
     },
     {
-      "stagger": "SB2.2",
-      "version": "262.3",
-      "count": 1,
-      "stage": "SB2.2",
-      "cells": 1
+      "stagger": "R0.1",
+      "version": "262.14",
+      "count": 2,
+      "stage": "R0.1",
+      "cells": 2
     },
     {
       "stagger": "R2a.2",
       "version": "262.7",
-      "count": 112,
+      "count": 139,
       "stage": "R2a.2",
-      "cells": 112
-    },
-    {
-      "stagger": "SB1.1",
-      "version": "262.9",
-      "count": 19,
-      "stage": "SB1.1",
-      "cells": 19
-    },
-    {
-      "stagger": "R1.1",
-      "version": "262.9",
-      "count": 47,
-      "stage": "R1.1",
-      "cells": 47
-    },
-    {
-      "stagger": "SB1.1",
-      "version": "262.15",
-      "count": 2,
-      "stage": "SB1.1",
-      "cells": 2
-    },
-    {
-      "stagger": "R1.2",
-      "version": "262.9",
-      "count": 41,
-      "stage": "R1.2",
-      "cells": 41
-    },
-    {
-      "stagger": "SB1.2",
-      "version": "262.3",
-      "count": 2,
-      "stage": "SB1.2",
-      "cells": 2
-    },
-    {
-      "stagger": "R2a.1",
-      "version": "262.9",
-      "count": 91,
-      "stage": "R2a.1",
-      "cells": 91
+      "cells": 139
     },
     {
       "stagger": "R1.1",
       "version": "262.7",
-      "count": 11,
+      "count": 17,
       "stage": "R1.1",
-      "cells": 11
+      "cells": 17
+    },
+    {
+      "stagger": "R1.2",
+      "version": "262.9",
+      "count": 20,
+      "stage": "R1.2",
+      "cells": 20
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.14",
+      "count": 3,
+      "stage": "SB0",
+      "cells": 3
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.3",
+      "count": 5,
+      "stage": "R2b.2",
+      "cells": 5
     }
   ],
   "deployment_summary": "Weekly Deployment Summary - Week of September 15, 2025\n\nThis week's deployment activities proceeded smoothly across all stagger groups. \nSDB version 258.11 was successfully deployed to sandbox environments (SB0-SB2) \nwith no major issues reported.\n\nKey highlights:\n- Version 258.11 rolled out to 150 sandbox cells\n- Zero failed deployments\n- Average deployment time: 12 minutes\n- All post-deployment validations passed\n\nNext week: Planning production rollout to P0-P3 stages pending final validation results.",
@@ -334,14 +345,14 @@
   "new_code_coverage": [
     {
       "component": "SDB Engine",
-      "new_code_coverage": 75.0,
+      "new_code_coverage": 74.9,
       "overall_coverage": 68.1,
       "new_code_line_coverage": 88.9,
       "overall_line_coverage": 81.3,
-      "lines_to_cover": 22419,
-      "uncovered_lines": 2485,
-      "overall_lines_to_cover": 570195,
-      "overall_uncovered_lines": 106619
+      "lines_to_cover": 22162,
+      "uncovered_lines": 2468,
+      "overall_lines_to_cover": 569772,
+      "overall_uncovered_lines": 106575
     }
   ],
   "ci_issues": [
@@ -637,6 +648,17 @@
   "abs_issues": [],
   "security_issues": [
     {
+      "work_id": "W-21775690",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:os:perf:5.14.0-611.36.1.el9_7 Vulnerability Detected",
+      "status": "In Progress",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-15",
+      "issue_type": "security"
+    },
+    {
       "work_id": "W-14324477",
       "team": "Unknown",
       "priority": "P2",
@@ -747,6 +769,28 @@
       "issue_type": "security"
     },
     {
+      "work_id": "W-21822744",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:os:perf:5.14.0-611.36.1.el9_7 Vulnerability Detected",
+      "status": "In Progress",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-15",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21881027",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:os:perf:5.14.0-611.27.1.el9_7 Vulnerability Detected",
+      "status": "Triaged",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-15",
+      "issue_type": "security"
+    },
+    {
       "work_id": "W-13140867",
       "team": "Unknown",
       "priority": "P2",
@@ -777,11 +821,11 @@
   "git_stats": {
     "reporting_period_start": "2026-04-06",
     "reporting_period_end": "2026-04-12",
-    "total_commits": 56,
-    "lines_added": 8995,
-    "lines_deleted": 3983,
-    "lines_changed": 12978,
-    "files_changed": 141,
+    "total_commits": 53,
+    "lines_added": 8958,
+    "lines_deleted": 3973,
+    "lines_changed": 12931,
+    "files_changed": 139,
     "authors": [
       "Atul Jha",
       "Audrey Fang",
@@ -878,30 +922,30 @@
         "total_changes": 355
       }
     ],
-    "commit_frequency": 8.0,
+    "commit_frequency": 7.571428571428571,
     "code_churn_risk": "Medium",
     "repository_path": "/Users/rchowdhuri/SDB"
   },
-  "generated_at": "2026-04-15T10:02:25.919912",
+  "generated_at": "2026-04-15T14:44:22.740339",
   "report_component": "Engine",
   "coverage_summary": {
     "new_code": {
-      "coverage": 75.0,
+      "coverage": 74.9,
       "line_coverage": 88.9,
-      "condition_coverage": 59.6,
-      "lines_to_cover": 22419,
-      "uncovered_lines": 2485,
-      "conditions_to_cover": 20146,
-      "uncovered_conditions": 8137
+      "condition_coverage": 59.5,
+      "lines_to_cover": 22162,
+      "uncovered_lines": 2468,
+      "conditions_to_cover": 20020,
+      "uncovered_conditions": 8111
     },
     "overall": {
       "coverage": 68.1,
       "line_coverage": 81.3,
       "condition_coverage": 53.1,
-      "lines_to_cover": 570195,
-      "uncovered_lines": 106619,
-      "conditions_to_cover": 501429,
-      "uncovered_conditions": 235061
+      "lines_to_cover": 569772,
+      "uncovered_lines": 106575,
+      "conditions_to_cover": 501117,
+      "uncovered_conditions": 234994
     }
   },
   "alltime_backlog": [
@@ -1615,15 +1659,6 @@
       "status": "Open",
       "created_date": "2026-04-15",
       "type": "backlog_bug"
-    },
-    {
-      "work_id": "Bug_80",
-      "severity": "P2",
-      "team": "Unknown",
-      "subject": "Bug from All-time Backlog Report",
-      "status": "Open",
-      "created_date": "2026-04-15",
-      "type": "backlog_bug"
     }
   ],
   "prb_backlog": [
@@ -1739,7 +1774,7 @@
     }
   ],
   "metadata": {
-    "generated_at": "2026-04-15T10:03:18.236779",
+    "generated_at": "2026-04-15T14:44:33.094351",
     "report_period_start": "2026-04-06",
     "report_period_end": "2026-04-12",
     "report_period_display": "April 06-12, 2026",
@@ -1749,29 +1784,29 @@
     "data_sources": {
       "risks": 2,
       "prbs": 1,
-      "bugs": 5,
+      "bugs": 6,
       "deployments": 34,
       "has_llm_content": true,
       "ci_total": 24,
       "ci_p0_p1": 0,
-      "security_total": 11,
+      "security_total": 14,
       "security_p0_p1": 0,
       "leftshift_total": 2,
       "leftshift_p0_p1": 0,
       "coverage_overall": 68.1,
       "coverage_overall_line": 81.3,
-      "coverage_new_code": 75.0,
+      "coverage_new_code": 74.9,
       "coverage_new_code_line": 88.9
     }
   },
   "llm_content": {
-    "trend_analysis": "## Quality Trends Analysis\n\n### Overall System Health: **GOOD** \u2705\n\n**Key Insights:**\n\n\u2022 **Low Critical Issues**: Only 1 PRB indicates strong operational stability with minimal production disruptions\n\n\u2022 **Manageable Bug Load**: 5 bugs represent a typical development backlog - not excessive for most systems\n\n\u2022 **Controlled Risk Profile**: 2 identified risks suggest proactive risk management; monitor for escalation\n\n\u2022 **Strong Security Posture**: Zero security issues is excellent - maintain current security practices\n\n### Trend Indicators:\n- **Stability**: High (minimal production issues)\n- **Development Quality**: Moderate (standard bug count)\n- **Risk Management**: Good (low risk exposure)\n- **Security**: Excellent (clean security profile)\n\n### Recommendations:\n1. **Maintain** current security protocols\n2. **Monitor** the 2 risks for potential impact escalation  \n3. **Prioritize** bug resolution to prevent accumulation\n4. **Continue** proactive quality practices that are keeping PRBs low\n\n**Bottom Line**: System demonstrates solid quality fundamentals with no immediate concerns. Focus on maintaining current standards while addressing the existing bug backlog.",
-    "risk_analysis": "### Deployment Risk Assessment - SDB Version 258.11\n\n#### Executive Summary\n\nThe sandbox deployment of SDB version 258.11 demonstrates strong stability indicators with zero failures across 150 cells. However, the upcoming production rollout requires careful consideration of several risk factors and validation gaps.\n\n#### Deployment Stability Analysis\n\n##### Current Performance Metrics\n- **Success Rate**: 100% (150/150 sandbox cells)\n- **Deployment Duration**: 12 minutes average (within acceptable range)\n- **Validation Status**: All post-deployment checks passed\n- **Environment Coverage**: Complete sandbox tier (SB0-SB2)\n\n##### Stability Risk Assessment: **LOW-MEDIUM**\n\nThe sandbox deployment shows excellent stability, but production environments typically present additional complexities not present in sandbox testing.\n\n#### Code Change Impact Assessment\n\n##### Missing Critical Information\n- **Change Scope**: No details provided on specific code modifications\n- **Feature Impact**: Unknown functional changes or enhancements\n- **Database Changes**: No schema or data migration information\n- **Configuration Updates**: Missing infrastructure or config changes\n\n##### Impact Risk Assessment: **MEDIUM-HIGH**\n\nWithout visibility into actual code changes, the impact assessment relies solely on deployment mechanics, which presents significant blind spots.\n\n#### Production Rollout Risk Factors\n\n##### High-Risk Areas\n- **Scale Differential**: Production environments (P0-P3) likely have higher traffic and complexity than sandbox\n- **Data Sensitivity**: Production data may expose edge cases not present in sandbox\n- **Integration Dependencies**: External system integrations may behave differently in production\n\n##### Recommended Risk Mitigations\n- **Phased Rollout**: Deploy to P0 first, monitor for 24-48 hours before proceeding\n- **Enhanced Monitoring**: Implement real-time alerting for key performance indicators\n- **Rollback Readiness**: Ensure rapid rollback procedures are tested and documented\n- **Stakeholder Communication**: Establish clear escalation paths for production issues\n\n#### Validation Gaps\n\n##### Critical Missing Validations\n- **Performance Testing**: No load testing results provided\n- **Security Scanning**: No security validation mentioned\n- **Regression Testing**: Limited visibility into functional test coverage\n- **Integration Testing**: No cross-system compatibility verification\n\n#### Recommendations\n\n##### Before Production Deployment\n1. **Complete Change Documentation**: Obtain detailed change logs and impact analysis\n2. **Extended Validation**: Perform comprehensive performance and security testing\n3. **Stakeholder Alignment**: Ensure all teams are prepared for production deployment\n4. **Monitoring Enhancement**: Deploy additional observability tools before rollout\n\n##### During Production Deployment\n1. **Gradual Rollout**: Use canary deployment strategy starting with P0\n2. **Real-time Monitoring**: Maintain active monitoring throughout deployment window\n3. **Communication Protocol**: Establish regular status updates to stakeholders\n\n**Overall Risk Rating: MEDIUM** - Proceed with enhanced monitoring and phased approach.",
+    "trend_analysis": "Content not available - LLM API HTTP 401. Check LLM_GW_EXPRESS_KEY (expired or wrong) and OPENAI_USER_ID if your gateway requires it.",
+    "risk_analysis": "Content not available - LLM API HTTP 401. Check LLM_GW_EXPRESS_KEY (expired or wrong) and OPENAI_USER_ID if your gateway requires it.",
     "prb_narratives": {
-      "PRB-21983672": "**Problem Type:** Incomplete or improperly documented problem report with successful pipeline execution recorded as an incident.\n\n**Root Cause:** The PRB documentation is incomplete with missing impact assessment, customer impact details, and unclear problem definition despite indicating successful pipeline execution.\n\n**Resolution:** The sdb-destroy pipeline for aws-prod24-apsouth2 ecom1 sdb-1-ind1h1 completed successfully as intended.\n\n**Next Steps:** Complete the missing PRB documentation fields including customer impact assessment, user retry analysis, and clarify whether this was actually an incident or routine maintenance activity."
+      "PRB-21983672": "Content not available - LLM API HTTP 401. Check LLM_GW_EXPRESS_KEY (expired or wrong) and OPENAI_USER_ID if your gateway requires it."
     },
     "prb_analyses": {
-      "PRB-21983672": "# Technical Analysis for PRB-21983672\n\n## **Technical Impact**\n\n**Severity Assessment:** Critical Infrastructure Event\n- **Database Destruction:** Complete removal of SDB instance `sdb-1-ind1h1` in AWS production environment `aws-prod24-apsouth2` for tenant `ecom1`\n- **Service Availability:** Potential complete service disruption for affected tenant and dependent applications\n- **Data Integrity:** Permanent data loss risk if proper backup/recovery procedures were not followed\n- **Regional Impact:** Affects Asia Pacific South 2 region operations\n- **Downstream Dependencies:** Cascading impact on applications, APIs, and services dependent on the destroyed database instance\n\n**Business Impact Metrics:**\n- Service downtime duration: To be determined based on recovery procedures\n- Data recovery time objective (RTO): Dependent on backup restoration capabilities\n- Potential revenue impact for ecommerce tenant operations\n- Customer experience degradation during service interruption\n\n## **Root Cause Analysis**\n\n**Primary Root Cause:** Intentional Database Infrastructure Decommissioning\n- **Trigger Event:** Execution of `sdb-destroy` pipeline for production database instance\n- **Technical Context:** \n  - Target: `aws-prod24-apsouth2/ecom1/sdb-1-ind1h1`\n  - Pipeline execution appears to be planned maintenance or decommissioning activity\n  - Managed through G2G (Google-to-Google) process indicating cross-team coordination\n\n**Contributing Factors:**\n1. **Process Execution:** Standard infrastructure lifecycle management\n2. **Change Management:** Coordinated through established channels (Slack communication referenced)\n3. **Documentation Gap:** Incomplete PRB documentation suggests ongoing investigation phase\n\n**Technical Analysis:**\n- Database destruction was successful from pipeline perspective\n- No indication of pipeline failure or technical malfunction\n- Suggests planned infrastructure changes rather than incident response\n\n## **Resolution Applied**\n\n**Current Status:** Under Investigation - Resolution Pending\n- **Immediate Actions:** Pipeline execution completed successfully\n- **Recovery Strategy:** Not yet documented in PRB\n- **Coordination:** G2G managed process with updates tracked in Google documentation\n\n**Expected Resolution Path:**\n1. **Data Recovery:** Restore from backup if service restoration required\n2. **Service Migration:** Redirect traffic to alternative database instances\n3. **Infrastructure Provisioning:** Deploy replacement infrastructure if needed\n4. **Validation Testing:** Ensure service functionality post-recovery\n\n## **Preventive Measures**\n\n**Immediate Prevention Strategies:**\n\n1. **Enhanced Change Management:**\n   - Implement mandatory impact assessment for production database destruction\n   - Require explicit customer notification procedures\n   - Establish rollback/recovery validation before destruction execution\n\n2. **Process Improvements:**\n   - **Pre-Destruction Checklist:**\n     - Verify backup completeness and recoverability\n     - Confirm dependent service migration completion\n     - Validate customer communication and approval\n   - **Automated Safeguards:**\n     - Implement confirmation delays for production destruction commands\n     - Require multi-person approval for critical infrastructure changes\n\n3. **Documentation Standards:**\n   - Complete PRB templates with all required impact assessment fields\n   - Maintain real-time status updates during infrastructure changes\n   - Document recovery procedures and timelines\n\n4. **Monitoring and Alerting:**\n   - Implement pre-destruction dependency scanning\n   - Establish automated customer impact detection\n   - Create real-time service availability monitoring post-destruction\n\n5. **Communication Protocol:**\n   - Standardize customer notification templates for planned infrastructure changes\n   - Establish clear escalation paths for unexpected impacts\n   - Implement automated status page updates for service disruptions\n\n**Long-term Strategic Improvements:**\n- Develop blue-green deployment strategies for database migrations\n- Implement infrastructure-as-code with built-in safety controls\n- Establish comprehensive disaster recovery testing procedures\n- Create automated rollback capabilities for critical infrastructure changes"
+      "PRB-21983672": "Content not available - LLM API HTTP 401. Check LLM_GW_EXPRESS_KEY (expired or wrong) and OPENAI_USER_ID if your gateway requires it."
     }
   }
 }

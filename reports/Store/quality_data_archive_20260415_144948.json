@@ -35,11 +35,53 @@
   "critical_issues": [],
   "deployments": [
     {
-      "stagger": "R0.1",
-      "version": "262.15",
+      "stagger": "R1.1",
+      "version": "262.3",
       "count": 2,
-      "stage": "R0.1",
+      "stage": "R1.1",
       "cells": 2
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.11",
+      "count": 37,
+      "stage": "SB1.1",
+      "cells": 37
+    },
+    {
+      "stagger": "R1.1",
+      "version": "262.9",
+      "count": 39,
+      "stage": "R1.1",
+      "cells": 39
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.9",
+      "count": 40,
+      "stage": "SB1.2",
+      "cells": 40
+    },
+    {
+      "stagger": "R2b.1",
+      "version": "262.9",
+      "count": 16,
+      "stage": "R2b.1",
+      "cells": 16
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.11",
+      "count": 2,
+      "stage": "SB2.2",
+      "cells": 2
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "262.3",
+      "count": 9,
+      "stage": "R2a.2",
+      "cells": 9
     },
     {
       "stagger": "SB1.2",
@@ -49,32 +91,18 @@
       "cells": 1
     },
     {
-      "stagger": "R2b.2",
-      "version": "262.9",
-      "count": 33,
-      "stage": "R2b.2",
-      "cells": 33
-    },
-    {
-      "stagger": "R2b.2",
-      "version": "262.3",
-      "count": 5,
-      "stage": "R2b.2",
-      "cells": 5
-    },
-    {
-      "stagger": "SB2.1",
-      "version": "262.9",
-      "count": 16,
-      "stage": "SB2.1",
-      "cells": 16
-    },
-    {
       "stagger": "R2a.2",
       "version": "262.9",
-      "count": 110,
+      "count": 75,
       "stage": "R2a.2",
-      "cells": 110
+      "cells": 75
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.3",
+      "count": 1,
+      "stage": "SB2.2",
+      "cells": 1
     },
     {
       "stagger": "R0.2",
@@ -84,11 +112,67 @@
       "cells": 3
     },
     {
-      "stagger": "SB1.2",
-      "version": "260.15",
+      "stagger": "R2a.1",
+      "version": "262.7",
+      "count": 108,
+      "stage": "R2a.1",
+      "cells": 108
+    },
+    {
+      "stagger": "R1.2",
+      "version": "262.7",
+      "count": 27,
+      "stage": "R1.2",
+      "cells": 27
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.9",
+      "count": 33,
+      "stage": "R2b.2",
+      "cells": 33
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.9",
+      "count": 72,
+      "stage": "R2a.1",
+      "cells": 72
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.3",
       "count": 1,
-      "stage": "SB1.2",
+      "stage": "SB0",
       "cells": 1
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.3",
+      "count": 2,
+      "stage": "SB1.2",
+      "cells": 2
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.9",
+      "count": 26,
+      "stage": "SB1.1",
+      "cells": 26
+    },
+    {
+      "stagger": "SB2.1",
+      "version": "262.11",
+      "count": 5,
+      "stage": "SB2.1",
+      "cells": 5
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.3",
+      "count": 4,
+      "stage": "R2a.1",
+      "cells": 4
     },
     {
       "stagger": "R2b.2",
@@ -105,60 +189,18 @@
       "cells": 9
     },
     {
-      "stagger": "SB0",
-      "version": "262.14",
-      "count": 1,
-      "stage": "SB0",
-      "cells": 1
-    },
-    {
       "stagger": "SB2.1",
-      "version": "262.11",
-      "count": 6,
-      "stage": "SB2.1",
-      "cells": 6
-    },
-    {
-      "stagger": "SB0",
-      "version": "262.3",
-      "count": 1,
-      "stage": "SB0",
-      "cells": 1
-    },
-    {
-      "stagger": "R2b.1",
       "version": "262.9",
-      "count": 16,
-      "stage": "R2b.1",
-      "cells": 16
-    },
-    {
-      "stagger": "SB2.2",
-      "version": "262.11",
-      "count": 2,
-      "stage": "SB2.2",
-      "cells": 2
-    },
-    {
-      "stagger": "SB0",
-      "version": "262.15",
-      "count": 2,
-      "stage": "SB0",
-      "cells": 2
-    },
-    {
-      "stagger": "R1.2",
-      "version": "262.7",
-      "count": 6,
-      "stage": "R1.2",
-      "cells": 6
+      "count": 17,
+      "stage": "SB2.1",
+      "cells": 17
     },
     {
       "stagger": "SB1.2",
-      "version": "262.9",
-      "count": 37,
+      "version": "262.11",
+      "count": 20,
       "stage": "SB1.2",
-      "cells": 37
+      "cells": 20
     },
     {
       "stagger": "SB2.2",
@@ -168,27 +210,6 @@
       "cells": 15
     },
     {
-      "stagger": "SB1.1",
-      "version": "262.11",
-      "count": 44,
-      "stage": "SB1.1",
-      "cells": 44
-    },
-    {
-      "stagger": "SB1.2",
-      "version": "262.11",
-      "count": 23,
-      "stage": "SB1.2",
-      "cells": 23
-    },
-    {
-      "stagger": "R2a.1",
-      "version": "262.7",
-      "count": 93,
-      "stage": "R2a.1",
-      "cells": 93
-    },
-    {
       "stagger": "R0.1",
       "version": "262.9",
       "count": 5,
@@ -196,81 +217,60 @@
       "cells": 5
     },
     {
-      "stagger": "R2a.2",
-      "version": "262.3",
+      "stagger": "SB1.2",
+      "version": "260.15",
       "count": 1,
-      "stage": "R2a.2",
+      "stage": "SB1.2",
       "cells": 1
     },
     {
       "stagger": "SB1.1",
       "version": "262.14",
-      "count": 2,
+      "count": 4,
       "stage": "SB1.1",
-      "cells": 2
+      "cells": 4
     },
     {
-      "stagger": "SB2.2",
-      "version": "262.3",
-      "count": 1,
-      "stage": "SB2.2",
-      "cells": 1
+      "stagger": "R0.1",
+      "version": "262.14",
+      "count": 2,
+      "stage": "R0.1",
+      "cells": 2
     },
     {
       "stagger": "R2a.2",
       "version": "262.7",
-      "count": 112,
+      "count": 139,
       "stage": "R2a.2",
-      "cells": 112
-    },
-    {
-      "stagger": "SB1.1",
-      "version": "262.9",
-      "count": 19,
-      "stage": "SB1.1",
-      "cells": 19
-    },
-    {
-      "stagger": "R1.1",
-      "version": "262.9",
-      "count": 47,
-      "stage": "R1.1",
-      "cells": 47
-    },
-    {
-      "stagger": "SB1.1",
-      "version": "262.15",
-      "count": 2,
-      "stage": "SB1.1",
-      "cells": 2
-    },
-    {
-      "stagger": "R1.2",
-      "version": "262.9",
-      "count": 41,
-      "stage": "R1.2",
-      "cells": 41
-    },
-    {
-      "stagger": "SB1.2",
-      "version": "262.3",
-      "count": 2,
-      "stage": "SB1.2",
-      "cells": 2
-    },
-    {
-      "stagger": "R2a.1",
-      "version": "262.9",
-      "count": 91,
-      "stage": "R2a.1",
-      "cells": 91
+      "cells": 139
     },
     {
       "stagger": "R1.1",
       "version": "262.7",
-      "count": 11,
+      "count": 17,
       "stage": "R1.1",
-      "cells": 11
+      "cells": 17
+    },
+    {
+      "stagger": "R1.2",
+      "version": "262.9",
+      "count": 20,
+      "stage": "R1.2",
+      "cells": 20
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.14",
+      "count": 3,
+      "stage": "SB0",
+      "cells": 3
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.3",
+      "count": 5,
+      "stage": "R2b.2",
+      "cells": 5
     }
   ],
   "deployment_summary": "Weekly Deployment Summary - Week of September 15, 2025\n\nThis week's deployment activities proceeded smoothly across all stagger groups. \nSDB version 258.11 was successfully deployed to sandbox environments (SB0-SB2) \nwith no major issues reported.\n\nKey highlights:\n- Version 258.11 rolled out to 150 sandbox cells\n- Zero failed deployments\n- Average deployment time: 12 minutes\n- All post-deployment validations passed\n\nNext week: Planning production rollout to P0-P3 stages pending final validation results.",
@@ -303,7 +303,63 @@
   ],
   "leftshift_issues": [],
   "abs_issues": [],
-  "security_issues": [],
+  "security_issues": [
+    {
+      "work_id": "W-21789048",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:io.netty:netty-codec-http:4.1.130.Final Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-15",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22037652",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.apache.commons:commons-configuration2:2.12.0 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-15",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21880949",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.apache.zookeeper:zookeeper:3.8.3 Vulnerability Detected",
+      "status": "Waiting",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-15",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21572522",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.apache.zookeeper:zookeeper:3.8.3 Vulnerability Detected",
+      "status": "Waiting",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-15",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22037480",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:commons-lang:commons-lang:2.6 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-15",
+      "issue_type": "security"
+    }
+  ],
   "all_bugs": [],
   "prb_bugs": [],
   "system_availability": {
@@ -404,7 +460,7 @@
     "code_churn_risk": "Low",
     "repository_path": "/Users/rchowdhuri/bookkeeper"
   },
-  "generated_at": "2026-04-15T09:49:49.367086",
+  "generated_at": "2026-04-15T14:49:39.680601",
   "report_component": "Store",
   "coverage_summary": {
     "new_code": {
@@ -565,7 +621,7 @@
   ],
   "prb_backlog": [],
   "metadata": {
-    "generated_at": "2026-04-15T09:49:58.140109",
+    "generated_at": "2026-04-15T14:49:50.715809",
     "report_period_start": "2026-04-06",
     "report_period_end": "2026-04-12",
     "report_period_display": "April 06-12, 2026",
@@ -580,7 +636,7 @@
       "has_llm_content": true,
       "ci_total": 1,
       "ci_p0_p1": 0,
-      "security_total": 0,
+      "security_total": 5,
       "security_p0_p1": 0,
       "leftshift_total": 0,
       "leftshift_p0_p1": 0,
@@ -591,13 +647,13 @@
     }
   },
   "llm_content": {
-    "trend_analysis": "Content not available - LLM API error",
-    "risk_analysis": "Content not available - LLM API error",
+    "trend_analysis": "Content not available - LLM API HTTP 401. Check LLM_GW_EXPRESS_KEY (expired or wrong) and OPENAI_USER_ID if your gateway requires it.",
+    "risk_analysis": "Content not available - LLM API HTTP 401. Check LLM_GW_EXPRESS_KEY (expired or wrong) and OPENAI_USER_ID if your gateway requires it.",
     "prb_narratives": {
-      "PRB-21983672": "Content not available - LLM API error"
+      "PRB-21983672": "Content not available - LLM API HTTP 401. Check LLM_GW_EXPRESS_KEY (expired or wrong) and OPENAI_USER_ID if your gateway requires it."
     },
     "prb_analyses": {
-      "PRB-21983672": "Content not available - LLM API error"
+      "PRB-21983672": "Content not available - LLM API HTTP 401. Check LLM_GW_EXPRESS_KEY (expired or wrong) and OPENAI_USER_ID if your gateway requires it."
     }
   }
 }
