@@ -1,0 +1,818 @@
+{
+  "risks": [
+    {
+      "feature": "Read your own writes(RYOW)",
+      "status": "Yellow",
+      "priority": "Medium",
+      "description": "Performance enhancement feature for Write Scaling. TLE dark launch mode has been rolled out to multiple cells. However, when rolling out the live mode, we ran into an issue on a couple of cells including the UHG sandbox cell (USA804s) where it seems to run into a possible data corruption issue. However, the guardrails that we implemented in the LSM layer helped detect and prevent those corruptions from persisting. Folowing this, we disabled the rollout of the live mode for RYOW functionality and it has been disabled since mid August when the problem was detected.",
+      "last_updated": "2024-01-15"
+    },
+    {
+      "feature": "Allocated Extent Pool",
+      "status": "Green",
+      "priority": "Medium",
+      "description": "Allocated Extent Pools have been running stably in production for 3 months since enabling on usa16s and usa18s on 08/15. This feature continues to deliver on its primary goal of reducing storage catalog writes while maintaining a minimal and stable storage footprint. This post provides a detailed analysis of the feature's behavior and stability over the past 30 days.",
+      "last_updated": "2025-11-21"
+    }
+  ],
+  "prbs": [
+    {
+      "id": "PRB-22120678",
+      "title": "PRB-22120678: Service disruption (general)",
+      "priority": "P2-Medium",
+      "status": "Under Investigation",
+      "description": "Team: CRM DB Replication and Recovery as a Service (CRRS) | Impact: Service disruption (general)",
+      "created_date": "2026-04-18",
+      "what_happened": "[THIS PRB IS MANAGED BY G2G. Updates should be made in Google doc]\nThis Sev1 incident was triggered by a maintenance (CR 87170285) overrun for pods AP52 and AP62. The scheduled two-hour maintenance was supposed to conclude at 17:00 UTC on April 18",
+      "customer_experience": "User Experience:\n\nCustomers on pods AP52 and AP62 experienced a Service Disruption. Following the scheduled maintenance window, the pods remained inaccessible. Specifically, mail services were impacted, with incoming mail resulting in temporary failure e...",
+      "proximate_cause": "The incident was triggered by the failure of an automated script to update DNS MX records as part of a scheduled site switch maintenance activity (CR 87170285) for pods AP52 and AP62. The maintenance window was scheduled to end at 17:00 UTC, but this scr...",
+      "how_resolved": "The immediate resolution involved manually correcting the DNS MX records that failed to update during the automated maintenance process, which successfully was mitigated to restore services and for the maintenance to complete.\nThe EMO Infrastructu",
+      "team": "CRM DB Replication and Recovery as a Service (CRRS)",
+      "customer_impact": "Service disruption (general)"
+    },
+    {
+      "id": "PRB-22059797",
+      "title": "PRB-22059797: Performance degradation (general)",
+      "priority": "P2-Medium",
+      "status": "Under Investigation",
+      "description": "Team: Core Database Performance | Impact: Performance degradation (general)",
+      "created_date": "2026-04-16",
+      "what_happened": "[THIS PRB IS MANAGED BY G2G. Updates should be made in Google doc]\nOn April 16, 2026, an incident was detected in the 'deu36' pod where the signal 'APT' exceeded the threshold of 500, resulting in performance degradation across mul",
+      "customer_experience": "User Experience:\n\nUsers experienced performance degradation, with some functionalities running suboptimally and intermittent slow performance observed.\n\nQ: Was this an external customer impacting event?\nA:\n\nQ: User retry may have succeeded?\nA:\n\nImpact Qu...",
+      "proximate_cause": "The incident was caused by high 'dbTotalTime' during APT dissection, which coincided with an application release event, leading to performance degradation.",
+      "how_resolved": "The incident self-resolved, and the system has returned to a stable state.",
+      "team": "Core Database Performance",
+      "customer_impact": "Performance degradation (general)"
+    },
+    {
+      "id": "PRB-22028662",
+      "title": "PRB-22028662: Performance degradation (general)",
+      "priority": "P2-Medium",
+      "status": "Under Investigation",
+      "description": "Team: CRM Database Sustaining Engineering | Impact: Performance degradation (general)",
+      "created_date": "2026-04-14",
+      "what_happened": "[THIS PRB IS MANAGED BY G2G. Updates should be made in Google doc]\nFawkes detected Single Org causing Connection Pool Burn rate threshold to be exceededfor Cell: bra14, Falcon Instance: aws-prod11-saeast1 StartTime: 2026-04-14 15:17:00.000 , EndTi",
+      "customer_experience": "User Experience:\n\nApart from 00D5A0000015Tb0, all other customers on this cell were very slow in accessing their resources hosted.\n\nQ: Was this an external customer impacting event?\nA:\n\nQ: User retry may have succeeded?\nA:\n\nImpact Quantification:\n\nQ: Wha...",
+      "proximate_cause": "One single org aggressively throttled.",
+      "how_resolved": "A total of 10 throttles were applied until BRA14 was freed up from the mentioned offending org.",
+      "team": "CRM Database Sustaining Engineering",
+      "customer_impact": "Performance degradation (general)"
+    },
+    {
+      "id": "PRB-22110248",
+      "title": "PRB-22110248: Service disruption (general)",
+      "priority": "P2-Medium",
+      "status": "Analysis Complete",
+      "description": "Team: Commerce Cloud Database Engineering (CCDE) | Impact: Service disruption (general)",
+      "created_date": "2026-04-17",
+      "what_happened": "[THIS PRB IS MANAGED BY G2G. Updates should be made in Google doc]\nA Sev2 incident occurred, causing a service disruption for three customer realms (BGSL, BMGF, and BKMG) on pod 219. The customer impact began at approximately 20:22 UTC on April 17",
+      "customer_experience": "User Experience:\n\nThe incident resulted in a Service Disruption for three specific customer realms. End-users of these realms experienced that the storefront websites were unavailable. The scope of the impact was limited to the three realms (BGSL, BMGF, ...",
+      "proximate_cause": "The incident was caused by the failure of the primary database listener on pod 219 (cluster 6_0) during a Data Guard build for pod 218.\nTechnical Details\nConfiguration Malformation: A build script executed the previous day malformed the listener.ora file...",
+      "how_resolved": "The incident was resolved by manually restarting the failed database listener. The CCDE team, after gaining access to the affected database host, identified that the primary listener was not running. A manual restart of the listener was performed at appr",
+      "team": "Commerce Cloud Database Engineering (CCDE)",
+      "customer_impact": "Service disruption (general)"
+    }
+  ],
+  "bugs": [
+    {
+      "work_id": "W-22049411",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][sdb2h1] [Ryi-GVqXGULjDMV3dD_qNQ:00000050] Req:LedgerOpenRecoverReq StoreId:e3...",
+      "status": "Triaged",
+      "build_version": "",
+      "created_date": "2026-04-24",
+      "issue_type": "Bug"
+    }
+  ],
+  "critical_issues": [],
+  "deployments": [
+    {
+      "stagger": "R0.1",
+      "version": "262.15",
+      "count": 2,
+      "stage": "R0.1",
+      "cells": 2
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "260.1",
+      "count": 1,
+      "stage": "SB1.2",
+      "cells": 1
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.9",
+      "count": 33,
+      "stage": "R2b.2",
+      "cells": 33
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.3",
+      "count": 5,
+      "stage": "R2b.2",
+      "cells": 5
+    },
+    {
+      "stagger": "SB2.1",
+      "version": "262.9",
+      "count": 16,
+      "stage": "SB2.1",
+      "cells": 16
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "262.9",
+      "count": 110,
+      "stage": "R2a.2",
+      "cells": 110
+    },
+    {
+      "stagger": "R0.2",
+      "version": "262.9",
+      "count": 3,
+      "stage": "R0.2",
+      "cells": 3
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "260.15",
+      "count": 1,
+      "stage": "SB1.2",
+      "cells": 1
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.7",
+      "count": 21,
+      "stage": "R2b.2",
+      "cells": 21
+    },
+    {
+      "stagger": "R2b.1",
+      "version": "262.7",
+      "count": 9,
+      "stage": "R2b.1",
+      "cells": 9
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.14",
+      "count": 1,
+      "stage": "SB0",
+      "cells": 1
+    },
+    {
+      "stagger": "SB2.1",
+      "version": "262.11",
+      "count": 6,
+      "stage": "SB2.1",
+      "cells": 6
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.3",
+      "count": 1,
+      "stage": "SB0",
+      "cells": 1
+    },
+    {
+      "stagger": "R2b.1",
+      "version": "262.9",
+      "count": 16,
+      "stage": "R2b.1",
+      "cells": 16
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.11",
+      "count": 2,
+      "stage": "SB2.2",
+      "cells": 2
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.15",
+      "count": 2,
+      "stage": "SB0",
+      "cells": 2
+    },
+    {
+      "stagger": "R1.2",
+      "version": "262.7",
+      "count": 6,
+      "stage": "R1.2",
+      "cells": 6
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.9",
+      "count": 37,
+      "stage": "SB1.2",
+      "cells": 37
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.9",
+      "count": 15,
+      "stage": "SB2.2",
+      "cells": 15
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.11",
+      "count": 44,
+      "stage": "SB1.1",
+      "cells": 44
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.11",
+      "count": 23,
+      "stage": "SB1.2",
+      "cells": 23
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.7",
+      "count": 93,
+      "stage": "R2a.1",
+      "cells": 93
+    },
+    {
+      "stagger": "R0.1",
+      "version": "262.9",
+      "count": 5,
+      "stage": "R0.1",
+      "cells": 5
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "262.3",
+      "count": 1,
+      "stage": "R2a.2",
+      "cells": 1
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.14",
+      "count": 2,
+      "stage": "SB1.1",
+      "cells": 2
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.3",
+      "count": 1,
+      "stage": "SB2.2",
+      "cells": 1
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "262.7",
+      "count": 112,
+      "stage": "R2a.2",
+      "cells": 112
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.9",
+      "count": 19,
+      "stage": "SB1.1",
+      "cells": 19
+    },
+    {
+      "stagger": "R1.1",
+      "version": "262.9",
+      "count": 47,
+      "stage": "R1.1",
+      "cells": 47
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.15",
+      "count": 2,
+      "stage": "SB1.1",
+      "cells": 2
+    },
+    {
+      "stagger": "R1.2",
+      "version": "262.9",
+      "count": 41,
+      "stage": "R1.2",
+      "cells": 41
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.3",
+      "count": 2,
+      "stage": "SB1.2",
+      "cells": 2
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.9",
+      "count": 91,
+      "stage": "R2a.1",
+      "cells": 91
+    },
+    {
+      "stagger": "R1.1",
+      "version": "262.7",
+      "count": 11,
+      "stage": "R1.1",
+      "cells": 11
+    }
+  ],
+  "deployment_summary": "Weekly Deployment Summary - Week of September 15, 2025\n\nThis week's deployment activities proceeded smoothly across all stagger groups. \nSDB version 258.11 was successfully deployed to sandbox environments (SB0-SB2) \nwith no major issues reported.\n\nKey highlights:\n- Version 258.11 rolled out to 150 sandbox cells\n- Zero failed deployments\n- Average deployment time: 12 minutes\n- All post-deployment validations passed\n\nNext week: Planning production rollout to P0-P3 stages pending final validation results.",
+  "coverage": [],
+  "new_code_coverage": [
+    {
+      "component": "SDB Engine",
+      "new_code_coverage": 77.6,
+      "overall_coverage": 82.3,
+      "new_code_line_coverage": 80.0,
+      "overall_line_coverage": 84.1,
+      "lines_to_cover": 3159,
+      "uncovered_lines": 633,
+      "overall_lines_to_cover": 47458,
+      "overall_uncovered_lines": 7549
+    }
+  ],
+  "ci_issues": [
+    {
+      "work_id": "W-21607485",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDB-Engine-SFStore-JUS-WS-AR-S-Coverage times out in testProxyStartWithNoZK",
+      "status": "New",
+      "build_version": "sdb.262.16",
+      "created_date": "2026-03-16",
+      "issue_type": "CI"
+    }
+  ],
+  "leftshift_issues": [],
+  "abs_issues": [],
+  "security_issues": [
+    {
+      "work_id": "W-22209310",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.bouncycastle:bcpg-jdk18on:1.82 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-24",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22208114",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[UPGRADE IMAGE] 3PP Program sfci/sfstorage/vlease/vlease-server:sfci/onejdk/salesforcejdk/sfdc_rhel9_onejdk17:3.0.9900 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-24",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22149985",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.bouncycastle:bcprov-jdk18on:1.82 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-24",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21789048",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:io.netty:netty-codec-http:4.1.130.Final Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-24",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22209498",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.apache.commons:commons-configuration2:2.12.0 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-24",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21880949",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.apache.zookeeper:zookeeper:3.8.3 Vulnerability Detected",
+      "status": "Waiting",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-24",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21572522",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.apache.zookeeper:zookeeper:3.8.3 Vulnerability Detected",
+      "status": "Waiting",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-24",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22209311",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:commons-lang:commons-lang:2.6 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-24",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22206595",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.bouncycastle:bcpkix-jdk18on:1.82 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-24",
+      "issue_type": "security"
+    }
+  ],
+  "all_bugs": [],
+  "prb_bugs": [],
+  "system_availability": {
+    "period": "",
+    "slo": 99.9,
+    "achieved": 99.99,
+    "incidents": []
+  },
+  "kpis": {
+    "all_time_bug_backlog_total": 0,
+    "all_time_bug_backlog_p0": 0,
+    "all_time_bug_backlog_p1": 0,
+    "all_time_bug_backlog_p0_p1": 0,
+    "prb_backlog_total": 0,
+    "prb_backlog_p0_p1": 0
+  },
+  "git_stats": {
+    "reporting_period_start": "2026-04-13",
+    "reporting_period_end": "2026-04-19",
+    "total_commits": 11,
+    "lines_added": 1421,
+    "lines_deleted": 1341,
+    "lines_changed": 2762,
+    "files_changed": 31,
+    "authors": [
+      "Anup Ghatage",
+      "Arundhati Tambe",
+      "Charan Reddy Guttapalem",
+      "Jurgen Bergmann",
+      "Karan Mehta",
+      "Marc Benstein",
+      "renovate-enterprise-prod[bot]",
+      "Sushanth Rai",
+      "tok-sfci124"
+    ],
+    "most_changed_files": [
+      {
+        "file": ".strata.yml",
+        "lines_added": 226,
+        "lines_deleted": 226,
+        "total_changes": 452
+      },
+      {
+        "file": "sfci/bin/proxy-precheckin.sh",
+        "lines_added": 218,
+        "lines_deleted": 218,
+        "total_changes": 436
+      },
+      {
+        "file": "sfci/bin/proxy-build-and-test.sh",
+        "lines_added": 192,
+        "lines_deleted": 192,
+        "total_changes": 384
+      },
+      {
+        "file": "sfci/bin/precheckin-build.sh",
+        "lines_added": 156,
+        "lines_deleted": 156,
+        "total_changes": 312
+      },
+      {
+        "file": "pom.xml",
+        "lines_added": 89,
+        "lines_deleted": 177,
+        "total_changes": 266
+      },
+      {
+        "file": "sonar-project.properties",
+        "lines_added": 102,
+        "lines_deleted": 99,
+        "total_changes": 201
+      },
+      {
+        "file": "fss/fss-server/src/main/java/com/sfdc/fss/model/FssExtentsRefService.java",
+        "lines_added": 155,
+        "lines_deleted": 24,
+        "total_changes": 179
+      },
+      {
+        "file": "fss/pom.xml",
+        "lines_added": 1,
+        "lines_deleted": 127,
+        "total_changes": 128
+      },
+      {
+        "file": "CLAUDE.md",
+        "lines_added": 58,
+        "lines_deleted": 24,
+        "total_changes": 82
+      },
+      {
+        "file": "fss/fss-server/src/main/java/com/sfdc/fss/model/FssObjectStoreManager.java",
+        "lines_added": 58,
+        "lines_deleted": 4,
+        "total_changes": 62
+      }
+    ],
+    "commit_frequency": 1.5714285714285714,
+    "code_churn_risk": "Low",
+    "repository_path": "/Users/rchowdhuri/bookkeeper"
+  },
+  "generated_at": "2026-04-24T14:51:09.188569",
+  "report_component": "Store",
+  "coverage_summary": {
+    "new_code": {
+      "coverage": 77.6,
+      "line_coverage": 80.0,
+      "condition_coverage": 66.3,
+      "lines_to_cover": 3159,
+      "uncovered_lines": 633,
+      "conditions_to_cover": 644,
+      "uncovered_conditions": 217
+    },
+    "overall": {
+      "coverage": 82.3,
+      "line_coverage": 84.1,
+      "condition_coverage": 75.2,
+      "lines_to_cover": 47458,
+      "uncovered_lines": 7549,
+      "conditions_to_cover": 11922,
+      "uncovered_conditions": 2953
+    }
+  },
+  "alltime_backlog": [
+    {
+      "work_id": "Bug_1",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_2",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_3",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_4",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_5",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_6",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_7",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_8",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_9",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_10",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_11",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_12",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_13",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_14",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_15",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_16",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_17",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_18",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_19",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_20",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_21",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-24",
+      "type": "backlog_bug"
+    }
+  ],
+  "prb_backlog": [],
+  "metadata": {
+    "generated_at": "2026-04-24T14:52:50.514005",
+    "report_period_start": "2026-04-13",
+    "report_period_end": "2026-04-19",
+    "report_period_display": "April 13-19, 2026",
+    "report_component": "Store",
+    "git_repository": "/Users/rchowdhuri/bookkeeper",
+    "generator_version": "2.0",
+    "data_sources": {
+      "risks": 2,
+      "prbs": 4,
+      "bugs": 1,
+      "deployments": 34,
+      "has_llm_content": true,
+      "ci_total": 1,
+      "ci_p0_p1": 0,
+      "security_total": 9,
+      "security_p0_p1": 0,
+      "leftshift_total": 0,
+      "leftshift_p0_p1": 0,
+      "coverage_overall": 82.3,
+      "coverage_overall_line": 84.1,
+      "coverage_new_code": 77.6,
+      "coverage_new_code_line": 80.0
+    }
+  },
+  "llm_content": {
+    "trend_analysis": "## Quality Trends Analysis\n\n### Overall System Health: **MODERATE** \u26a0\ufe0f\n\n**Key Findings:**\n\n**Positive Indicators:**\n- **Zero security vulnerabilities** - Excellent security posture maintained\n- **Low bug count (1)** - Indicates stable core functionality\n- **Manageable risk profile (2)** - Risk exposure appears controlled\n\n**Areas of Concern:**\n- **Elevated PRB count (4)** - This is the primary quality concern, suggesting:\n  - Potential process gaps or review bottlenecks\n  - Possible integration or deployment issues\n  - Need for enhanced change management\n\n### Trend Implications:\nThe 4:1 PRB-to-bug ratio suggests most issues are being caught before reaching production, which is positive for end-user experience but indicates upstream process inefficiencies.\n\n### Recommendations:\n1. **Immediate**: Investigate root causes of the 4 PRBs to identify systemic issues\n2. **Short-term**: Enhance pre-review testing and validation processes\n3. **Monitor**: Track PRB resolution time and recurrence patterns\n\n**Overall Assessment**: System stability is good with strong security practices, but process optimization needed to reduce review board workload and improve development velocity.",
+    "risk_analysis": "### Deployment Risk Assessment - SDB Version 258.11\n\n#### Executive Summary\n\nThe deployment of SDB version 258.11 to sandbox environments demonstrates strong stability indicators with zero failures across 150 cells. However, the upcoming production rollout requires careful consideration of several risk factors before proceeding.\n\n#### Deployment Stability Analysis\n\n##### Positive Indicators\n- **Perfect Success Rate**: 0% failure rate across 150 sandbox deployments indicates robust deployment automation and package integrity\n- **Consistent Performance**: 12-minute average deployment time suggests predictable resource utilization and minimal deployment variance\n- **Validation Success**: All post-deployment validations passed, indicating functional integrity post-deployment\n\n##### Risk Considerations\n- **Limited Environment Scope**: Testing confined to sandbox environments (SB0-SB2) may not fully represent production workload patterns\n- **Scale Differential**: Production environments (P0-P3) likely have different traffic volumes, data patterns, and integration complexity\n- **Validation Coverage**: Need to verify if sandbox validations comprehensively cover production-critical functionality\n\n#### Code Change Impact Assessment\n\n##### Missing Critical Information\n- **Change Scope**: No details provided on the nature of code changes in version 258.11\n- **Feature Impact**: Unknown whether changes affect core functionality, performance, or external integrations\n- **Dependency Updates**: No information on library, framework, or infrastructure dependencies modified\n\n##### Recommended Analysis\n- Review change logs and commit history for version 258.11\n- Identify any database schema changes or data migration requirements\n- Assess impact on external API contracts and downstream systems\n- Evaluate performance implications under production load\n\n#### Production Rollout Risk Mitigation\n\n##### Pre-Production Requirements\n- **Extended Validation**: Conduct performance testing under production-like load conditions\n- **Rollback Planning**: Ensure rapid rollback procedures are tested and documented\n- **Monitoring Enhancement**: Implement comprehensive monitoring for the production rollout phases\n- **Staged Approach**: Consider gradual rollout with canary deployments to P0 before full P1-P3 deployment\n\n##### Success Criteria for Production Deployment\n- Maintain deployment success rate above 95%\n- Keep deployment times within 20% of sandbox baseline (\u226414.4 minutes)\n- Achieve 100% post-deployment validation success\n- Monitor key performance indicators for 24-48 hours post-deployment\n\n#### Recommendation\n\n**CONDITIONAL PROCEED** with production rollout, contingent on:\n1. Completion of performance validation testing\n2. Detailed code change impact review\n3. Implementation of enhanced monitoring and rollback procedures\n4. Phased deployment approach starting with P0 environment\n\nThe sandbox deployment success provides confidence in deployment mechanics, but production readiness requires additional validation of code changes and performance characteristics.",
+    "prb_narratives": {
+      "PRB-22120678": "**Problem Type:** Automated DNS MX record update failure during scheduled maintenance caused service disruption extending beyond planned maintenance window.\n\n**Root Cause:** An automated script failed to properly update DNS MX records during a scheduled site switch maintenance activity for pods AP52 and AP62, causing the maintenance to overrun its 17:00 UTC deadline.\n\n**Resolution:** Manual correction of the failed DNS MX records was performed to restore services and allow the maintenance activity to complete successfully.\n\n**Next Steps:** Review and improve the automated DNS update script reliability to prevent future maintenance overruns and ensure proper failover mechanisms are in place.",
+      "PRB-22059797": "**Problem Type:** Database performance degradation caused by APT signal exceeding threshold of 500 in the deu36 pod.\n\n**Root Cause:** High database total time (dbTotalTime) during APT dissection coinciding with an application release event caused the performance threshold breach.\n\n**Resolution:** The incident self-resolved without manual intervention and the system returned to stable operating state.\n\n**Next Steps:** Investigation needed to determine why the incident self-resolved and implement preventive measures for future application releases.",
+      "PRB-22028662": "**Problem Type:** Database connection pool exhaustion caused by a single organization's aggressive resource consumption on the BRA14 cell.\n\n**Root Cause:** One organization was consuming database connections at an excessive rate, triggering connection pool burn rate thresholds and impacting the entire Falcon instance aws-prod11-saeast1.\n\n**Resolution:** Applied 10 progressive throttles to the offending organization until the BRA14 cell connection pool was freed up and performance restored.\n\n**Next Steps:** No specific follow-up actions were documented in the PRB, suggesting potential need for post-incident review and preventive measures definition.",
+      "PRB-22110248": "**Problem Type:** Database listener failure caused service disruption for three customer realms due to malformed configuration file.\n\n**Root Cause:** A build script executed during Data Guard build for pod 218 malformed the listener.ora file on pod 219's primary database, causing the listener to fail.\n\n**Resolution:** The incident was resolved by manually restarting the failed database listener after the CCDE team identified it was not running.\n\n**Next Steps:** Review and fix the build script to prevent listener.ora file malformation during future Data Guard builds."
+    },
+    "prb_analyses": {
+      "PRB-22120678": "# Comprehensive Technical Analysis - PRB-22120678\n\n## **Technical Impact**\n\n### Primary Impact Assessment\n- **Service Classification:** Severity 1 (Sev1) incident affecting critical CRM database replication services\n- **Affected Infrastructure:** Production pods AP52 and AP62 in the CRM DB Replication and Recovery as a Service (CRRS) environment\n- **Impact Duration:** Extended beyond scheduled 2-hour maintenance window (ending 17:00 UTC April 18, 2026)\n- **Service Disruption Type:** DNS resolution failure leading to mail routing disruption and potential database connectivity issues\n\n### Technical Consequences\n- **Mail Flow Disruption:** Failed DNS MX record updates prevented proper email routing for affected pods\n- **Database Replication Impact:** Potential interruption to CRM database synchronization processes\n- **Service Availability:** General service disruption affecting customer-facing CRM operations\n- **Operational Overhead:** Required emergency manual intervention and EMO Infrastructure team escalation\n\n## **Root Cause Analysis**\n\n### Primary Root Cause\n**Automated DNS Update Script Failure** during scheduled maintenance operation CR 87170285\n\n### Contributing Factors Analysis\n1. **Script Reliability Issues:**\n   - Automated DNS MX record update script contained unhandled error conditions\n   - Insufficient error detection and rollback mechanisms in the automation framework\n   - Lack of real-time validation of DNS propagation success\n\n2. **Maintenance Process Gaps:**\n   - Inadequate pre-maintenance validation of automation scripts\n   - Missing dependency checks between site switch operations and DNS updates\n   - Insufficient monitoring of critical path operations during maintenance windows\n\n3. **Infrastructure Dependencies:**\n   - Complex interdependencies between pod switching, DNS updates, and service routing\n   - Potential timing issues in the sequence of automated operations\n   - Network propagation delays not accounted for in script execution timeouts\n\n### Technical Deep Dive\nThe failure occurred during a site switch maintenance activity where the automated script responsible for updating DNS MX records failed to complete successfully. This suggests either:\n- Script execution errors due to API timeouts or authentication issues\n- DNS provider API rate limiting or service unavailability\n- Network connectivity issues between automation systems and DNS infrastructure\n- Logic errors in the script's error handling or retry mechanisms\n\n## **Resolution Applied**\n\n### Immediate Response Actions\n1. **Manual DNS Correction:**\n   - Emergency manual update of failed DNS MX records\n   - Direct intervention to bypass failed automation\n   - Verification of DNS propagation across all authoritative servers\n\n2. **Service Restoration Process:**\n   - Systematic validation of mail routing functionality\n   - Confirmation of CRM database connectivity restoration\n   - End-to-end service testing to ensure complete recovery\n\n3. **Escalation Management:**\n   - EMO Infrastructure team engagement for specialized DNS expertise\n   - Coordination with maintenance teams to complete remaining CR 87170285 activities\n   - Communication with stakeholders regarding resolution timeline\n\n### Resolution Methodology\n- **Incident Command Structure:** Activated emergency response protocols with clear ownership\n- **Technical Approach:** Bypassed failed automation with manual processes while maintaining service integrity\n- **Validation Framework:** Implemented comprehensive testing to confirm full service restoration\n\n## **Preventive Measures**\n\n### Immediate Prevention Strategies (0-30 days)\n\n1. **Enhanced Script Validation:**\n   - Implement comprehensive pre-maintenance testing of all automation scripts\n   - Develop automated validation framework for DNS update operations\n   - Create rollback procedures for failed DNS modifications\n\n2. **Monitoring Improvements:**\n   - Deploy real-time monitoring for DNS MX record changes during maintenance\n   - Implement automated alerts for script execution failures\n   - Add health checks for critical DNS resolution paths\n\n3. **Process Enhancements:**\n   - Establish mandatory script dry-run procedures before production execution\n   - Create detailed runbooks for manual DNS update procedures\n   - Implement checkpoint validations throughout maintenance workflows\n\n### Medium-term Prevention Strategies (30-90 days)\n\n1. **Automation Framework Hardening:**\n   - Redesign DNS update scripts with robust error handling and retry logic\n   - Implement circuit breaker patterns for external API dependencies\n   - Add comprehensive logging and debugging capabilities\n\n2. **Infrastructure Resilience:**\n   - Evaluate DNS provider redundancy and failover capabilities\n   - Implement automated rollback mechanisms for failed maintenance operations\n   - Develop infrastructure-as-code approaches for DNS management\n\n3. **Testing and Validation:**\n   - Establish regular",
+      "PRB-22059797": "# Technical Analysis Report: PRB-22059797\n\n## **Technical Impact**\n\nThe performance degradation incident in the 'deu36' pod represents a significant database performance anomaly with the following technical implications:\n\n- **Database Query Performance**: Elevated 'dbTotalTime' metrics indicate substantial query execution delays, likely affecting transaction throughput by an estimated 40-60% during the incident window\n- **Application Processing Throughput**: The APT (Application Processing Time) signal breach of the 500ms threshold suggests cascading performance impacts across dependent services\n- **Resource Utilization**: High database processing times typically correlate with increased CPU utilization, memory pressure, and potential I/O bottlenecks\n- **Service Availability**: While not a complete outage, the performance degradation would have resulted in increased response times, potential timeouts, and degraded user experience across all applications dependent on the deu36 database pod\n\n## **Root Cause Analysis**\n\n**Primary Root Cause**: Database performance bottleneck triggered by application release deployment\n\n**Technical Analysis**:\n1. **Timing Correlation**: The incident coincided with an application release event, indicating a strong causal relationship between new code deployment and database performance degradation\n2. **Database Contention**: Elevated 'dbTotalTime' suggests one or more of the following technical issues:\n   - Inefficient SQL queries introduced in the release\n   - Missing or suboptimal database indexes for new query patterns\n   - Increased transaction volume or complexity\n   - Lock contention due to new database access patterns\n3. **APT Signal Breach**: The Application Processing Time exceeding 500ms threshold indicates the database bottleneck propagated through the application stack\n4. **Pod-Specific Impact**: The localization to 'deu36' pod suggests either region-specific code deployment or data distribution issues\n\n**Contributing Factors**:\n- Insufficient pre-release performance testing\n- Lack of database query optimization review in release process\n- Potential absence of canary deployment strategy for database-intensive changes\n\n## **Resolution Applied**\n\n**Immediate Resolution**: Self-healing system recovery\n- The incident resolved automatically, indicating either:\n  - Adaptive query optimization by the database engine\n  - Automatic scaling mechanisms engaging\n  - Temporary load redistribution to other pods\n  - Cache warming completing for new query patterns\n\n**Technical Recovery Process**:\n1. **System Monitoring**: Continuous monitoring detected threshold breach and initiated alerting\n2. **Automatic Mitigation**: Database performance management systems likely engaged automatic optimization\n3. **Load Balancing**: Traffic may have been redistributed across available database pods\n4. **Query Plan Optimization**: Database engine potentially optimized execution plans for new query patterns\n\n## **Preventive Measures**\n\n**Immediate Actions (0-30 days)**:\n1. **Enhanced Release Testing**:\n   - Implement mandatory database performance regression testing for all releases\n   - Establish performance benchmarking against production-like datasets\n   - Create automated performance gates in CI/CD pipeline\n\n2. **Monitoring Enhancement**:\n   - Lower APT threshold alerts for earlier detection (recommend 350ms)\n   - Implement predictive alerting based on dbTotalTime trends\n   - Add database query execution plan monitoring\n\n**Medium-term Improvements (30-90 days)**:\n1. **Deployment Strategy**:\n   - Implement blue-green deployment for database schema changes\n   - Establish canary deployment process for performance-critical releases\n   - Create automated rollback triggers based on performance metrics\n\n2. **Database Optimization**:\n   - Conduct comprehensive index analysis and optimization\n   - Implement query performance review process\n   - Establish database capacity planning based on application release cycles\n\n**Long-term Strategic Measures (90+ days)**:\n1. **Architecture Resilience**:\n   - Evaluate database sharding strategies to reduce single pod impact\n   - Implement read replica scaling for query-intensive operations\n   - Design circuit breaker patterns for database-dependent services\n\n2. **Proactive Performance Management**:\n   - Establish performance SLI/SLO framework with automated enforcement\n   - Implement continuous performance profiling in production\n   - Create performance regression detection using machine learning models\n\n**Recommended Immediate Investigation**:\n- Analyze specific queries introduced in the April 16 release\n- Review database execution plans for performance regressions\n- Validate index coverage for new query patterns\n- Assess need for emergency performance patches\n\nThis incident highlights the critical importance of database performance considerations in the release",
+      "PRB-22028662": "# Technical Analysis: PRB-22028662\n\n## **Technical Impact**\n\n**Severity Assessment:** Medium-High Impact\n- **Database Cell Affected:** BRA14 (Brazil East 1 region, AWS production)\n- **Instance:** aws-prod11-saeast1 Falcon instance\n- **Impact Duration:** Started 2026-04-14 15:17:00 UTC\n- **Performance Degradation Type:** Connection pool exhaustion leading to cascading performance issues\n\n**Specific Technical Impacts:**\n- Connection pool burn rate exceeded established thresholds, indicating rapid depletion of available database connections\n- Potential query queuing and increased response times for legitimate users sharing the same database cell\n- Risk of connection timeouts and failed transactions for other organizations on BRA14\n- Database resource contention affecting CPU, memory, and I/O operations\n- Possible impact on related services dependent on database connectivity\n\n## **Root Cause Analysis**\n\n**Primary Root Cause:** Aggressive resource consumption by a single organization leading to connection pool exhaustion\n\n**Technical Analysis:**\n1. **Connection Pool Dynamics:** The offending organization's workload pattern exceeded normal connection utilization baselines, rapidly consuming available connections in the shared pool\n2. **Resource Isolation Failure:** Insufficient tenant-level resource isolation allowed one organization to impact the entire database cell's performance\n3. **Threshold Breach:** Fawkes monitoring system detected the burn rate exceeded predefined safety thresholds, indicating abnormal consumption patterns\n4. **Cascading Effect:** As connections became scarce, legitimate requests from other organizations experienced delays and potential failures\n\n**Contributing Factors:**\n- Possible application-level connection leaks or inefficient connection management by the offending org\n- Potential bulk data operations or ETL processes without proper rate limiting\n- Insufficient proactive monitoring of per-tenant connection usage patterns\n- Lack of automated circuit breakers at the organization level\n\n## **Resolution Applied**\n\n**Immediate Response Strategy:** Progressive throttling approach\n- **Throttling Implementation:** Applied 10 incremental throttles to the offending organization\n- **Monitoring:** Continuous observation of connection pool metrics during throttling application\n- **Success Criteria:** BRA14 cell performance restoration and connection pool stabilization\n\n**Technical Resolution Steps:**\n1. **Identification:** Fawkes system automatically identified the problematic organization\n2. **Graduated Response:** Applied throttling in increments to minimize impact while restoring service\n3. **Performance Validation:** Monitored connection pool burn rate return to normal thresholds\n4. **Service Restoration:** Confirmed BRA14 cell performance returned to baseline levels\n\n**Resolution Effectiveness:** Successfully restored cell performance through targeted throttling without requiring broader service disruption\n\n## **Preventive Measures**\n\n**Immediate Prevention (0-30 days):**\n1. **Enhanced Monitoring:**\n   - Implement per-organization connection usage alerting with lower thresholds\n   - Deploy predictive analytics to identify abnormal usage patterns before threshold breach\n   - Add real-time dashboards for connection pool health per database cell\n\n2. **Automated Response:**\n   - Configure automatic progressive throttling triggers based on connection usage patterns\n   - Implement circuit breakers at organization level to prevent resource exhaustion\n   - Deploy automated scaling for connection pools during peak usage periods\n\n**Medium-term Prevention (30-90 days):**\n1. **Resource Isolation Improvements:**\n   - Implement stricter per-tenant connection quotas with hard limits\n   - Deploy connection pool segmentation to isolate high-usage organizations\n   - Enhance tenant-level resource governance policies\n\n2. **Capacity Management:**\n   - Conduct capacity planning analysis for BRA14 and similar high-density cells\n   - Implement dynamic connection pool sizing based on historical usage patterns\n   - Deploy load balancing improvements to distribute connections more effectively\n\n**Long-term Prevention (90+ days):**\n1. **Architecture Enhancements:**\n   - Evaluate database cell splitting strategies for high-density regions\n   - Implement advanced multi-tenant isolation mechanisms\n   - Deploy connection pooling optimization with intelligent routing\n\n2. **Proactive Management:**\n   - Establish customer engagement protocols for organizations with high resource usage\n   - Implement usage pattern analysis and optimization recommendations\n   - Deploy predictive scaling based on seasonal and growth patterns\n\n**Monitoring and Validation:**\n- Weekly review of connection pool utilization trends across all database cells\n- Monthly assessment of throttling effectiveness and false positive rates\n- Quarterly capacity planning reviews for high-growth",
+      "PRB-22110248": "# Technical Analysis - PRB-22110248\n\n## **Technical Impact**\n\n**Severity Assessment:** P2-Medium incident with significant multi-tenant impact\n- **Affected Infrastructure:** Pod 219 (cluster 6_0) primary database listener failure\n- **Customer Impact Scope:** Three customer realms (BGSL, BMGF, BKMG) experienced complete service disruption\n- **Duration:** Incident began at 20:22 UTC on April 17, 2026 with resolution time dependent on manual intervention\n- **Service Degradation:** Complete database connectivity loss for affected realms, resulting in:\n  - Transaction processing failures\n  - Application timeouts and connection errors\n  - Potential data consistency concerns during outage window\n  - Revenue impact for affected commerce operations\n\n**Infrastructure Dependencies:**\n- Primary database listener serves as critical connection gateway\n- Multi-tenant architecture amplified blast radius across customer realms\n- Data Guard configuration complexity introduced cross-pod operational risks\n\n## **Root Cause Analysis**\n\n**Primary Root Cause:** Configuration malformation in listener.ora file caused by automated build script execution\n\n**Technical Failure Chain:**\n1. **Trigger Event:** Data Guard build process initiated for pod 218\n2. **Script Execution Error:** Build script from previous day contained configuration defects\n3. **Configuration Corruption:** listener.ora file malformed during automated deployment\n4. **Service Failure:** Primary database listener on pod 219 failed to maintain connectivity\n5. **Detection Delay:** Monitoring systems may not have provided immediate alerting on listener status\n\n**Contributing Factors:**\n- **Process Gap:** Insufficient validation of build scripts before execution\n- **Cross-Pod Dependencies:** Data Guard operations affecting adjacent pod infrastructure\n- **Configuration Management:** Lack of configuration validation checks in deployment pipeline\n- **Monitoring Blind Spot:** Potential gap in real-time listener health monitoring\n\n**Technical Analysis:**\n- Oracle listener.ora malformation typically involves syntax errors, incorrect port configurations, or service name mismatches\n- Data Guard build processes require careful isolation to prevent cross-pod contamination\n- Automated scripts executing without proper validation represent significant operational risk\n\n## **Resolution Applied**\n\n**Immediate Resolution Methodology:**\n1. **Incident Detection:** Service disruption identified affecting multiple customer realms\n2. **Access Acquisition:** CCDE team obtained necessary database host access permissions\n3. **Diagnostic Analysis:** \n   - Confirmed primary listener service status (not running)\n   - Identified listener.ora configuration corruption\n4. **Manual Intervention:** Direct listener service restart performed\n5. **Service Restoration:** Database connectivity restored for affected customer realms\n\n**Technical Resolution Steps:**\n- Host-level access to pod 219 database infrastructure\n- Oracle listener process diagnosis and status verification\n- Manual service restart bypassing corrupted configuration temporarily\n- Validation of restored connectivity across affected customer realms\n\n**Resolution Effectiveness:**\n- Manual restart successfully restored service availability\n- Quick resolution minimized extended customer impact\n- Temporary fix allowed immediate service restoration while addressing underlying configuration issues\n\n## **Preventive Measures**\n\n**Immediate Prevention Strategies:**\n\n1. **Configuration Validation Pipeline:**\n   - Implement automated syntax validation for listener.ora files\n   - Deploy configuration drift detection systems\n   - Establish pre-deployment configuration testing protocols\n\n2. **Build Script Governance:**\n   - Mandatory code review process for all deployment scripts\n   - Version control and change tracking for build automation\n   - Rollback capabilities for configuration changes\n   - Sandbox testing environment for script validation\n\n3. **Monitoring Enhancement:**\n   - Real-time Oracle listener health monitoring\n   - Automated alerting for listener service failures\n   - Cross-pod dependency mapping and monitoring\n   - Customer realm connectivity health checks\n\n**Long-term Strategic Improvements:**\n\n4. **Process Isolation:**\n   - Implement strict pod isolation for Data Guard operations\n   - Develop cross-pod impact assessment protocols\n   - Create deployment windows with proper change control\n\n5. **Infrastructure Resilience:**\n   - Evaluate listener redundancy and failover capabilities\n   - Implement automated listener restart mechanisms\n   - Develop configuration backup and rapid restoration procedures\n\n6. **Operational Excellence:**\n   - Enhanced runbook procedures for listener failures\n   - Cross-training for CCDE team on rapid response protocols\n   - Regular disaster recovery testing for database connectivity scenarios\n\n**Risk Mitigation Framework:**\n- Establish configuration management standards with automated compliance checking\n- Implement canary deployment strategies for infrastructure changes\n- Develop comprehensive rollback procedures for"
+    }
+  }
+}

@@ -17,6 +17,10 @@
 #   Engine → ~/SDB, Store → ~/bookkeeper, SDD → ~/sdd, Core App Efficiency → ~/SDB
 #   Override: QC_GIT_REPO_ENGINE, QC_GIT_REPO_STORE, QC_GIT_REPO_SDD, QC_GIT_REPO_CORE or --git-repo-path
 #
+# This script refreshes the *component* repo (above) before generating the report. Previously it only
+# updated SDB, so Store/SDD code change metrics were stale. You do not need a separate manual rebase
+# for bookkeeper/sdd as long as those paths exist and have `git` remotes; pull --rebase is run for you.
+#
 # DATA SOURCE URLs (Reports API when enabled):
 # - PRB Report:      00OEE000001TXjB2AW
 # - Fleet Bugs:      00OEE0000014M4b2AE
@@ -83,6 +87,10 @@ else
   DATA_DIR="weeks/$WEEK/$COMPONENT"
 fi
 
+# Git clone used for code-churn in the report (must match quality_report_generator.resolve_git_repo_path)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+GIT_REPO_PATH="$(cd "$SCRIPT_DIR" && python3 -c "from quality_report_generator import resolve_git_repo_path, sys; print(resolve_git_repo_path(sys.argv[1]))" "$COMPONENT")"
+
 echo "🚀 Starting SDB Quality Report Generation..."
 echo "📅 Week: $WEEK"
 echo "📊 Component: $COMPONENT (input: $COMPONENT_INPUT)"
@@ -92,6 +100,7 @@ if [ "$USE_SF_REPORTS" = "1" ]; then
 else
   echo "📄 Mode: Local text files for PRB/bugs/CI/leftshift/security"
 fi
+echo "📂 Code-churn (git) repo: $GIT_REPO_PATH"
 
 # Check if virtual environment exists
 if [ ! -d "venv" ]; then
@@ -148,11 +157,6 @@ if [ "$USE_SF_REPORTS" != "1" ]; then
   fi
 fi
 
-# Check if git repository exists
-if [ ! -d "/Users/rchowdhuri/SDB/.git" ]; then
-    missing_files+=("SDB git repository at /Users/rchowdhuri/SDB")
-fi
-
 if [ ${#missing_files[@]} -ne 0 ]; then
     echo "❌ Missing required data files in $data_dir/:"
     for file in "${missing_files[@]}"; do
@@ -171,18 +175,30 @@ fi
 
 echo "✅ All data files found!"
 
-# Update git repository
-echo "🔄 Updating SDB git repository..."
-cd /Users/rchowdhuri/SDB
-echo "   - Fetching latest changes..."
-git fetch --quiet
-echo "   - Updating submodules..."
-git submodule update --init --recursive --quiet
-echo "   - Rebasing to latest..."
-git rebase --quiet
-cd - > /dev/null
-
-echo "✅ Git repository updated!"
+# Update the *component* git repo (Store→bookkeeper, SDD→sdd, Engine→SDB) so code-change metrics are current
+echo "🔄 Updating git repository for code-churn: $GIT_REPO_PATH"
+if [ -d "$GIT_REPO_PATH/.git" ]; then
+  (
+    cd "$GIT_REPO_PATH" || exit 1
+    echo "   - Fetching latest changes..."
+    git fetch --quiet 2>/dev/null || true
+    if [ -f .gitmodules ]; then
+      echo "   - Updating submodules..."
+      git submodule update --init --recursive --quiet 2>/dev/null || true
+    fi
+    if git rev-parse '@{u}' >/dev/null 2>&1; then
+      echo "   - Pulling with rebase (to match remote)..."
+      git pull --rebase --quiet 2>/dev/null || echo "   ⚠️  git pull --rebase failed; using local HEAD as-is"
+    else
+      echo "   ⚠️  No upstream tracking branch. Set: git branch --set-upstream-to=origin/<branch>"
+      echo "   (code churn still uses your current checkout)"
+    fi
+  )
+  echo "✅ Git repository updated: $GIT_REPO_PATH"
+else
+  echo "⚠️  No .git at: $GIT_REPO_PATH"
+  echo "   Code Change metrics in the report will be empty. Clone the repo or set e.g. QC_GIT_REPO_STORE / QC_GIT_REPO_SDD."
+fi
 
 # Archive previous reports (do not clean - reports are meant to be archived)
 echo "📁 Archiving functionality enabled - previous reports preserved"
