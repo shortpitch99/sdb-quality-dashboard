@@ -1,0 +1,2227 @@
+{
+  "risks": [
+    {
+      "feature": "Read your own writes(RYOW)",
+      "status": "Yellow",
+      "priority": "Medium",
+      "description": "Performance enhancement feature for Write Scaling. TLE dark launch mode has been rolled out to multiple cells. However, when rolling out the live mode, we ran into an issue on a couple of cells including the UHG sandbox cell (USA804s) where it seems to run into a possible data corruption issue. However, the guardrails that we implemented in the LSM layer helped detect and prevent those corruptions from persisting. Folowing this, we disabled the rollout of the live mode for RYOW functionality and it has been disabled since mid August when the problem was detected.",
+      "last_updated": "2024-01-15"
+    },
+    {
+      "feature": "Allocated Extent Pool",
+      "status": "Green",
+      "priority": "Medium",
+      "description": "Allocated Extent Pools have been running stably in production for 3 months since enabling on usa16s and usa18s on 08/15. This feature continues to deliver on its primary goal of reducing storage catalog writes while maintaining a minimal and stable storage footprint. This post provides a detailed analysis of the feature's behavior and stability over the past 30 days.",
+      "last_updated": "2025-11-21"
+    }
+  ],
+  "prbs": [
+    {
+      "id": "PRB-21966664",
+      "title": "PRB-21966664: New - Scale Insight Services",
+      "priority": "P2-Medium",
+      "status": "New",
+      "description": "Team: Scale Insight Services | Impact: Unknown",
+      "created_date": "2026-04-25",
+      "what_happened": "og added for improved debugabliity for production issue caused because of Oven for Core App Experiment caused\u00a0log volume bloating.",
+      "customer_experience": "",
+      "proximate_cause": "",
+      "how_resolved": "",
+      "team": "Scale Insight Services",
+      "customer_impact": "Unknown"
+    }
+  ],
+  "bugs": [
+    {
+      "work_id": "W-22220468",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][usa1000] Transaction too large in Memstore (8589934784 bytes for 46435836 rec...",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-04-27",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-22221222",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][usa16s] Scan processing for tenant \"00DEU0000031mlw\" and object with phyId 21...",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-04-27",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-22229991",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][usa752s] there is already a transaction in progress",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-04-27",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-22198345",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][TRAP][usa960]",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-04-27",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-22234979",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][usa12] column t_c15.val6 does not exist at character 297",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-04-27",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-21883898",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][INTERNAL_ERROR][usa6s] Cannot allocate FragmentStaetQueue slot after 649 attempts over 120 seconds, error=1,",
+      "status": "In Progress",
+      "build_version": "",
+      "created_date": "2026-04-27",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-22241376",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][fra76] server znode does not exist /sdb/09a71531-4ca1-4370-9854-add10371179a/node-0095287519",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-04-27",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-22241955",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][INTERNAL_ERROR][fra96s] Could not retrieve encryption key with keyID 04292fe5-9945-4fe9-9...",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-04-27",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-22241981",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][fra32] server znode does not exist /sdb/d44e99e0-6ffd-4f3d-abed-741fcc7530f4/node-0119198456",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-04-27",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-22242037",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][fra32] [LhjK0xvEi4uHdqrCX_R12Q:003F7B91] Req:LedgerReadStreamReq StoreId:e92d...",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-04-27",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-22242041",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][fra74] server znode does not exist /sdb/776a29a1-30e9-43d6-84a7-110be8210863/node-0115591432",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-04-27",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-21650292",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][usa18s] Standby has fallen more than 300000 milliseconds behind the master's ...",
+      "status": "Triaged",
+      "build_version": "",
+      "created_date": "2026-04-27",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-22185715",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][TRAP][usa846] OptimisticSearchLink.constprop.0,PerformLookup,SkiplistInsert,InsertRowRecord,MemstoreInsertRowRecordInternal",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-04-27",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-22219575",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][ZDT_TC][stg4s] relation \"tableconv_new.cmpcustom_unique_value\" does not exist",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-04-27",
+      "issue_type": "Bug"
+    },
+    {
+      "work_id": "W-21047929",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDBFalcon - core/sdb17 - sdb service unavailable for 7min+ with primary az partitioned from both secondary az's",
+      "status": "In Progress",
+      "build_version": "",
+      "created_date": "2026-04-27",
+      "issue_type": "Bug"
+    }
+  ],
+  "critical_issues": [],
+  "deployments": [
+    {
+      "stagger": "R1.2",
+      "version": "262.7",
+      "count": 4,
+      "stage": "R1.2",
+      "cells": 4
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.3",
+      "count": 5,
+      "stage": "R2b.2",
+      "cells": 5
+    },
+    {
+      "stagger": "SB2.1",
+      "version": "262.11",
+      "count": 17,
+      "stage": "SB2.1",
+      "cells": 17
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "260.1",
+      "count": 1,
+      "stage": "SB1.2",
+      "cells": 1
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "262.11",
+      "count": 53,
+      "stage": "R2a.2",
+      "cells": 53
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.7",
+      "count": 43,
+      "stage": "R2a.1",
+      "cells": 43
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.7",
+      "count": 14,
+      "stage": "R2b.2",
+      "cells": 14
+    },
+    {
+      "stagger": "R2b.1",
+      "version": "262.7",
+      "count": 3,
+      "stage": "R2b.1",
+      "cells": 3
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.3",
+      "count": 2,
+      "stage": "SB1.2",
+      "cells": 2
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.3",
+      "count": 1,
+      "stage": "SB0",
+      "cells": 1
+    },
+    {
+      "stagger": "SB2.1",
+      "version": "262.13",
+      "count": 5,
+      "stage": "SB2.1",
+      "cells": 5
+    },
+    {
+      "stagger": "R0.2",
+      "version": "262.11",
+      "count": 3,
+      "stage": "R0.2",
+      "cells": 3
+    },
+    {
+      "stagger": "R2b.1",
+      "version": "262.9",
+      "count": 7,
+      "stage": "R2b.1",
+      "cells": 7
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "262.7",
+      "count": 69,
+      "stage": "R2a.2",
+      "cells": 69
+    },
+    {
+      "stagger": "R0.1",
+      "version": "262.16",
+      "count": 2,
+      "stage": "R0.1",
+      "cells": 2
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.11",
+      "count": 33,
+      "stage": "R2b.2",
+      "cells": 33
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.9",
+      "count": 85,
+      "stage": "R2a.1",
+      "cells": 85
+    },
+    {
+      "stagger": "R2b.1",
+      "version": "262.11",
+      "count": 15,
+      "stage": "R2b.1",
+      "cells": 15
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.16",
+      "count": 1,
+      "stage": "SB0",
+      "cells": 1
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.11",
+      "count": 55,
+      "stage": "R2a.1",
+      "cells": 55
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "260.15",
+      "count": 1,
+      "stage": "SB1.2",
+      "cells": 1
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.9",
+      "count": 7,
+      "stage": "R2b.2",
+      "cells": 7
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.13",
+      "count": 37,
+      "stage": "SB1.1",
+      "cells": 37
+    },
+    {
+      "stagger": "R1.2",
+      "version": "262.9",
+      "count": 30,
+      "stage": "R1.2",
+      "cells": 30
+    },
+    {
+      "stagger": "R1.1",
+      "version": "262.9",
+      "count": 32,
+      "stage": "R1.1",
+      "cells": 32
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.11",
+      "count": 15,
+      "stage": "SB2.2",
+      "cells": 15
+    },
+    {
+      "stagger": "R1.1",
+      "version": "262.7",
+      "count": 10,
+      "stage": "R1.1",
+      "cells": 10
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.3",
+      "count": 1,
+      "stage": "SB2.2",
+      "cells": 1
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.16",
+      "count": 4,
+      "stage": "SB1.1",
+      "cells": 4
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.11",
+      "count": 40,
+      "stage": "SB1.2",
+      "cells": 40
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.13",
+      "count": 1,
+      "stage": "R2a.1",
+      "cells": 1
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.13",
+      "count": 20,
+      "stage": "SB1.2",
+      "cells": 20
+    },
+    {
+      "stagger": "R0.1",
+      "version": "262.11",
+      "count": 5,
+      "stage": "R0.1",
+      "cells": 5
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.13",
+      "count": 2,
+      "stage": "SB2.2",
+      "cells": 2
+    },
+    {
+      "stagger": "R1.1",
+      "version": "262.11",
+      "count": 16,
+      "stage": "R1.1",
+      "cells": 16
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.11",
+      "count": 26,
+      "stage": "SB1.1",
+      "cells": 26
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "262.9",
+      "count": 101,
+      "stage": "R2a.2",
+      "cells": 101
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.17",
+      "count": 2,
+      "stage": "SB0",
+      "cells": 2
+    },
+    {
+      "stagger": "R1.2",
+      "version": "262.11",
+      "count": 13,
+      "stage": "R1.2",
+      "cells": 13
+    }
+  ],
+  "deployment_summary": "Weekly Deployment Summary - Week of September 15, 2025\n\nThis week's deployment activities proceeded smoothly across all stagger groups. \nSDB version 258.11 was successfully deployed to sandbox environments (SB0-SB2) \nwith no major issues reported.\n\nKey highlights:\n- Version 258.11 rolled out to 150 sandbox cells\n- Zero failed deployments\n- Average deployment time: 12 minutes\n- All post-deployment validations passed\n\nNext week: Planning production rollout to P0-P3 stages pending final validation results.",
+  "coverage": [],
+  "new_code_coverage": [
+    {
+      "component": "SDB Engine",
+      "new_code_coverage": 75.5,
+      "overall_coverage": 68.2,
+      "new_code_line_coverage": 89.6,
+      "overall_line_coverage": 81.3,
+      "lines_to_cover": 25222,
+      "uncovered_lines": 2617,
+      "overall_lines_to_cover": 576611,
+      "overall_uncovered_lines": 107960
+    }
+  ],
+  "ci_issues": [
+    {
+      "work_id": "W-21591099",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDB-JUnitStress-LD-WS-sandbox-stress-drop-create-tenant-RHEL9.sandbox-stress: AssertionError: Expected total of 3 SDB nodes running, b",
+      "status": "New",
+      "build_version": "sdb.262.17",
+      "created_date": "2026-03-14",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20907228",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDB-JUnitStress-LD-WS-FC-mixed-workload-RHEL9-Release.mixed-workload-cancel: PSQLException: FATAL: lock (count=0) [1045308456,259826",
+      "status": "New",
+      "build_version": "sdb.262",
+      "created_date": "2026-01-15",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19860706",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDB-JUnitStress-sandbox-stress-TLE-key-deriv-RHEL9.sandbox-stress: 1,[::1], port=62780, expectedState=UP]: Last Error: dbsay`20251009182106.748208`",
+      "status": "New",
+      "build_version": "sdb.260.10",
+      "created_date": "2025-10-09",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19726659",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "MergeMergeConflictTest.testTombstoneOverlapMergeConflictRatio: PSQLException: An I/O error occurred while sending to t",
+      "status": "Triaged",
+      "build_version": "sdb.260.8",
+      "created_date": "2025-09-24",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-19626626",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDB-JUnitStress-sandbox-stress-encryption-kms-RHEL9.sandbox-stress-encryption-kms: PSQLException: ERROR: FAILED: get_current_active_server",
+      "status": "Triaged",
+      "build_version": "sdb.260.7",
+      "created_date": "2025-09-12",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-21164651",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "Trap file after using SET configuration_parameter TO value clause in CREATE FUNCTION",
+      "status": "Triaged",
+      "build_version": "sdb.260.16",
+      "created_date": "2026-02-03",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-21711185",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDB-JUnitStress-LD-WS-zdt-table-conversion-RHEL9.zdt-table-conversion: AssertionError: Expected total of 3 SDB nodes running, b",
+      "status": "New",
+      "build_version": "sdb.262.18",
+      "created_date": "2026-03-23",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-21597419",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDB-JUnitStress-dml-check-index-real-fast-purgeflush-destructive-RHEL9.dml-check-real-fast-purgeflush: AssertionError: Expected total of 3 SDB nodes running, b",
+      "status": "New",
+      "build_version": "sdb.262.17",
+      "created_date": "2026-03-15",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-21047929",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDBFalcon - core/sdb17 - sdb service unavailable for 7min+ with primary az partitioned from both secondary az's",
+      "status": "In Progress",
+      "build_version": "sdb.262",
+      "created_date": "2026-01-26",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20296642",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "WSLogTailingPostCommitBloomRegistrationTest.testRedoAsyncDaemonPostCommitCompleteBeforeBloomTransfer: RuntimeException: JUnit barfed with multiple errors, this",
+      "status": "New",
+      "build_version": "sdb.262",
+      "created_date": "2025-11-22",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20976423",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "LockWaitTraceAndLogLineTest.testSdbTimeoutTraceForDeadlock: TestTimedOutException: test timed out after 900 seconds",
+      "status": "In Progress",
+      "build_version": "sdb.262",
+      "created_date": "2026-01-20",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20911026",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "stress-dml-check-xcmode.stress-dml-check-xcmode: PSQLException: ERROR: [ColNum:8][ColName:app_thread_nam",
+      "status": "New",
+      "build_version": "sdb.262",
+      "created_date": "2026-01-15",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-21512082",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "testForceMergeWhenMergerHitsPanic(RestartableForceMergeTest): Forked Java VM exited abnormally in Batch-With-Multiple-Tests (server tools)",
+      "status": "New",
+      "build_version": "sdb.262.16",
+      "created_date": "2026-03-09",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20108133",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "MergeEventTraceTest.testTerminateOnMaxER: AssertionFailedError: expected:<1> but was:<0>",
+      "status": "New",
+      "build_version": "sdb.260.14",
+      "created_date": "2025-11-03",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-22097328",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "Several dashboard are impacted with node_role change",
+      "status": "New",
+      "build_version": "sdb.262",
+      "created_date": "2026-04-17",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-21238651",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDB-JUnitStress-LD-WS-func-cache-RHEL9-Release.func-cache: NullPointerException: Cannot invoke \"org.postgresql.util.Serve",
+      "status": "Triaged",
+      "build_version": "sdb.262.9",
+      "created_date": "2026-02-11",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20995370",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "regression.exec_init_cache_spi: regression test failed: [2026-01-22 01:02:43] test exec_init_cac",
+      "status": "Fixed",
+      "build_version": "sdb.262",
+      "created_date": "2026-01-22",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20964894",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "regression.no_replan: regression test failed: [2026-01-20 00:37:22]      no_replan",
+      "status": "Fixed",
+      "build_version": "sdb.262",
+      "created_date": "2026-01-20",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-22031039",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "Expose Commit Latency via SDB Unified Saturation Signal",
+      "status": "New",
+      "build_version": "sdb.262",
+      "created_date": "2026-04-14",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20330166",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SoftRestartAndPurgeTest.testParallelKeyOrderPurgeSoftRestart: SysCmdException: Command: \"[/home/jenkins/agent/workspace",
+      "status": "Triaged",
+      "build_version": "sdb.262",
+      "created_date": "2025-11-26",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20028639",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDB-JUnitStress-RSWS-dml-check-scan-restart-RHEL9.dml-check-scan-restart: PSQLException: ERROR: failed to fetch deleted tuple for",
+      "status": "New",
+      "build_version": "sdb.260.12",
+      "created_date": "2025-10-23",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20028134",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDB-JUnitStress-LD-WS-FC-dml-check-scan-restart-RHEL9.dml-check-scan-restart: PSQLException: ERROR: index \"t1_c1\" has an entry with n",
+      "status": "New",
+      "build_version": "sdb.260.12",
+      "created_date": "2025-10-23",
+      "issue_type": "CI"
+    },
+    {
+      "work_id": "W-20027585",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDB-JUnitStress-LD-WS-dml-check-dbFaults-SLA-RHEL9.dml-check: PSQLException: ERROR: index \"t1_c1\" has an entry with n",
+      "status": "New",
+      "build_version": "sdb.260.12",
+      "created_date": "2025-10-23",
+      "issue_type": "CI"
+    }
+  ],
+  "leftshift_issues": [
+    {
+      "work_id": "W-19399167",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDBFalcon - core/sdb33s - dbschema 258/postscripts failed after running for 20 hours",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-04-27",
+      "issue_type": "LeftShift"
+    },
+    {
+      "work_id": "W-19813453",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "coreapp shutdown failing for sdb900s due to missing artifacts",
+      "status": "New",
+      "build_version": "",
+      "created_date": "2026-04-27",
+      "issue_type": "LeftShift"
+    }
+  ],
+  "abs_issues": [],
+  "security_issues": [
+    {
+      "work_id": "W-22171922",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[UPGRADE IMAGE] 3PP Program sfci/sayonara/tsunami/tsunami-docker-fss-packages:sfci/onejdk/salesforcejdk/sfdc_rhel9_onejdk17:3.0.10400 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22230004",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[UPGRADE IMAGE] 3PP Program sfci/sayonara/tsunami/tsunami-docker:sfci/onejdk/salesforcejdk/sfdc_rhel9_onejdk17:3.0.10400 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22230006",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[UPGRADE IMAGE] 3PP Program sfci/sayonara/tsunami/tsunami-docker-bk-packages:sfci/onejdk/salesforcejdk/sfdc_rhel9_onejdk17:3.0.10400 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22230008",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[UPGRADE IMAGE] 3PP Program sfci/sayonara/tsunami/tsunami-docker-zk-packages:sfci/onejdk/salesforcejdk/sfdc_rhel9_onejdk17:3.0.10400 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-14324477",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "ARRAY_VS_SINGLETON - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/contrib/pgvector/src/ivfinsert.c (1 issues)",
+      "status": "New",
+      "build_version": "sdb.248.25",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-14324465",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "ARRAY_VS_SINGLETON - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/contrib/pgvector/src/ivfbuild.c (2 issues)",
+      "status": "New",
+      "build_version": "sdb.248.25",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-20482272",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "OVERRUN - /src/backend/access/common/lsmkey.c (1 issues)",
+      "status": "New",
+      "build_version": "None",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21103239",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "UNINIT - /src/backend/executor/execExprInterp.c (1 issues)",
+      "status": "New",
+      "build_version": "None",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21103241",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "RESOURCE_LEAK - /src/test/regress/pg_regress.c (1 issues)",
+      "status": "New",
+      "build_version": "None",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21103240",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "UNINIT - /src/backend/optimizer/path/indxpath.c (2 issues)",
+      "status": "New",
+      "build_version": "None",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21435466",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "Y2K38_SAFETY - /src/backend/lsmp/materializer/test/materializer_test_utils.c (1 issues)",
+      "status": "New",
+      "build_version": "None",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21435467",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "RETURN_LOCAL - /src/backend/keystone/catalog/catsrv_zk.c (1 issues)",
+      "status": "New",
+      "build_version": "None",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21435468",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "UNINIT - /src/backend/ws/cluster/wscluster_impl.c (1 issues)",
+      "status": "New",
+      "build_version": "None",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21435464",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "RESOURCE_LEAK - /src/test/regress/pg_regress.c (1 issues)",
+      "status": "New",
+      "build_version": "None",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22228479",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.bouncycastle:bcprov-jdk18on:1.82 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22228563",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:os:vim:8.2.2637-23.el9_7.1 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22228565",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.bouncycastle:bcpg-jdk18on:1.82 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22228570",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.bouncycastle:bcpkix-jdk18on:1.82 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22228576",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:os:libarchive:3.5.3-7.el9_7 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22075285",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:os:python-iniparse:0.4-45.el9 Vulnerability Detected",
+      "status": "Triaged",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22075292",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:os:vim:8.2.2637-23.el9_7 Vulnerability Detected",
+      "status": "Triaged",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-13140867",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "OVERRUN - /storage/sayonara/workspace/SayonaraDB-Coverity/postgresql/src/backend/replication/pg_workflow_extra.c (1 issues)",
+      "status": "New",
+      "build_version": "sdb.246.9",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    }
+  ],
+  "all_bugs": [],
+  "prb_bugs": [],
+  "system_availability": {
+    "period": "",
+    "slo": 99.9,
+    "achieved": 99.99,
+    "incidents": []
+  },
+  "kpis": {
+    "all_time_bug_backlog_total": 0,
+    "all_time_bug_backlog_p0": 0,
+    "all_time_bug_backlog_p1": 0,
+    "all_time_bug_backlog_p0_p1": 0,
+    "prb_backlog_total": 0,
+    "prb_backlog_p0_p1": 0
+  },
+  "git_stats": {
+    "reporting_period_start": "2026-04-20",
+    "reporting_period_end": "2026-04-26",
+    "total_commits": 42,
+    "lines_added": 6899,
+    "lines_deleted": 1112,
+    "lines_changed": 8011,
+    "files_changed": 120,
+    "authors": [
+      "Aneesh Raman",
+      "Anup Ghatage",
+      "Atish Agrawal",
+      "Bryan Pendleton",
+      "Chris Drexelius",
+      "Dhaval Limdiwala",
+      "Dipesh Pandit",
+      "Doug Doole",
+      "Elena Milkai",
+      "Jamie Martin",
+      "Jim Mace",
+      "Jonathan Hu",
+      "Jun Yuan",
+      "Kun Ren",
+      "Lars Hofhansl",
+      "Marc Benstein",
+      "Matt Woicik",
+      "Roy Chowdhuri",
+      "Sai Akhil Vemula",
+      "Sanjib Ghosh",
+      "Sebastian Wardzinski",
+      "Shao Yuan Ho",
+      "Suresh Kumar Jami",
+      "svc_sdb_infra_agent",
+      "Swadesh Bhattarai",
+      "Tej Kashi",
+      "Theo",
+      "tok-sfci124",
+      "Yucong Wang",
+      "Zhihan Guo"
+    ],
+    "most_changed_files": [
+      {
+        "file": "postgresql/src/backend/access/lsm/lsmindexdiagnostic.c",
+        "lines_added": 832,
+        "lines_deleted": 35,
+        "total_changes": 867
+      },
+      {
+        "file": "postgresql/src/backend/executor/execExprInterp.c",
+        "lines_added": 717,
+        "lines_deleted": 5,
+        "total_changes": 722
+      },
+      {
+        "file": "postgresql/src/backend/parser/gram.y",
+        "lines_added": 636,
+        "lines_deleted": 49,
+        "total_changes": 685
+      },
+      {
+        "file": "postgresql/src/backend/replication/logical/cdc.c",
+        "lines_added": 413,
+        "lines_deleted": 142,
+        "total_changes": 555
+      },
+      {
+        "file": "postgresql/src/backend/parser/parse_expr.c",
+        "lines_added": 491,
+        "lines_deleted": 0,
+        "total_changes": 491
+      },
+      {
+        "file": "postgresql/src/backend/replication/logical/cdcfuncs.c",
+        "lines_added": 345,
+        "lines_deleted": 40,
+        "total_changes": 385
+      },
+      {
+        "file": "postgresql/src/bin/dbgmonc/dbgmonc_shared.c",
+        "lines_added": 155,
+        "lines_deleted": 100,
+        "total_changes": 255
+      },
+      {
+        "file": "postgresql/src/bin/dbgmonc/dbgmonc_client.c",
+        "lines_added": 98,
+        "lines_deleted": 144,
+        "total_changes": 242
+      },
+      {
+        "file": "postgresql/doc/src/sgml/func.sgml",
+        "lines_added": 201,
+        "lines_deleted": 0,
+        "total_changes": 201
+      },
+      {
+        "file": "postgresql/src/backend/nodes/nodeFuncs.c",
+        "lines_added": 171,
+        "lines_deleted": 1,
+        "total_changes": 172
+      }
+    ],
+    "commit_frequency": 6.0,
+    "code_churn_risk": "Low",
+    "repository_path": "/Users/rchowdhuri/SDB"
+  },
+  "generated_at": "2026-04-27T09:01:04.900648",
+  "report_component": "Engine",
+  "coverage_summary": {
+    "new_code": {
+      "coverage": 75.5,
+      "line_coverage": 89.6,
+      "condition_coverage": 59.5,
+      "lines_to_cover": 25222,
+      "uncovered_lines": 2617,
+      "conditions_to_cover": 22293,
+      "uncovered_conditions": 9039
+    },
+    "overall": {
+      "coverage": 68.2,
+      "line_coverage": 81.3,
+      "condition_coverage": 53.3,
+      "lines_to_cover": 576611,
+      "uncovered_lines": 107960,
+      "conditions_to_cover": 505756,
+      "uncovered_conditions": 236420
+    }
+  },
+  "alltime_backlog": [
+    {
+      "work_id": "Bug_1",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_2",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_3",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_4",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_5",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_6",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_7",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_8",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_9",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_10",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_11",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_12",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_13",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_14",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_15",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_16",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_17",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_18",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_19",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_20",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_21",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_22",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_23",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_24",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_25",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_26",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_27",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_28",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_29",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_30",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_31",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_32",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_33",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_34",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_35",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_36",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_37",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_38",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_39",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_40",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_41",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_42",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_43",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_44",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_45",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_46",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_47",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_48",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_49",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_50",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_51",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_52",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_53",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_54",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_55",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_56",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_57",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_58",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_59",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_60",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_61",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_62",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_63",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_64",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_65",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_66",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_67",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_68",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_69",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_70",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_71",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_72",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_73",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_74",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_75",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_76",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_77",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_78",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_79",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_80",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_81",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_82",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_83",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_84",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_85",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_86",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_87",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_88",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_89",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_90",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_91",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_92",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_93",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_94",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_95",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_96",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_97",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_98",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_99",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_100",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_101",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_102",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_103",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    }
+  ],
+  "prb_backlog": [
+    {
+      "work_id": "PRB_Work_1",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "Sayonara Data Management",
+      "subject": "Raise alert if extent index root page running out of blocks",
+      "status": "New",
+      "created_date": "2023-07-03",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_2",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "Sandbox",
+      "subject": "Fix interaction between merge private EAs and max_data_extents",
+      "status": "New",
+      "created_date": "2024-02-12",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_3",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "Sayonara TxP",
+      "subject": "Fix CPU/WAIT time accounting for txnproc_bank_block_acquire() and txnproc_bank_block_free()",
+      "status": "New",
+      "created_date": "2024-09-10",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_4",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "CRM Database Sustaining Engineering - APAC",
+      "subject": "Work with Observability Team to create a Fawkes alert for sustained catalog contention caused by daemons",
+      "status": "New",
+      "created_date": "2024-11-01",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_5",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "CRM Database Sustaining Engineering - APAC",
+      "subject": "Enable range-delete optimization for avoiding slicing for empty key-ranges for table truncation (TRUNCATE TABLE FOR TENANT)",
+      "status": "New",
+      "created_date": "2024-10-23",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_6",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "SDB Store / Zk Management",
+      "subject": "NFR: Long recovery should not cause pipelines to fail or disrupt service availability.",
+      "status": "Waiting",
+      "created_date": "2024-10-22",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_7",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "SDB Store / Zk Management",
+      "subject": "NFR: Recovery should succeed when memstore ringbuffer is full to last byte on primary",
+      "status": "Waiting",
+      "created_date": "2024-10-22",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_8",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "CRM Database Sustaining Engineering",
+      "subject": "NFR: Eliminate Rollback Processing from the Critical Path during Promotion and Soft Restart",
+      "status": "Waiting",
+      "created_date": "2023-07-03",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_9",
+      "priority": "P2",
+      "severity": "P2",
+      "team": "Platform Encryption & Keys",
+      "subject": "Expose Commit Latency via SDB Unified Saturation Signal",
+      "status": "New",
+      "created_date": "2026-04-14",
+      "type": "prb_backlog"
+    },
+    {
+      "work_id": "PRB_Work_10",
+      "priority": "P2",
+      "severity": "3",
+      "team": "CRM Database Sustaining Engineering",
+      "subject": "Analysis and Investigation for Internal Root Cause Analysis for PRB-0029575",
+      "status": "New",
+      "created_date": "2025-12-18",
+      "type": "prb_backlog"
+    }
+  ],
+  "metadata": {
+    "generated_at": "2026-04-27T09:01:45.663102",
+    "report_period_start": "2026-04-20",
+    "report_period_end": "2026-04-26",
+    "report_period_display": "April 20-26, 2026",
+    "report_component": "Engine",
+    "git_repository": "/Users/rchowdhuri/SDB",
+    "generator_version": "2.0",
+    "data_sources": {
+      "risks": 2,
+      "prbs": 1,
+      "bugs": 15,
+      "deployments": 39,
+      "has_llm_content": true,
+      "ci_total": 23,
+      "ci_p0_p1": 0,
+      "security_total": 22,
+      "security_p0_p1": 0,
+      "leftshift_total": 2,
+      "leftshift_p0_p1": 0,
+      "coverage_overall": 68.2,
+      "coverage_overall_line": 81.3,
+      "coverage_new_code": 75.5,
+      "coverage_new_code_line": 89.6
+    }
+  },
+  "llm_content": {
+    "trend_analysis": "## Quality Trends Analysis\n\n### Overall System Health: **GOOD** \u2b50\u2b50\u2b50\u2b50\n\n**Key Observations:**\n\n**Strengths:**\n- **Excellent Security Posture**: Zero security issues indicates robust security controls and practices\n- **Minimal Critical Issues**: Only 1 PRB suggests stable core functionality with few production-impacting problems\n- **Low Risk Profile**: 2 identified risks show proactive risk management without overwhelming exposure\n\n**Areas for Attention:**\n- **Bug Volume**: 15 bugs represent the primary quality concern, though this may be within acceptable limits depending on system complexity and development velocity\n\n### Trend Implications:\n\n**Positive Indicators:**\n- Security-first approach is working effectively\n- Production stability appears well-maintained\n- Risk management processes are identifying and controlling potential issues\n\n**Monitoring Recommendations:**\n- Track bug resolution velocity and root cause patterns\n- Ensure the 2 identified risks have mitigation plans in place\n- Maintain current security practices as they're clearly effective\n\n**Overall Assessment:** The system demonstrates strong foundational health with security and production stability well-controlled. The bug count warrants continued attention to prevent accumulation, but current metrics suggest a well-managed quality program.",
+    "risk_analysis": "### Deployment Risk Assessment - SDB Version 258.11\n\n#### Executive Summary\n\nThe deployment of SDB version 258.11 to sandbox environments demonstrates strong stability indicators with zero failures across 150 cells. However, the upcoming production rollout requires careful consideration of several risk factors before proceeding.\n\n#### Deployment Stability Analysis\n\n##### Positive Indicators\n- **Zero Failure Rate**: 100% successful deployment across all 150 sandbox cells indicates robust deployment automation and package integrity\n- **Consistent Timing**: 12-minute average deployment time suggests predictable resource utilization and minimal deployment complexity\n- **Validation Success**: All post-deployment validations passed, indicating functional integrity post-deployment\n\n##### Risk Considerations\n- **Limited Environment Scope**: Testing confined to sandbox environments (SB0-SB2) may not fully represent production load characteristics\n- **Scale Differential**: Production environments (P0-P3) likely have different scale, traffic patterns, and integration complexity than sandbox\n- **Validation Coverage**: Need clarity on validation scope and whether it covers all critical business functions\n\n#### Code Change Impact Assessment\n\n##### Unknown Risk Factors\n- **Change Scope**: No visibility into specific code changes, feature additions, or bug fixes in version 258.11\n- **Dependency Impact**: Unclear if changes affect external integrations or downstream systems\n- **Performance Implications**: No performance metrics provided for resource utilization or response times\n\n##### Recommended Analysis\n- Review change logs and feature documentation for version 258.11\n- Analyze code diff for high-risk areas (security, data handling, critical business logic)\n- Validate backward compatibility with existing production integrations\n\n#### Production Rollout Risk Assessment\n\n##### Medium Risk Areas\n- **Environment Parity**: Potential configuration or scale differences between sandbox and production\n- **Traffic Load**: Production traffic patterns may expose issues not visible in sandbox testing\n- **Integration Points**: External system dependencies may behave differently in production\n\n##### Mitigation Recommendations\n1. **Phased Rollout**: Implement gradual rollout starting with P0 (lowest risk production stage)\n2. **Enhanced Monitoring**: Deploy additional monitoring for the first 24-48 hours post-deployment\n3. **Rollback Readiness**: Ensure rollback procedures are tested and ready for immediate execution\n4. **Validation Extension**: Consider expanded validation suite covering production-specific scenarios\n\n#### Final Recommendation\n\n**PROCEED WITH CAUTION**: While sandbox deployment success is encouraging, recommend implementing additional validation and monitoring safeguards before production rollout. The zero-failure rate provides confidence, but production deployment should follow a conservative phased approach with enhanced observability.",
+    "prb_narratives": {
+      "PRB-21966664": "**Problem Type:** Production logging volume bloating caused by excessive debug logs from Core App Experiment's Oven component.\n\n**Root Cause:** The Oven component within the Core App Experiment generated excessive log entries that significantly increased overall log volume in the production environment.\n\n**Resolution:** Additional logging was implemented to improve debuggability and help identify the source of the log volume bloating issue.\n\n**Next Steps:** Implement log volume monitoring and controls to prevent future logging bloat from experimental components in production environments."
+    },
+    "prb_analyses": {
+      "PRB-21966664": "# Technical Analysis: PRB-21966664\n\n## **Technical Impact**\n\n**Severity Assessment:** Medium-High Risk\n- **System Performance:** Significant log volume bloating indicates potential storage capacity strain and degraded system performance\n- **Operational Impact:** Excessive logging can overwhelm log aggregation systems, impacting monitoring and alerting capabilities\n- **Resource Consumption:** Increased disk I/O, storage costs, and potential memory pressure on logging infrastructure\n- **Debugging Efficiency:** While logs were added for improved debugability, the volume bloating may paradoxically hinder effective troubleshooting due to signal-to-noise ratio degradation\n- **Downstream Effects:** Log processing pipelines, SIEM systems, and analytics platforms may experience performance degradation\n\n**Business Impact Considerations:**\n- Unknown customer impact requires immediate assessment and monitoring\n- Potential cascading effects on other services dependent on Core App functionality\n- Increased operational costs due to storage and processing overhead\n\n## **Root Cause Analysis**\n\n**Primary Root Cause:** Inadequate logging strategy implementation during Core App Experiment deployment\n\n**Contributing Factors:**\n1. **Insufficient Log Level Configuration:** Likely deployment of debug/verbose logging levels in production environment\n2. **Missing Log Volume Controls:** Absence of rate limiting, sampling, or conditional logging mechanisms\n3. **Inadequate Pre-Production Testing:** Log volume impact not assessed during experiment validation\n4. **Configuration Management Gap:** Logging configuration may not have been properly environment-specific\n5. **Monitoring Blind Spot:** Lack of proactive log volume monitoring and alerting\n\n**Technical Analysis:**\n- The \"Oven for Core App Experiment\" suggests A/B testing or feature flag implementation\n- Log additions were intended for production debugging but lacked volume consideration\n- Potential correlation between experiment activation and exponential log growth\n\n**Systemic Issues:**\n- Logging standards and guidelines may be insufficient\n- Code review process may not adequately assess logging impact\n- Deployment pipeline lacks log volume validation checks\n\n## **Resolution Applied**\n\n**Immediate Actions Required:**\n1. **Log Level Adjustment:** Implement emergency log level reduction from DEBUG/TRACE to WARN/ERROR for production\n2. **Selective Logging:** Enable conditional logging based on sampling rates or specific conditions\n3. **Storage Management:** Implement log rotation and retention policies to prevent disk space exhaustion\n4. **Performance Monitoring:** Deploy real-time monitoring of system performance metrics\n\n**Technical Implementation:**\n```\nPriority Actions:\n- Configure log4j/logback appenders with appropriate levels\n- Implement structured logging with consistent formatting\n- Deploy log aggregation rate limiting (e.g., 1000 logs/minute per service)\n- Enable log sampling for high-frequency events (10% sampling rate)\n```\n\n**Validation Steps:**\n- Monitor log volume reduction (target: 80% reduction within 2 hours)\n- Verify system performance recovery\n- Ensure critical debugging capability retention\n- Validate experiment functionality remains intact\n\n## **Preventive Measures**\n\n**Immediate Prevention (0-30 days):**\n1. **Logging Standards Implementation:**\n   - Establish production logging guidelines with volume limits\n   - Implement mandatory log level configuration reviews\n   - Deploy automated log volume monitoring with alerting thresholds\n\n2. **Code Review Enhancement:**\n   - Add logging impact assessment to PR review checklist\n   - Implement static analysis tools for log statement detection\n   - Require logging volume estimation for new features\n\n3. **Deployment Pipeline Integration:**\n   - Add log volume validation gates in CI/CD pipeline\n   - Implement canary deployment monitoring for log metrics\n   - Create automated rollback triggers for excessive log volume\n\n**Long-term Prevention (30-90 days):**\n1. **Infrastructure Improvements:**\n   - Deploy centralized logging configuration management\n   - Implement dynamic log level adjustment capabilities\n   - Establish log volume quotas per service/team\n\n2. **Monitoring and Alerting:**\n   - Create comprehensive log volume dashboards\n   - Implement predictive alerting for log growth trends\n   - Deploy automated log analysis for anomaly detection\n\n3. **Process Enhancement:**\n   - Establish logging architecture review board\n   - Create incident response playbooks for log volume issues\n   - Implement regular log volume audits and optimization\n\n**Governance and Training:**\n- Conduct team training on production logging best practices\n- Establish logging cost awareness and accountability\n- Create documentation for troubleshooting without excessive logging\n\n**Success Metrics:**\n- Log volume growth"
+    }
+  }
+}

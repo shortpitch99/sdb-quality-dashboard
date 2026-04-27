@@ -25,7 +25,7 @@
 - **Action**: Copy query → Run SQL → Download as CSV → Save as `deployment.csv`
 
 ### 5. Code Coverage Data (`coverage.txt`)
-- **Source**: [SonarQube Dashboard](https://sonarqube.sfcq.buildndeliver-s.aws-esvc1-useast2.aws.sfdc.cl/component_measures?id=sayonara.sayonaradb.sdb&metric=uncovered_lines&view=list)
+- **Source**: [SonarQube Dashboard for Engine](https://sonarqube.sfcq.buildndeliver-s.aws-esvc1-useast2.aws.sfdc.cl/component_measures?id=sayonara.sayonaradb.sdb&metric=uncovered_lines&view=list)
 - **Source**: [SonarQube Dashboard for Store](https://sonarqube.sfcq.buildndeliver-s.aws-esvc1-useast2.aws.sfdc.cl/component_measures?id=sfstorage.bookkeeper&metric=line_coverage)
 - **Source**: [SonarQube Dashboard for SDD](https://sonarqube.sfcq.buildndeliver-s.aws-esvc1-useast2.aws.sfdc.cl/component_measures?id=sdd.sdd)
 - **Action**: Copy coverage section from "On new code" through end of "Overall" coverage → Create `coverage.txt`

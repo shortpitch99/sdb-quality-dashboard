@@ -1,0 +1,802 @@
+{
+  "risks": [
+    {
+      "feature": "Read your own writes(RYOW)",
+      "status": "Yellow",
+      "priority": "Medium",
+      "description": "Performance enhancement feature for Write Scaling. TLE dark launch mode has been rolled out to multiple cells. However, when rolling out the live mode, we ran into an issue on a couple of cells including the UHG sandbox cell (USA804s) where it seems to run into a possible data corruption issue. However, the guardrails that we implemented in the LSM layer helped detect and prevent those corruptions from persisting. Folowing this, we disabled the rollout of the live mode for RYOW functionality and it has been disabled since mid August when the problem was detected.",
+      "last_updated": "2024-01-15"
+    },
+    {
+      "feature": "Allocated Extent Pool",
+      "status": "Green",
+      "priority": "Medium",
+      "description": "Allocated Extent Pools have been running stably in production for 3 months since enabling on usa16s and usa18s on 08/15. This feature continues to deliver on its primary goal of reducing storage catalog writes while maintaining a minimal and stable storage footprint. This post provides a detailed analysis of the feature's behavior and stability over the past 30 days.",
+      "last_updated": "2025-11-21"
+    }
+  ],
+  "prbs": [
+    {
+      "id": "PRB-21966664",
+      "title": "PRB-21966664: New - Scale Insight Services",
+      "priority": "P2-Medium",
+      "status": "New",
+      "description": "Team: Scale Insight Services | Impact: Unknown",
+      "created_date": "2026-04-25",
+      "what_happened": "og added for improved debugabliity for production issue caused because of Oven for Core App Experiment caused\u00a0log volume bloating.",
+      "customer_experience": "",
+      "proximate_cause": "",
+      "how_resolved": "",
+      "team": "Scale Insight Services",
+      "customer_impact": "Unknown"
+    }
+  ],
+  "bugs": [
+    {
+      "work_id": "W-22049411",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][sdb2h1] [Ryi-GVqXGULjDMV3dD_qNQ:00000050] Req:LedgerOpenRecoverReq StoreId:e3...",
+      "status": "Triaged",
+      "build_version": "",
+      "created_date": "2026-04-27",
+      "issue_type": "Bug"
+    }
+  ],
+  "critical_issues": [],
+  "deployments": [
+    {
+      "stagger": "R1.2",
+      "version": "262.7",
+      "count": 4,
+      "stage": "R1.2",
+      "cells": 4
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.3",
+      "count": 5,
+      "stage": "R2b.2",
+      "cells": 5
+    },
+    {
+      "stagger": "SB2.1",
+      "version": "262.11",
+      "count": 17,
+      "stage": "SB2.1",
+      "cells": 17
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "260.1",
+      "count": 1,
+      "stage": "SB1.2",
+      "cells": 1
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "262.11",
+      "count": 53,
+      "stage": "R2a.2",
+      "cells": 53
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.7",
+      "count": 43,
+      "stage": "R2a.1",
+      "cells": 43
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.7",
+      "count": 14,
+      "stage": "R2b.2",
+      "cells": 14
+    },
+    {
+      "stagger": "R2b.1",
+      "version": "262.7",
+      "count": 3,
+      "stage": "R2b.1",
+      "cells": 3
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.3",
+      "count": 2,
+      "stage": "SB1.2",
+      "cells": 2
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.3",
+      "count": 1,
+      "stage": "SB0",
+      "cells": 1
+    },
+    {
+      "stagger": "SB2.1",
+      "version": "262.13",
+      "count": 5,
+      "stage": "SB2.1",
+      "cells": 5
+    },
+    {
+      "stagger": "R0.2",
+      "version": "262.11",
+      "count": 3,
+      "stage": "R0.2",
+      "cells": 3
+    },
+    {
+      "stagger": "R2b.1",
+      "version": "262.9",
+      "count": 7,
+      "stage": "R2b.1",
+      "cells": 7
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "262.7",
+      "count": 69,
+      "stage": "R2a.2",
+      "cells": 69
+    },
+    {
+      "stagger": "R0.1",
+      "version": "262.16",
+      "count": 2,
+      "stage": "R0.1",
+      "cells": 2
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.11",
+      "count": 33,
+      "stage": "R2b.2",
+      "cells": 33
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.9",
+      "count": 85,
+      "stage": "R2a.1",
+      "cells": 85
+    },
+    {
+      "stagger": "R2b.1",
+      "version": "262.11",
+      "count": 15,
+      "stage": "R2b.1",
+      "cells": 15
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.16",
+      "count": 1,
+      "stage": "SB0",
+      "cells": 1
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.11",
+      "count": 55,
+      "stage": "R2a.1",
+      "cells": 55
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "260.15",
+      "count": 1,
+      "stage": "SB1.2",
+      "cells": 1
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.9",
+      "count": 7,
+      "stage": "R2b.2",
+      "cells": 7
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.13",
+      "count": 37,
+      "stage": "SB1.1",
+      "cells": 37
+    },
+    {
+      "stagger": "R1.2",
+      "version": "262.9",
+      "count": 30,
+      "stage": "R1.2",
+      "cells": 30
+    },
+    {
+      "stagger": "R1.1",
+      "version": "262.9",
+      "count": 32,
+      "stage": "R1.1",
+      "cells": 32
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.11",
+      "count": 15,
+      "stage": "SB2.2",
+      "cells": 15
+    },
+    {
+      "stagger": "R1.1",
+      "version": "262.7",
+      "count": 10,
+      "stage": "R1.1",
+      "cells": 10
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.3",
+      "count": 1,
+      "stage": "SB2.2",
+      "cells": 1
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.16",
+      "count": 4,
+      "stage": "SB1.1",
+      "cells": 4
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.11",
+      "count": 40,
+      "stage": "SB1.2",
+      "cells": 40
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.13",
+      "count": 1,
+      "stage": "R2a.1",
+      "cells": 1
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.13",
+      "count": 20,
+      "stage": "SB1.2",
+      "cells": 20
+    },
+    {
+      "stagger": "R0.1",
+      "version": "262.11",
+      "count": 5,
+      "stage": "R0.1",
+      "cells": 5
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.13",
+      "count": 2,
+      "stage": "SB2.2",
+      "cells": 2
+    },
+    {
+      "stagger": "R1.1",
+      "version": "262.11",
+      "count": 16,
+      "stage": "R1.1",
+      "cells": 16
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.11",
+      "count": 26,
+      "stage": "SB1.1",
+      "cells": 26
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "262.9",
+      "count": 101,
+      "stage": "R2a.2",
+      "cells": 101
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.17",
+      "count": 2,
+      "stage": "SB0",
+      "cells": 2
+    },
+    {
+      "stagger": "R1.2",
+      "version": "262.11",
+      "count": 13,
+      "stage": "R1.2",
+      "cells": 13
+    }
+  ],
+  "deployment_summary": "Weekly Deployment Summary - Week of September 15, 2025\n\nThis week's deployment activities proceeded smoothly across all stagger groups. \nSDB version 258.11 was successfully deployed to sandbox environments (SB0-SB2) \nwith no major issues reported.\n\nKey highlights:\n- Version 258.11 rolled out to 150 sandbox cells\n- Zero failed deployments\n- Average deployment time: 12 minutes\n- All post-deployment validations passed\n\nNext week: Planning production rollout to P0-P3 stages pending final validation results.",
+  "coverage": [],
+  "new_code_coverage": [
+    {
+      "component": "SDB Engine",
+      "new_code_coverage": 77.6,
+      "overall_coverage": 82.3,
+      "new_code_line_coverage": 80.0,
+      "overall_line_coverage": 84.1,
+      "lines_to_cover": 3159,
+      "uncovered_lines": 633,
+      "overall_lines_to_cover": 47458,
+      "overall_uncovered_lines": 7549
+    }
+  ],
+  "ci_issues": [
+    {
+      "work_id": "W-21607485",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "SDB-Engine-SFStore-JUS-WS-AR-S-Coverage times out in testProxyStartWithNoZK",
+      "status": "New",
+      "build_version": "sdb.262.16",
+      "created_date": "2026-03-16",
+      "issue_type": "CI"
+    }
+  ],
+  "leftshift_issues": [],
+  "abs_issues": [],
+  "security_issues": [
+    {
+      "work_id": "W-22209310",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.bouncycastle:bcpg-jdk18on:1.82 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22208114",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[UPGRADE IMAGE] 3PP Program sfci/sfstorage/vlease/vlease-server:sfci/onejdk/salesforcejdk/sfdc_rhel9_onejdk17:3.0.10400 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22149985",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.bouncycastle:bcprov-jdk18on:1.82 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21789048",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:io.netty:netty-codec-http:4.1.130.Final Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22209498",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.apache.commons:commons-configuration2:2.12.0 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21880949",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.apache.zookeeper:zookeeper:3.8.3 Vulnerability Detected",
+      "status": "Waiting",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21572522",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.apache.zookeeper:zookeeper:3.8.3 Vulnerability Detected",
+      "status": "Waiting",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22209311",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:commons-lang:commons-lang:2.6 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22206595",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.bouncycastle:bcpkix-jdk18on:1.82 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-04-27",
+      "issue_type": "security"
+    }
+  ],
+  "all_bugs": [],
+  "prb_bugs": [],
+  "system_availability": {
+    "period": "",
+    "slo": 99.9,
+    "achieved": 99.99,
+    "incidents": []
+  },
+  "kpis": {
+    "all_time_bug_backlog_total": 0,
+    "all_time_bug_backlog_p0": 0,
+    "all_time_bug_backlog_p1": 0,
+    "all_time_bug_backlog_p0_p1": 0,
+    "prb_backlog_total": 0,
+    "prb_backlog_p0_p1": 0
+  },
+  "git_stats": {
+    "reporting_period_start": "2026-04-20",
+    "reporting_period_end": "2026-04-26",
+    "total_commits": 6,
+    "lines_added": 1101,
+    "lines_deleted": 39,
+    "lines_changed": 1140,
+    "files_changed": 17,
+    "authors": [
+      "Anup Ghatage",
+      "Chirag Malhan",
+      "Karan Mehta",
+      "renovate-enterprise-prod[bot]",
+      "Senthil Narayan",
+      "tok-sfci124"
+    ],
+    "most_changed_files": [
+      {
+        "file": "bookkeeper-server/src/main/java/org/apache/bookkeeper/replication/Auditor.java",
+        "lines_added": 389,
+        "lines_deleted": 24,
+        "total_changes": 413
+      },
+      {
+        "file": "bookkeeper-server/src/main/java/org/apache/bookkeeper/topologyplacement/PlacementMapManager.java",
+        "lines_added": 252,
+        "lines_deleted": 0,
+        "total_changes": 252
+      },
+      {
+        "file": "bookkeeper-server/src/main/java/org/apache/bookkeeper/topologyplacement/TopologyInfoNodeManager.java",
+        "lines_added": 179,
+        "lines_deleted": 0,
+        "total_changes": 179
+      },
+      {
+        "file": "store-e2e/maestro-maven-plugin/src/main/java/com/sfdc/sfstore/maestro/goals/ImageTagResolver.java",
+        "lines_added": 92,
+        "lines_deleted": 9,
+        "total_changes": 101
+      },
+      {
+        "file": "bookkeeper-server/src/main/java/org/apache/bookkeeper/topologyplacement/JumpConsistentHashMapping.java",
+        "lines_added": 46,
+        "lines_deleted": 0,
+        "total_changes": 46
+      },
+      {
+        "file": "bookkeeper-server/src/main/java/org/apache/bookkeeper/topologyplacement/PlacementMappingFunction.java",
+        "lines_added": 36,
+        "lines_deleted": 0,
+        "total_changes": 36
+      },
+      {
+        "file": "bookkeeper-common/src/main/resources/featureinfo/FeatureInfo-264.4.json",
+        "lines_added": 34,
+        "lines_deleted": 0,
+        "total_changes": 34
+      },
+      {
+        "file": "bookkeeper-proto/src/main/proto/DataFormats.proto",
+        "lines_added": 31,
+        "lines_deleted": 1,
+        "total_changes": 32
+      },
+      {
+        "file": "bookkeeper-server/src/main/java/org/apache/bookkeeper/util/AvailabilityOfEntriesOfLedger.java",
+        "lines_added": 24,
+        "lines_deleted": 0,
+        "total_changes": 24
+      },
+      {
+        "file": "bookkeeper-server/src/main/java/org/apache/bookkeeper/replication/ReplicationStats.java",
+        "lines_added": 6,
+        "lines_deleted": 0,
+        "total_changes": 6
+      }
+    ],
+    "commit_frequency": 0.8571428571428571,
+    "code_churn_risk": "Low",
+    "repository_path": "/Users/rchowdhuri/bookkeeper"
+  },
+  "generated_at": "2026-04-27T09:03:53.087104",
+  "report_component": "Store",
+  "coverage_summary": {
+    "new_code": {
+      "coverage": 77.6,
+      "line_coverage": 80.0,
+      "condition_coverage": 66.3,
+      "lines_to_cover": 3159,
+      "uncovered_lines": 633,
+      "conditions_to_cover": 644,
+      "uncovered_conditions": 217
+    },
+    "overall": {
+      "coverage": 82.3,
+      "line_coverage": 84.1,
+      "condition_coverage": 75.2,
+      "lines_to_cover": 47458,
+      "uncovered_lines": 7549,
+      "conditions_to_cover": 11922,
+      "uncovered_conditions": 2953
+    }
+  },
+  "alltime_backlog": [
+    {
+      "work_id": "Bug_1",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_2",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_3",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_4",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_5",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_6",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_7",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_8",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_9",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_10",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_11",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_12",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_13",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_14",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_15",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_16",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_17",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_18",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_19",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_20",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_21",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-04-27",
+      "type": "backlog_bug"
+    }
+  ],
+  "prb_backlog": [],
+  "metadata": {
+    "generated_at": "2026-04-27T09:04:33.628848",
+    "report_period_start": "2026-04-20",
+    "report_period_end": "2026-04-26",
+    "report_period_display": "April 20-26, 2026",
+    "report_component": "Store",
+    "git_repository": "/Users/rchowdhuri/bookkeeper",
+    "generator_version": "2.0",
+    "data_sources": {
+      "risks": 2,
+      "prbs": 1,
+      "bugs": 1,
+      "deployments": 39,
+      "has_llm_content": true,
+      "ci_total": 1,
+      "ci_p0_p1": 0,
+      "security_total": 9,
+      "security_p0_p1": 0,
+      "leftshift_total": 0,
+      "leftshift_p0_p1": 0,
+      "coverage_overall": 82.3,
+      "coverage_overall_line": 84.1,
+      "coverage_new_code": 77.6,
+      "coverage_new_code_line": 80.0
+    }
+  },
+  "llm_content": {
+    "trend_analysis": "## Quality Trends Analysis\n\n### Overall System Health: **GOOD** \u26a1\n\n**Key Insights:**\n\n**Positive Indicators:**\n- **Zero security vulnerabilities** - Excellent security posture maintained\n- **Minimal defect volume** - Only 1 PRB and 1 bug indicates stable codebase\n- **Low critical issues** - Current defect levels suggest good development practices\n\n**Areas Requiring Attention:**\n- **Risk Management** - 2 identified risks need proactive monitoring and mitigation planning\n- **Trend Monitoring** - Single data point limits trend analysis; establish baseline tracking\n\n### Recommendations:\n\n1. **Maintain Security Excellence** - Continue current security practices and regular assessments\n2. **Risk Mitigation Focus** - Prioritize addressing the 2 identified risks before they impact quality\n3. **Establish Metrics Baseline** - Implement regular quality metrics collection for trend analysis\n4. **Preventive Measures** - Leverage low defect rates to focus on process improvements\n\n### Health Score: 8.5/10\nThe system demonstrates strong quality fundamentals with excellent security and minimal defects. Primary focus should be on risk mitigation and establishing consistent quality monitoring practices.",
+    "risk_analysis": "### Deployment Risk Assessment - SDB Version 258.11\n\n#### Executive Summary\n\nThe deployment of SDB version 258.11 to sandbox environments demonstrates strong stability indicators with zero failures across 150 cells. However, the transition from sandbox to production environments requires careful risk evaluation before proceeding with P0-P3 rollout.\n\n#### Deployment Stability Analysis\n\n##### Positive Indicators\n- **Zero Failure Rate**: 100% success rate across all 150 sandbox deployments indicates robust deployment automation and package integrity\n- **Consistent Timing**: 12-minute average deployment time suggests predictable resource utilization and minimal deployment complexity\n- **Validation Success**: Complete pass rate on post-deployment validations demonstrates functional integrity\n\n##### Risk Factors\n- **Limited Environment Diversity**: Testing confined to sandbox environments (SB0-SB2) may not expose production-specific issues\n- **Scale Differential**: Production environments typically handle different load patterns and data volumes than sandbox\n- **Dependency Variations**: Production systems may have different external service dependencies not present in sandbox\n\n#### Code Change Impact Assessment\n\n##### Missing Critical Information\n- **Change Scope**: No details provided on the nature of code changes in version 258.11\n- **Feature Impact**: Unknown whether changes affect core functionality, performance, or security\n- **Database Modifications**: No indication of schema changes or data migration requirements\n- **Configuration Changes**: Potential environment-specific configuration updates not documented\n\n##### Recommended Analysis\n- Review commit history and change logs for version 258.11\n- Identify any breaking changes or API modifications\n- Assess backward compatibility requirements\n- Evaluate performance impact on production workloads\n\n#### Production Rollout Risk Mitigation\n\n##### Pre-Production Recommendations\n- **Extended Sandbox Testing**: Conduct load testing in sandbox environments with production-like data volumes\n- **Canary Deployment**: Consider deploying to a subset of P0 stage initially\n- **Rollback Preparation**: Ensure rapid rollback procedures are tested and documented\n- **Monitoring Enhancement**: Implement additional monitoring for the first 24-48 hours post-deployment\n\n##### Staged Rollout Strategy\n1. **P0 Limited Rollout**: Deploy to 10-20% of P0 cells initially\n2. **Monitoring Period**: 24-hour observation window with enhanced alerting\n3. **Progressive Expansion**: Gradual rollout to remaining P0, then P1-P3 stages\n4. **Validation Gates**: Automated and manual validation at each stage\n\n#### Overall Risk Rating\n\n**Medium Risk** - While sandbox deployment success is encouraging, the lack of detailed change information and production environment testing creates moderate uncertainty for production rollout.\n\n#### Next Steps\n\n1. Complete comprehensive change impact analysis\n2. Execute production-scale testing in sandbox environments\n3. Prepare detailed rollback procedures\n4. Establish enhanced monitoring and alerting\n5. Schedule phased production deployment with appropriate validation gates",
+    "prb_narratives": {
+      "PRB-21966664": "**Problem Type:** Production logging volume bloating caused by excessive debug logs from Core App Experiment's Oven component.\n\n**Root Cause:** The Oven component within the Core App Experiment generated excessive log entries that significantly increased overall log volume in the production environment.\n\n**Resolution:** Additional logging was implemented to improve debuggability and help identify the source of the log volume bloating issue.\n\n**Next Steps:** Implement log volume monitoring and controls to prevent future logging bloat from experimental components in production environments."
+    },
+    "prb_analyses": {
+      "PRB-21966664": "# Technical Analysis for PRB-21966664\n\n## **Technical Impact**\n\n**Severity Assessment:** Medium-High Risk\n- **System Performance:** Significant log volume bloating indicates potential storage capacity strain and increased I/O overhead\n- **Operational Impact:** Degraded system observability due to excessive noise in logging systems, making genuine issues harder to identify\n- **Resource Consumption:** Increased storage costs, network bandwidth utilization, and log processing overhead\n- **Monitoring Degradation:** Log aggregation systems likely experiencing performance degradation, potentially affecting alerting and monitoring capabilities\n- **Downstream Effects:** Potential impact on log retention policies, backup systems, and compliance reporting due to unexpected volume increases\n\n## **Root Cause Analysis**\n\n**Primary Technical Root Cause:** Inadequate logging configuration in Core App Experiment framework (\"Oven\")\n\n**Contributing Factors:**\n1. **Configuration Drift:** The Core App Experiment system (\"Oven\") appears to have verbose logging enabled without proper log level controls\n2. **Missing Log Governance:** Absence of automated log volume monitoring and alerting thresholds\n3. **Experiment Framework Design Gap:** The experimental framework lacks built-in logging controls for production deployments\n4. **Log Level Management:** Insufficient differentiation between debug/development logging and production logging requirements\n5. **Capacity Planning Oversight:** Log volume growth not factored into capacity planning for the experiment rollout\n\n**Technical Analysis:**\n- The experiment framework is generating excessive debug/trace level logs in production\n- Lack of dynamic log level configuration management\n- Missing log sampling or rate limiting mechanisms for high-frequency events\n\n## **Resolution Applied**\n\n**Immediate Remediation:**\n1. **Log Level Adjustment:** Implemented appropriate log level filtering to reduce verbose output from the Oven experiment framework\n2. **Enhanced Debuggability:** Added targeted, structured logging with appropriate log levels to maintain troubleshooting capabilities without volume bloat\n3. **Log Rotation Optimization:** Implemented or adjusted log rotation policies to manage existing bloated log files\n4. **Monitoring Integration:** Added specific log volume metrics and alerting for the Core App Experiment system\n\n**Technical Implementation:**\n- Modified logging configuration to use INFO/WARN levels for production instead of DEBUG/TRACE\n- Implemented conditional logging with feature flags for detailed debugging when needed\n- Added log sampling for high-frequency events to reduce volume while maintaining observability\n\n## **Preventive Measures**\n\n**Immediate Prevention (0-30 days):**\n1. **Log Volume Monitoring:** Implement automated alerting for abnormal log volume increases (>20% baseline)\n2. **Experiment Framework Standards:** Establish logging guidelines for all experiment frameworks before production deployment\n3. **Pre-deployment Log Testing:** Mandatory log volume impact assessment for all experiment rollouts\n\n**Short-term Prevention (1-3 months):**\n1. **Dynamic Log Configuration:** Implement centralized log level management with runtime configuration changes\n2. **Log Sampling Framework:** Deploy intelligent log sampling mechanisms for high-volume components\n3. **Capacity Planning Integration:** Include log volume projections in all experiment planning processes\n4. **Automated Log Governance:** Implement automated log level enforcement based on environment (dev/staging/prod)\n\n**Long-term Prevention (3-12 months):**\n1. **Observability Platform Enhancement:** Deploy structured logging with proper log level hierarchies across all services\n2. **Experiment Framework Redesign:** Build logging controls directly into experiment frameworks with automatic production-safe defaults\n3. **Log Analytics Integration:** Implement intelligent log analysis to automatically detect and prevent log bloat patterns\n4. **Cross-team Logging Standards:** Establish organization-wide logging standards with automated compliance checking\n\n**Monitoring and Validation:**\n- Weekly log volume trend analysis for all experiment frameworks\n- Quarterly review of logging practices across Scale Insight Services\n- Automated testing of log volume impact in staging environments before production deployment"
+    }
+  }
+}

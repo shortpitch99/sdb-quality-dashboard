@@ -3345,29 +3345,34 @@ class QualityReportDashboard:
         return f"**Exhaustive Analysis:** Content not available - requires LLM generation during report creation for {prb_id}"
     
     def deduplicate_prbs(self, prbs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Remove duplicate PRBs based on content similarity."""
+        """Remove duplicate PRBs based on ID, falling back to content similarity."""
         if not prbs:
             return prbs
-        
+
         unique_prbs = []
+        seen_ids = set()
         seen_incidents = set()
-        
+
         for prb in prbs:
-            # Create a signature for the incident based on key fields
-            what_happened = prb.get('what_happened', '').strip()
-            created_date = prb.get('created_date', '')
-            team = prb.get('team', '')
-            
-            # Create a unique signature for this incident
-            incident_signature = f"{what_happened}|{created_date}|{team}"
-            
-            if incident_signature not in seen_incidents:
-                unique_prbs.append(prb)
-                seen_incidents.add(incident_signature)
+            prb_id = prb.get('id', '').strip()
+
+            # Deduplicate by ID first
+            if prb_id:
+                if prb_id in seen_ids:
+                    continue
+                seen_ids.add(prb_id)
             else:
-                # This is a duplicate - silently skip
-                pass
-        
+                # Fall back to content signature for items without an ID
+                what_happened = prb.get('what_happened', '').strip()
+                created_date = prb.get('created_date', '')
+                team = prb.get('team', '')
+                incident_signature = f"{what_happened}|{created_date}|{team}"
+                if incident_signature in seen_incidents:
+                    continue
+                seen_incidents.add(incident_signature)
+
+            unique_prbs.append(prb)
+
         return unique_prbs
     
     def create_prb_insights(self, data: Dict[str, Any]):
