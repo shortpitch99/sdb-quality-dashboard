@@ -7,6 +7,7 @@ Interactive dashboard for viewing and analyzing quality reports.
 import streamlit as st
 import os
 import json
+import csv
 import pandas as pd
 import numpy as np
 import plotly.express as px
@@ -20,6 +21,7 @@ from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # Import our quality report components
 import sys
@@ -322,7 +324,125 @@ class QualityReportDashboard:
         if not deployments:
             # Fallback to stagger_deployments format if available
             deployments = data.get('stagger_deployments', [])
+        if self._deployment_rows_usable(deployments):
+            return deployments
+
+        # Week-level fallback from Engine/global_deployment.csv (history format).
+        selected_week = getattr(st.session_state, 'selected_week', None)
+        week_folder = self._resolve_week_folder_key(selected_week, data)
+        if week_folder:
+            global_csv = os.path.join(APP_ROOT, "weeks", week_folder, "Engine", "global_deployment.csv")
+            if os.path.exists(global_csv):
+                parsed = self._parse_global_deployment_history(global_csv)
+                if self._deployment_rows_usable(parsed):
+                    return parsed
         return deployments
+
+    def _deployment_rows_usable(self, rows: List[Dict[str, Any]]) -> bool:
+        if not rows:
+            return False
+        total = 0
+        for r in rows:
+            try:
+                total += int(float(r.get('count', r.get('cells', 0)) or 0))
+            except Exception:
+                continue
+        return total > 0
+
+    def _parse_global_deployment_history(self, csv_path: str) -> List[Dict[str, Any]]:
+        """
+        Convert weekly history CSV rows into latest-week deployment snapshot rows.
+        Expected columns: week_start,current_version,total_cells,sb0_pct,sb1_pct,r0_pct,r1_pct,r2a_pct,r2b_pct
+        """
+        out: List[Dict[str, Any]] = []
+        try:
+            with open(csv_path, "r", newline="") as f:
+                reader = csv.DictReader(f)
+                rows = list(reader)
+        except Exception:
+            return out
+
+        dated_rows: List[tuple[datetime, Dict[str, Any]]] = []
+        for row in rows:
+            try:
+                d = datetime.strptime(str(row.get("week_start", "")).strip(), "%Y-%m-%d")
+            except ValueError:
+                continue
+            dated_rows.append((d, row))
+        if not dated_rows:
+            return out
+
+        latest = max(d for d, _ in dated_rows)
+        latest_rows = [r for d, r in dated_rows if d == latest]
+        stage_map = {
+            "sb0_pct": "SB0",
+            "sb1_pct": "SB1",
+            "r0_pct": "R0",
+            "r1_pct": "R1",
+            "r2a_pct": "R2a",
+            "r2b_pct": "R2b",
+        }
+
+        for row in latest_rows:
+            version = str(row.get("current_version", "")).strip()
+            try:
+                total_cells = float(str(row.get("total_cells", "0")).strip() or 0)
+            except ValueError:
+                total_cells = 0.0
+            if not version or total_cells <= 0:
+                continue
+            for pct_col, stage in stage_map.items():
+                try:
+                    pct = float(str(row.get(pct_col, "0")).strip() or 0)
+                except ValueError:
+                    pct = 0.0
+                count = int(round(total_cells * pct / 100.0))
+                if count <= 0:
+                    continue
+                out.append(
+                    {
+                        "stagger": stage,
+                        "version": version,
+                        "count": count,
+                        "stage": stage,
+                        "cells": count,
+                    }
+                )
+        return out
+
+    def _resolve_week_folder_key(self, selected_week: Optional[str], data: Optional[Dict[str, Any]] = None) -> Optional[str]:
+        """
+        Convert UI week selector key (often YYYY-MM-DD timestamp key) into weeks/cwNN folder key.
+        Priority:
+          1) explicit cwNN in selected_week
+          2) metadata.week_label
+          3) metadata.report_period_start
+          4) selected_week parsed as date
+        """
+        def cw_from_date_str(s: str) -> Optional[str]:
+            try:
+                d = datetime.strptime(str(s).strip(), "%Y-%m-%d")
+                return f"cw{d.isocalendar().week:02d}"
+            except ValueError:
+                return None
+
+        if selected_week and re.match(r"^cw\d{2}$", str(selected_week).strip(), re.IGNORECASE):
+            return str(selected_week).strip().lower()
+
+        md = (data or {}).get("metadata", {}) if isinstance(data, dict) else {}
+        wl = str(md.get("week_label", "")).strip().lower()
+        if re.match(r"^cw\d{2}$", wl):
+            return wl
+
+        rps = str(md.get("report_period_start", "")).strip()
+        cw = cw_from_date_str(rps)
+        if cw:
+            return cw
+
+        cw = cw_from_date_str(str(selected_week or ""))
+        if cw:
+            return cw
+        return None
 
     def parse_ci_data(self) -> List[Dict[str, Any]]:
         """CI data is now loaded from archived reports, not from ci.txt file."""
@@ -2241,6 +2361,281 @@ class QualityReportDashboard:
             st.plotly_chart(fig, use_container_width=True, key="version_pie_chart")
         else:
             st.warning(f"📊 No valid version data for pie chart (found {total_cells} total cells)")
+
+    def _version_tuple(self, version: str) -> Tuple[int, ...]:
+        nums = re.findall(r"\d+", str(version))
+        return tuple(int(n) for n in nums) if nums else (0,)
+
+    def _load_global_deployment_history(self, selected_week: Optional[str], data: Optional[Dict[str, Any]] = None) -> pd.DataFrame:
+        week_folder = self._resolve_week_folder_key(selected_week, data)
+        if not week_folder:
+            return pd.DataFrame()
+        path = os.path.join(APP_ROOT, "weeks", week_folder, "Engine", "global_deployment.csv")
+        if not os.path.exists(path):
+            return pd.DataFrame()
+        try:
+            df = pd.read_csv(path)
+        except Exception:
+            return pd.DataFrame()
+        required = {
+            "current_version",
+            "week_start",
+            "total_cells",
+            "sb0_pct",
+            "sb1_pct",
+            "r0_pct",
+            "r1_pct",
+            "r2a_pct",
+            "r2b_pct",
+        }
+        if not required.issubset(set(df.columns)):
+            return pd.DataFrame()
+        df["week_start"] = pd.to_datetime(df["week_start"], errors="coerce")
+        df = df.dropna(subset=["week_start"]).copy()
+        if df.empty:
+            return df
+        df["current_version"] = df["current_version"].astype(str)
+        df["total_cells"] = pd.to_numeric(df["total_cells"], errors="coerce").fillna(0.0)
+        for c in ["sb0_pct", "sb1_pct", "r0_pct", "r1_pct", "r2a_pct", "r2b_pct"]:
+            df[c] = pd.to_numeric(df[c], errors="coerce").fillna(0.0)
+        return df
+
+    def create_global_deployment_journey_single_version(self, selected_week: Optional[str], data: Optional[Dict[str, Any]] = None, key_suffix: str = "") -> None:
+        """Graph 1: Select any version and view stagger progression over latest 8 weeks."""
+        df = self._load_global_deployment_history(selected_week, data)
+        if df.empty:
+            st.info("Global deployment history not available for selected week.")
+            return
+
+        latest_weeks = sorted(df["week_start"].unique())[-8:]
+        window = df[df["week_start"].isin(latest_weeks)].copy()
+        if window.empty:
+            st.info("No rows available in latest 8-week window.")
+            return
+
+        versions = sorted(window["current_version"].unique(), key=self._version_tuple)
+        default_idx = max(0, len(versions) - 1)
+        selected_version = st.selectbox(
+            "Release Version",
+            versions,
+            index=default_idx,
+            key=f"global_journey_selected_version_{key_suffix}",
+        )
+        filtered = window[window["current_version"] == selected_version].copy()
+        if filtered.empty:
+            st.warning("No rows in latest 8 weeks for selected version.")
+            return
+
+        pct_cols = ["sb0_pct", "sb1_pct", "r0_pct", "r1_pct", "r2a_pct", "r2b_pct"]
+        stagger_label = {
+            "sb0_pct": "SB0",
+            "sb1_pct": "SB1",
+            "r0_pct": "R0",
+            "r1_pct": "R1",
+            "r2a_pct": "R2A",
+            "r2b_pct": "R2B",
+        }
+        melted = filtered.melt(
+            id_vars=["week_start", "current_version", "total_cells"],
+            value_vars=pct_cols,
+            var_name="stagger_key",
+            value_name="pct",
+        ).dropna(subset=["pct"]).copy()
+        melted["stagger"] = melted["stagger_key"].map(stagger_label)
+        melted["week_label"] = melted["week_start"].dt.strftime("%Y-%m-%d")
+        melted["stagger_order"] = melted["stagger_key"].map(
+            {"sb0_pct": 1, "sb1_pct": 2, "r0_pct": 3, "r1_pct": 4, "r2a_pct": 5, "r2b_pct": 6}
+        )
+        # Keep all 8 weeks on axis even if the selected version has no row in some weeks.
+        week_labels = [pd.to_datetime(w).strftime("%Y-%m-%d") for w in latest_weeks]
+        all_staggers = ["SB0", "SB1", "R0", "R1", "R2A", "R2B"]
+        full_index = pd.MultiIndex.from_product([week_labels, all_staggers], names=["week_label", "stagger"])
+        melted = (
+            melted.set_index(["week_label", "stagger"])
+            .reindex(full_index, fill_value=0.0)
+            .reset_index()
+        )
+        melted["stagger_order"] = melted["stagger"].map({"SB0": 1, "SB1": 2, "R0": 3, "R1": 4, "R2A": 5, "R2B": 6})
+        melted = melted.sort_values(["week_label", "stagger_order"])
+
+        fig = px.bar(
+            melted,
+            x="week_label",
+            y="pct",
+            color="stagger",
+            barmode="group",
+            category_orders={"stagger": ["SB0", "SB1", "R0", "R1", "R2A", "R2B"]},
+            custom_data=["total_cells"],
+            title=(
+                "🚀 Release Journey by Stagger (Latest 8 Weeks)"
+                f"<br><sub>Version v{selected_version}</sub>"
+            ),
+        )
+        fig.update_traces(
+            hovertemplate=(
+                "<b>%{fullData.name}</b><br>"
+                "Week: %{x}<br>"
+                "Percent: %{y:.1f}%<br>"
+                "Total cells: %{customdata[0]}<extra></extra>"
+            )
+        )
+        fig.update_layout(
+            xaxis_title="Week Start",
+            yaxis_title="Percentage of cells in stagger (%)",
+            yaxis=dict(range=[0, 100]),
+            legend_title="Stagger",
+            height=520,
+        )
+        fig.update_xaxes(categoryorder="array", categoryarray=week_labels)
+        st.plotly_chart(fig, use_container_width=True, key=f"global_journey_single_{key_suffix}")
+
+    def create_global_deployment_journey_top6(self, selected_week: Optional[str], data: Optional[Dict[str, Any]] = None, key_suffix: str = "") -> None:
+        """Graph 2: Top 6 versions as-of latest week, shown across latest 8 weeks and staggers."""
+        df = self._load_global_deployment_history(selected_week, data)
+        if df.empty:
+            st.info("Global deployment history not available for selected week.")
+            return
+
+        latest_weeks = sorted(df["week_start"].unique())[-8:]
+        window = df[df["week_start"].isin(latest_weeks)].copy()
+        if window.empty:
+            st.info("No rows available in latest 8-week window.")
+            return
+
+        latest_week = window["week_start"].max()
+        latest_slice = window[window["week_start"] == latest_week].copy()
+        top6 = (
+            latest_slice.groupby("current_version", as_index=False)["total_cells"]
+            .max()
+            .sort_values("total_cells", ascending=False)["current_version"]
+            .head(6)
+            .tolist()
+        )
+        if not top6:
+            st.info("No top versions available.")
+            return
+        window = window[window["current_version"].isin(top6)].copy()
+
+        stage_specs = [
+            (" ", "__week_sep__"),
+            ("SB0", "sb0_pct"),
+            ("SB1", "sb1_pct"),
+            ("R0", "r0_pct"),
+            ("R1", "r1_pct"),
+            ("R2A", "r2a_pct"),
+            ("R2B", "r2b_pct"),
+        ]
+        stage_order = [s for s, _ in stage_specs]
+
+        long_rows: List[Dict[str, Any]] = []
+        for _, row in window.iterrows():
+            week_label = row["week_start"].strftime("%Y-%m-%d")
+            version = str(row["current_version"])
+            total_cells = float(row["total_cells"] or 0)
+            for stage_name, stage_col in stage_specs:
+                pct = float(row.get(stage_col, 0.0) or 0.0) if stage_col != "__week_sep__" else 0.0
+                cells_in_stage = total_cells * pct / 100.0
+                long_rows.append(
+                    {
+                        "week_label": week_label,
+                        "version": version,
+                        "stagger": stage_name,
+                        "cells_in_stage": cells_in_stage,
+                        "total_cells": total_cells,
+                    }
+                )
+        stage_df = pd.DataFrame(long_rows)
+        if stage_df.empty:
+            st.info("No top-6 stagger journey data available.")
+            return
+        stage_df["pct_of_version"] = np.where(
+            stage_df["total_cells"] > 0,
+            (stage_df["cells_in_stage"] / stage_df["total_cells"]) * 100.0,
+            0.0,
+        )
+        stage_totals = (
+            stage_df.groupby(["week_label", "stagger"], as_index=False)["cells_in_stage"].sum()
+            .rename(columns={"cells_in_stage": "stage_total"})
+        )
+        stage_df = stage_df.merge(stage_totals, on=["week_label", "stagger"], how="left")
+        stage_df["pct_in_stage"] = np.where(
+            stage_df["stage_total"] > 0,
+            (stage_df["cells_in_stage"] / stage_df["stage_total"]) * 100.0,
+            0.0,
+        )
+        stage_df["stagger"] = pd.Categorical(stage_df["stagger"], categories=stage_order, ordered=True)
+        stage_df = stage_df.sort_values(["week_label", "stagger", "version"])
+        week_labels_order = sorted(stage_df["week_label"].unique())
+        full_pairs = [(wk, stg) for wk in week_labels_order for stg in stage_order]
+
+        fig = go.Figure()
+        versions = [v for v in top6 if v in set(stage_df["version"].unique())]
+        palette = list(px.colors.qualitative.Dark24) + list(px.colors.qualitative.Set3)
+        version_color = {ver: palette[i % len(palette)] for i, ver in enumerate(versions)}
+
+        for version in versions:
+            part = stage_df[stage_df["version"] == version]
+            if part.empty:
+                continue
+            values = {
+                (str(r["week_label"]), str(r["stagger"])): (
+                    float(r["pct_of_version"]),
+                    float(r["cells_in_stage"]),
+                    float(r["total_cells"]),
+                    float(r["stage_total"]),
+                )
+                for _, r in part.iterrows()
+            }
+            y_vals = [values.get((wk, stg), (0.0, 0.0, 0.0, 0.0))[0] for wk, stg in full_pairs]
+            cells_vals = [values.get((wk, stg), (0.0, 0.0, 0.0, 0.0))[1] for wk, stg in full_pairs]
+            version_total_vals = [values.get((wk, stg), (0.0, 0.0, 0.0, 0.0))[2] for wk, stg in full_pairs]
+            stage_total_vals = [values.get((wk, stg), (0.0, 0.0, 0.0, 0.0))[3] for wk, stg in full_pairs]
+            fig.add_trace(
+                go.Bar(
+                    x=[[wk for wk, _ in full_pairs], [stg for _, stg in full_pairs]],
+                    y=y_vals,
+                    name=f"v{version}",
+                    marker_color=version_color[version],
+                    marker_line_color="#000000",
+                    marker_line_width=0.8,
+                    legendgroup=version,
+                    showlegend=True,
+                    customdata=np.stack(
+                        [
+                            [wk for wk, _ in full_pairs],
+                            [stg for _, stg in full_pairs],
+                            cells_vals,
+                            version_total_vals,
+                            stage_total_vals,
+                        ],
+                        axis=-1,
+                    ),
+                    hovertemplate=(
+                        "<b>v%{fullData.legendgroup}</b><br>"
+                        "Week: %{customdata[0]}<br>"
+                        "Stagger: %{customdata[1]}<br>"
+                        "Percent in this stagger (of version): %{y:.1f}%<br>"
+                        "Cells in stagger: %{customdata[2]:.1f}<br>"
+                        "Total cells for version that week: %{customdata[3]:.1f}<br>"
+                        "Total cells in this stagger (all top-6): %{customdata[4]:.1f}<extra></extra>"
+                    ),
+                )
+            )
+
+        fig.update_layout(
+            barmode="stack",
+            title="📦 Top 6 Versions — Percent in Each Stagger by Week (Latest 8 Weeks)",
+            xaxis_title="Week Start / Stagger",
+            yaxis_title="Percent in stagger for each version (%)",
+            yaxis=dict(range=[0, 100]),
+            legend_title="Version",
+            # Make grouped bars less skinny when all versions are present.
+            bargap=0.08,
+            bargroupgap=0.02,
+            height=560,
+        )
+        fig.update_xaxes(tickangle=-35)
+        st.plotly_chart(fig, use_container_width=True, key=f"global_journey_top6_{key_suffix}")
     
     def create_deployment_insights(self, data: Dict[str, Any]):
         """Create enhanced deployment insights using only deployment.csv metrics and deployment.txt LLM analysis."""
@@ -4441,6 +4836,10 @@ def render_component_development_metrics(component: str, display_name: Optional[
             dashboard.create_deployment_stacked_bar(data)
         with col2:
             dashboard.create_version_pie_chart(data)
+
+        st.markdown("#### Release Stagger Journey from `weeks/<selected_week>/Engine/global_deployment.csv`")
+        dashboard.create_global_deployment_journey_single_version(selected_week, data, key_suffix=component.lower())
+        dashboard.create_global_deployment_journey_top6(selected_week, data, key_suffix=component.lower())
         
         # Add deployment insights
         dashboard.create_deployment_insights(data)
