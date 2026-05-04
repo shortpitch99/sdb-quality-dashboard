@@ -2452,9 +2452,18 @@ class QualityReportDashboard:
         full_index = pd.MultiIndex.from_product([week_labels, all_staggers], names=["week_label", "stagger"])
         melted = (
             melted.set_index(["week_label", "stagger"])
-            .reindex(full_index, fill_value=0.0)
+            .reindex(full_index)
             .reset_index()
         )
+        # Fill only numeric fields with 0; keep string fields as strings.
+        if "pct" in melted.columns:
+            melted["pct"] = pd.to_numeric(melted["pct"], errors="coerce").fillna(0.0)
+        if "total_cells" in melted.columns:
+            melted["total_cells"] = pd.to_numeric(melted["total_cells"], errors="coerce").fillna(0.0)
+        if "current_version" in melted.columns:
+            melted["current_version"] = melted["current_version"].fillna("").astype(str)
+        if "stagger_key" in melted.columns:
+            melted["stagger_key"] = melted["stagger_key"].fillna("").astype(str)
         melted["stagger_order"] = melted["stagger"].map({"SB0": 1, "SB1": 2, "R0": 3, "R1": 4, "R2A": 5, "R2B": 6})
         melted = melted.sort_values(["week_label", "stagger_order"])
 
