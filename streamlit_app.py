@@ -3779,7 +3779,7 @@ class QualityReportDashboard:
 
         return unique_prbs
     
-    def create_prb_insights(self, data: Dict[str, Any]):
+    def create_prb_insights(self, data: Dict[str, Any], key_suffix: str = ""):
         """Create enhanced PRB insights panel with AI-generated narratives."""
         prbs = data.get('prbs', [])
         if not prbs:
@@ -3926,28 +3926,58 @@ class QualityReportDashboard:
                     
                     # Full description and technical details with comprehensive data
                     if prb.get('description'):
-                        st.text_area(f"Description - {prb.get('id')}", prb.get('description'), height=100, key=f"desc_{prb.get('id')}")
+                        st.text_area(
+                            f"Description - {prb.get('id')}",
+                            prb.get('description'),
+                            height=100,
+                            key=f"desc_{prb.get('id')}{key_suffix}",
+                        )
                     
                     # Comprehensive technical details 
                     what_happened = prb.get('what_happened', '') or getattr(prb, 'what_happened', '')
                     if what_happened:
-                        st.text_area(f"What Happened (Complete) - {prb.get('id')}", what_happened, height=120, key=f"what_{prb.get('id')}")
+                        st.text_area(
+                            f"What Happened (Complete) - {prb.get('id')}",
+                            what_happened,
+                            height=120,
+                            key=f"what_{prb.get('id')}{key_suffix}",
+                        )
                     
                     proximate_cause = prb.get('proximate_cause', '') or getattr(prb, 'proximate_cause', '')
                     if proximate_cause:
-                        st.text_area(f"Root Cause (Complete) - {prb.get('id')}", proximate_cause, height=120, key=f"cause_{prb.get('id')}")
+                        st.text_area(
+                            f"Root Cause (Complete) - {prb.get('id')}",
+                            proximate_cause,
+                            height=120,
+                            key=f"cause_{prb.get('id')}{key_suffix}",
+                        )
                     
                     how_resolved = prb.get('how_resolved', '') or getattr(prb, 'how_resolved', '')
                     if how_resolved:
-                        st.text_area(f"Resolution (Complete) - {prb.get('id')}", how_resolved, height=120, key=f"resolution_{prb.get('id')}")
+                        st.text_area(
+                            f"Resolution (Complete) - {prb.get('id')}",
+                            how_resolved,
+                            height=120,
+                            key=f"resolution_{prb.get('id')}{key_suffix}",
+                        )
                     
                     next_steps = prb.get('next_steps', '') or getattr(prb, 'next_steps', '')
                     if next_steps:
-                        st.text_area(f"Next Steps (Complete) - {prb.get('id')}", next_steps, height=120, key=f"next_{prb.get('id')}")
+                        st.text_area(
+                            f"Next Steps (Complete) - {prb.get('id')}",
+                            next_steps,
+                            height=120,
+                            key=f"next_{prb.get('id')}{key_suffix}",
+                        )
                     
                     user_experience = prb.get('user_experience', '') or getattr(prb, 'user_experience', '')
                     if user_experience:
-                        st.text_area(f"User Experience - {prb.get('id')}", user_experience, height=100, key=f"user_{prb.get('id')}")
+                        st.text_area(
+                            f"User Experience - {prb.get('id')}",
+                            user_experience,
+                            height=100,
+                            key=f"user_{prb.get('id')}{key_suffix}",
+                        )
                     
                     st.markdown("---")
         
@@ -4637,7 +4667,7 @@ def render_component_development_metrics(component: str, display_name: Optional[
         with col1:
             dashboard.create_prb_analysis(data, f"_{component}")
         with col2:
-            dashboard.create_prb_insights(data)
+            dashboard.create_prb_insights(data, key_suffix=f"_{component}")
         
         # Bug Analysis
         st.markdown('<h3 id="production-bug-analysis">🐛 Production Bug Analysis</h3>', unsafe_allow_html=True)
