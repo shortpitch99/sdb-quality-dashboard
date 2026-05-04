@@ -1,0 +1,317 @@
+{
+  "risks": [
+    {
+      "feature": "Read your own writes(RYOW)",
+      "status": "Yellow",
+      "priority": "Medium",
+      "description": "Performance enhancement feature for Write Scaling. TLE dark launch mode has been rolled out to multiple cells. However, when rolling out the live mode, we ran into an issue on a couple of cells including the UHG sandbox cell (USA804s) where it seems to run into a possible data corruption issue. However, the guardrails that we implemented in the LSM layer helped detect and prevent those corruptions from persisting. Folowing this, we disabled the rollout of the live mode for RYOW functionality and it has been disabled since mid August when the problem was detected.",
+      "last_updated": "2024-01-15"
+    },
+    {
+      "feature": "Allocated Extent Pool",
+      "status": "Green",
+      "priority": "Medium",
+      "description": "Allocated Extent Pools have been running stably in production for 3 months since enabling on usa16s and usa18s on 08/15. This feature continues to deliver on its primary goal of reducing storage catalog writes while maintaining a minimal and stable storage footprint. This post provides a detailed analysis of the feature's behavior and stability over the past 30 days.",
+      "last_updated": "2025-11-21"
+    }
+  ],
+  "prbs": [
+    {
+      "id": "PRB-22320384",
+      "title": "PRB-22320384: Service disruption (general)",
+      "priority": "P2-Medium",
+      "status": "Waiting 3rd Party",
+      "description": "Team: CRM Database Sustaining Engineering | Impact: Service disruption (general)",
+      "created_date": "2026-05-02",
+      "what_happened": "[THIS PRB IS MANAGED BY G2G. Updates should be made in Google doc]\n*Conditions:* On May 2, 2026, POD276's database cluster5_0 experienced intermittent accessibility issues due to 'maximum number of processes exceeded' errors, impacting",
+      "customer_experience": "User Experience:\n\nUnable to access Business Manager (BM) & Storefront for 3 customers:\nBJWT\nBDQM\nBLBG\n\nQ: Was this an external customer impacting event?\nA:\n\nQ: User retry may have succeeded?\nA:\n\nImpact Quantification:\n\nQ: What # or % of users/tenants/req...",
+      "proximate_cause": "Initial investigated identified \"max no process exceeded\" error. Later there were issues identified with all the cluster nodes.",
+      "how_resolved": "Disable CRS (Content Replication Service) followed by reboot of nodes in sequence.\n- Node 3 -> Node 1 -> Node 2",
+      "team": "CRM Database Sustaining Engineering",
+      "customer_impact": "Service disruption (general)"
+    }
+  ],
+  "bugs": [
+    {
+      "work_id": "W-22049411",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][sdb2h1] [Ryi-GVqXGULjDMV3dD_qNQ:00000050] Req:LedgerOpenRecoverReq StoreId:e3...",
+      "status": "Triaged",
+      "build_version": "",
+      "created_date": "2026-05-04",
+      "issue_type": "Bug"
+    }
+  ],
+  "critical_issues": [],
+  "deployments": [],
+  "deployment_summary": "Weekly Deployment Summary - Week of September 15, 2025\n\nThis week's deployment activities proceeded smoothly across all stagger groups. \nSDB version 258.11 was successfully deployed to sandbox environments (SB0-SB2) \nwith no major issues reported.\n\nKey highlights:\n- Version 258.11 rolled out to 150 sandbox cells\n- Zero failed deployments\n- Average deployment time: 12 minutes\n- All post-deployment validations passed\n\nNext week: Planning production rollout to P0-P3 stages pending final validation results.",
+  "coverage": [],
+  "new_code_coverage": [
+    {
+      "component": "SDB Engine",
+      "new_code_coverage": 77.6,
+      "overall_coverage": 82.3,
+      "new_code_line_coverage": 80.0,
+      "overall_line_coverage": 84.1,
+      "lines_to_cover": 3159,
+      "uncovered_lines": 633,
+      "overall_lines_to_cover": 47458,
+      "overall_uncovered_lines": 7549
+    }
+  ],
+  "ci_issues": [],
+  "leftshift_issues": [],
+  "abs_issues": [],
+  "security_issues": [
+    {
+      "work_id": "W-21880949",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.apache.zookeeper:zookeeper:3.8.3 Vulnerability Detected",
+      "status": "Waiting",
+      "build_version": "Off Core Build",
+      "created_date": "2026-05-04",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21572522",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.apache.zookeeper:zookeeper:3.8.3 Vulnerability Detected",
+      "status": "Waiting",
+      "build_version": "Off Core Build",
+      "created_date": "2026-05-04",
+      "issue_type": "security"
+    }
+  ],
+  "all_bugs": [],
+  "prb_bugs": [],
+  "system_availability": {
+    "period": "",
+    "slo": 99.9,
+    "achieved": 99.99,
+    "incidents": []
+  },
+  "kpis": {
+    "all_time_bug_backlog_total": 0,
+    "all_time_bug_backlog_p0": 0,
+    "all_time_bug_backlog_p1": 0,
+    "all_time_bug_backlog_p0_p1": 0,
+    "prb_backlog_total": 0,
+    "prb_backlog_p0_p1": 0
+  },
+  "git_stats": {
+    "reporting_period_start": "2026-04-27",
+    "reporting_period_end": "2026-05-03",
+    "total_commits": 0,
+    "lines_added": 0,
+    "lines_deleted": 0,
+    "lines_changed": 0,
+    "files_changed": 0,
+    "authors": [],
+    "most_changed_files": [],
+    "commit_frequency": 0.0,
+    "code_churn_risk": "Low",
+    "repository_path": "/Users/rchowdhuri/bookkeeper"
+  },
+  "generated_at": "2026-05-04T06:57:29.031459",
+  "report_component": "Store",
+  "coverage_summary": {
+    "new_code": {
+      "coverage": 77.6,
+      "line_coverage": 80.0,
+      "condition_coverage": 66.3,
+      "lines_to_cover": 3159,
+      "uncovered_lines": 633,
+      "conditions_to_cover": 644,
+      "uncovered_conditions": 217
+    },
+    "overall": {
+      "coverage": 82.3,
+      "line_coverage": 84.1,
+      "condition_coverage": 75.2,
+      "lines_to_cover": 47458,
+      "uncovered_lines": 7549,
+      "conditions_to_cover": 11922,
+      "uncovered_conditions": 2953
+    }
+  },
+  "alltime_backlog": [
+    {
+      "work_id": "Bug_1",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_2",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_3",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_4",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_5",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_6",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_7",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_8",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_9",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_10",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_11",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_12",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_13",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_14",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_15",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    }
+  ],
+  "prb_backlog": [],
+  "metadata": {
+    "generated_at": "2026-05-04T06:57:42.386706",
+    "report_period_start": "2026-04-27",
+    "report_period_end": "2026-05-03",
+    "report_period_display": "April 27-03, 2026",
+    "report_component": "Store",
+    "git_repository": "/Users/rchowdhuri/bookkeeper",
+    "generator_version": "2.0",
+    "data_sources": {
+      "risks": 2,
+      "prbs": 1,
+      "bugs": 1,
+      "deployments": 0,
+      "has_llm_content": true,
+      "ci_total": 0,
+      "ci_p0_p1": 0,
+      "security_total": 2,
+      "security_p0_p1": 0,
+      "leftshift_total": 0,
+      "leftshift_p0_p1": 0,
+      "coverage_overall": 82.3,
+      "coverage_overall_line": 84.1,
+      "coverage_new_code": 77.6,
+      "coverage_new_code_line": 80.0
+    }
+  },
+  "llm_content": {
+    "trend_analysis": "## Quality Trends Analysis\n\n### Overall System Health: **GOOD** \u2705\n\n**Key Observations:**\n\n\u2022 **Low Defect Density**: Only 1 PRB and 1 bug indicates excellent code quality and robust development processes\n\u2022 **Proactive Risk Management**: 2 identified risks suggest good visibility into potential issues before they impact production\n\u2022 **Strong Security Posture**: Zero security issues demonstrates effective security practices and controls\n\n### Trend Indicators:\n\n**Positive Signals:**\n- Minimal production issues (1 PRB)\n- Low bug count suggests effective testing coverage\n- Clean security profile indicates mature security practices\n\n**Areas for Monitoring:**\n- Track resolution time for the existing PRB and bug\n- Monitor if the 2 risks materialize into actual issues\n- Ensure risk mitigation plans are in place\n\n### Recommendations:\n\n1. **Maintain Current Quality Standards** - Continue existing development and testing practices\n2. **Risk Mitigation Focus** - Prioritize addressing the 2 identified risks to prevent future issues\n3. **Trend Monitoring** - Establish baseline metrics to track quality trajectory over time\n\n**Overall Assessment**: The system demonstrates strong quality health with minimal active issues and proactive risk identification. This profile suggests mature engineering processes and effective quality controls.",
+    "risk_analysis": "### Deployment Risk Assessment - SDB Version 258.11\n\n#### Overall Risk Level: **LOW-MEDIUM**\n\nBased on the sandbox deployment data, the current deployment shows positive stability indicators, though some areas require attention before production rollout.\n\n#### Deployment Stability Analysis\n\n##### Positive Indicators\n- **Zero Failed Deployments**: 100% success rate across 150 sandbox cells indicates robust deployment process\n- **Consistent Timing**: 12-minute average deployment time suggests predictable and stable deployment pipeline\n- **Validation Success**: All post-deployment validations passed, indicating functional integrity maintained\n- **Broad Coverage**: Testing across SB0-SB2 environments provides good coverage of deployment scenarios\n\n##### Areas of Concern\n- **Limited Environment Scope**: Testing only in sandbox environments may not reveal production-specific issues\n- **Missing Performance Metrics**: No data on resource utilization, response times, or throughput impact\n- **Rollback Preparedness**: No mention of rollback testing or procedures validation\n\n#### Code Change Impact Assessment\n\n##### Risk Factors Requiring Investigation\n- **Change Scope Unknown**: No details provided on the nature or extent of code changes in version 258.11\n- **Dependency Analysis**: Missing information about external system dependencies or integration points\n- **Database Schema Changes**: No indication whether database migrations or schema updates are included\n- **Configuration Changes**: Unclear if environment-specific configurations require updates\n\n#### Pre-Production Recommendations\n\n##### Critical Actions Before P0-P3 Rollout\n1. **Conduct Load Testing**: Validate performance under production-like traffic volumes\n2. **Security Scan**: Perform comprehensive security assessment of new code changes\n3. **Rollback Validation**: Test rollback procedures in sandbox environment\n4. **Monitoring Setup**: Ensure enhanced monitoring is in place for production deployment\n\n##### Deployment Strategy Recommendations\n- **Phased Rollout**: Consider deploying to P0 first with extended monitoring period\n- **Canary Deployment**: Implement gradual traffic shifting to minimize blast radius\n- **Enhanced Monitoring**: Deploy with increased logging and alerting during initial hours\n- **Communication Plan**: Establish clear escalation procedures and stakeholder notifications\n\n#### Final Assessment\n\nThe sandbox deployment results are encouraging, but the lack of detailed change information and performance data elevates the risk profile. Recommend proceeding with production deployment only after addressing the identified gaps and implementing the suggested risk mitigation strategies.\n\n**Recommended Timeline**: Delay production rollout by 2-3 days to complete additional validation activities.",
+    "prb_narratives": {
+      "PRB-22320384": "**Problem Type:** Database cluster experienced intermittent accessibility issues due to maximum process limit exceeded errors affecting multiple nodes.\n\n**Root Cause:** The cluster's process limit was exceeded, initially triggering max process errors that subsequently cascaded to cause issues across all cluster nodes.\n\n**Resolution:** Content Replication Service (CRS) was disabled followed by sequential reboot of cluster nodes in order (Node 3, Node 1, Node 2).\n\n**Next Steps:** Monitor process utilization patterns and review CRS configuration to prevent future process limit violations."
+    },
+    "prb_analyses": {
+      "PRB-22320384": "# Technical Analysis Report: PRB-22320384\n\n## **Technical Impact**\n\n### **Primary Impact Assessment**\n- **Service Availability**: Complete intermittent service disruption affecting POD276's database cluster5_0\n- **Database Accessibility**: Critical database connectivity failures preventing normal operations\n- **System Resource Exhaustion**: Process limit threshold breach causing cascading failures\n- **Multi-Node Failure**: Progressive degradation affecting all cluster nodes, indicating systemic issues\n- **Customer-Facing Impact**: General service disruption with potential data access delays and transaction failures\n\n### **Secondary Impact Considerations**\n- **Data Integrity Risk**: Potential for incomplete transactions during intermittent failures\n- **Performance Degradation**: Reduced throughput during recovery phases\n- **Operational Overhead**: Manual intervention required for resolution\n- **Business Continuity**: Service reliability concerns for dependent applications\n\n## **Root Cause Analysis**\n\n### **Primary Root Cause**\n**Process Resource Exhaustion**: The \"maximum number of processes exceeded\" error indicates the database cluster reached its configured process limit, likely due to:\n\n1. **Connection Pool Saturation**: Excessive concurrent connections not being properly released\n2. **Process Leak**: Background processes accumulating without proper cleanup\n3. **Resource Contention**: Competing processes for limited system resources\n\n### **Contributing Factors**\n- **CRS (Content Replication Service) Malfunction**: The need to disable CRS suggests it was contributing to process proliferation\n- **Cluster-Wide Propagation**: Issues spreading across all nodes indicates either:\n  - Shared resource contention\n  - Cascading failure from primary node\n  - Configuration synchronization problems\n- **Inadequate Resource Monitoring**: Lack of proactive alerting before threshold breach\n\n### **Technical Analysis**\nThe progression from single-node process exhaustion to cluster-wide issues suggests a distributed system failure where the initial resource constraint triggered protective mechanisms that inadvertently affected cluster stability.\n\n## **Resolution Applied**\n\n### **Immediate Resolution Strategy**\n**Sequential Node Recovery Approach**:\n1. **CRS Disablement**: Eliminated the suspected contributing service\n2. **Controlled Node Restart**: Strategic reboot sequence (Node 3 \u2192 Node 1 \u2192 Node 2)\n3. **Resource Reset**: Process tables cleared and connection pools reinitialized\n\n### **Resolution Methodology Analysis**\n- **Risk Mitigation**: Sequential restart minimized cluster downtime\n- **Service Isolation**: CRS disablement prevented recurrence during recovery\n- **Load Distribution**: Restart order likely considered node roles and dependencies\n\n### **Effectiveness Assessment**\nThe resolution successfully restored service availability, though the \"Waiting 3rd Party\" status suggests ongoing vendor involvement for deeper analysis or permanent fixes.\n\n## **Preventive Measures**\n\n### **Immediate Prevention Strategies**\n\n1. **Enhanced Monitoring Implementation**\n   - Deploy process count monitoring with threshold alerts at 80% capacity\n   - Implement connection pool utilization dashboards\n   - Configure automated alerts for resource exhaustion patterns\n\n2. **Resource Management Optimization**\n   - Review and optimize database connection pool configurations\n   - Implement connection timeout and cleanup policies\n   - Establish process lifecycle management procedures\n\n3. **CRS Service Analysis**\n   - Conduct thorough CRS performance audit\n   - Implement CRS resource consumption monitoring\n   - Develop CRS failover and recovery procedures\n\n### **Long-term Prevention Framework**\n\n1. **Capacity Planning Enhancement**\n   - Establish baseline process utilization metrics\n   - Implement predictive scaling based on usage patterns\n   - Regular capacity reviews and threshold adjustments\n\n2. **Automated Recovery Mechanisms**\n   - Develop automated process cleanup scripts\n   - Implement self-healing cluster management\n   - Create automated failover procedures for resource exhaustion\n\n3. **Operational Excellence**\n   - Establish regular cluster health assessments\n   - Implement chaos engineering practices for resilience testing\n   - Develop comprehensive runbooks for similar scenarios\n\n### **Vendor Collaboration**\n- Work with 3rd party vendor to identify CRS optimization opportunities\n- Establish SLA requirements for vendor response to critical issues\n- Implement joint monitoring and escalation procedures\n\n### **Risk Mitigation Priorities**\n1. **High Priority**: Process monitoring and alerting implementation\n2. **Medium Priority**: CRS service optimization and monitoring\n3. **Long-term**: Automated recovery and self-healing capabilities\n\nThis comprehensive approach addresses both the immediate technical causes and establishes a framework for preventing similar incidents while"
+    }
+  }
+}

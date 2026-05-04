@@ -89,7 +89,6 @@ fi
 
 # Git clone used for code-churn in the report (must match quality_report_generator.resolve_git_repo_path)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-GIT_REPO_PATH="$(cd "$SCRIPT_DIR" && python3 -c "from quality_report_generator import resolve_git_repo_path, sys; print(resolve_git_repo_path(sys.argv[1]))" "$COMPONENT")"
 
 echo "🚀 Starting SDB Quality Report Generation..."
 echo "📅 Week: $WEEK"
@@ -113,6 +112,17 @@ fi
 # Activate virtual environment
 echo "📦 Activating virtual environment..."
 source venv/bin/activate
+
+# Resolve code-churn repo path using venv python (quality_report_generator imports requests/aiohttp).
+if [ -x "venv/bin/python" ]; then
+  PY_FOR_RESOLVE="venv/bin/python"
+else
+  PY_FOR_RESOLVE="python3"
+fi
+GIT_REPO_PATH="$(cd "$SCRIPT_DIR" && "$PY_FOR_RESOLVE" -c "from quality_report_generator import resolve_git_repo_path, sys; print(resolve_git_repo_path(sys.argv[1]))" "$COMPONENT" 2>/dev/null || true)"
+if [ -z "$GIT_REPO_PATH" ]; then
+  echo "⚠️  Could not resolve code-churn repo path from quality_report_generator; using empty path."
+fi
 
 # Check if all required data files exist
 echo "🔍 Checking required data files..."
