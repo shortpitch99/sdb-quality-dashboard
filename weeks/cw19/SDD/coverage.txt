@@ -1,0 +1,44 @@
+On new code
+
+Coverage
+90.3%
+
+Lines to Cover
+13,637
+
+Uncovered Lines
+894
+
+Line Coverage
+93.4%
+
+Conditions to Cover
+5,323
+
+Uncovered Conditions
+945
+
+Condition Coverage
+82.2%
+Overall
+
+Coverage
+87.0%
+
+Lines to Cover
+53,801
+
+Uncovered Lines
+5,920
+
+Line Coverage
+89.0%
+
+Conditions to Cover
+15,403
+
+Uncovered Conditions
+3,084
+
+Condition Coverage
+80.0%

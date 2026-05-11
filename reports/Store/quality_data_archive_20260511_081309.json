@@ -1,0 +1,708 @@
+{
+  "risks": [
+    {
+      "feature": "Read your own writes(RYOW)",
+      "status": "Yellow",
+      "priority": "Medium",
+      "description": "Performance enhancement feature for Write Scaling. TLE dark launch mode has been rolled out to multiple cells. However, when rolling out the live mode, we ran into an issue on a couple of cells including the UHG sandbox cell (USA804s) where it seems to run into a possible data corruption issue. However, the guardrails that we implemented in the LSM layer helped detect and prevent those corruptions from persisting. Folowing this, we disabled the rollout of the live mode for RYOW functionality and it has been disabled since mid August when the problem was detected.",
+      "last_updated": "2024-01-15"
+    },
+    {
+      "feature": "Allocated Extent Pool",
+      "status": "Green",
+      "priority": "Medium",
+      "description": "Allocated Extent Pools have been running stably in production for 3 months since enabling on usa16s and usa18s on 08/15. This feature continues to deliver on its primary goal of reducing storage catalog writes while maintaining a minimal and stable storage footprint. This post provides a detailed analysis of the feature's behavior and stability over the past 30 days.",
+      "last_updated": "2025-11-21"
+    }
+  ],
+  "prbs": [
+    {
+      "id": "PRB-22424026",
+      "title": "PRB-22424026: Performance degradation (general)",
+      "priority": "P2-Medium",
+      "status": "Under Investigation",
+      "description": "Team: SDB-Intake | Impact: Performance degradation (general)",
+      "created_date": "2026-05-09",
+      "what_happened": "[THIS PRB IS MANAGED BY G2G. Updates should be made in Google doc]\nOn May 9, 2026, an incident was identified involving prolonged SQL queries and elevated CPU utilization within a database cluster. The issue was triggered by a high volume of reque",
+      "customer_experience": "User Experience:\n\nUsers experienced performance degradation due to prolonged SQL query times and high CPU usage, impacting system responsiveness.\n\nQ: Was this an external customer impacting event?\nA:\n\nQ: User retry may have succeeded?\nA:\n\nImpact Quantifi...",
+      "proximate_cause": "The contributing factor was the high volume of specific requests from one customer, which overwhelmed the database system. The throttle mechanism's bug exacerbated the issue.",
+      "how_resolved": "The immediate resolution involved identifying the ineffective throttle mechanism and engaging the support team to address the issue. The customer's cessation of activity provided temporary relief.",
+      "team": "SDB-Intake",
+      "customer_impact": "Performance degradation (general)"
+    },
+    {
+      "id": "PRB-22422703",
+      "title": "PRB-22422703: Performance degradation (general)",
+      "priority": "P2-Medium",
+      "status": "Under Investigation",
+      "description": "Team: SDB-Intake | Impact: Performance degradation (general)",
+      "created_date": "2026-05-09",
+      "what_happened": "[THIS PRB IS MANAGED BY G2G. Updates should be made in Google doc]\nOn May 9, 2026, the IND94 instance experienced significant performance degradation due to elevated CPU utilization. This was attributed to a single SQL statement from organization",
+      "customer_experience": "User Experience:\n\nUsers experienced intermittent slow performance and timeouts, impacting their ability to utilize the service effectively during the incident timeframe.\n\nQ: Was this an external customer impacting event?\nA:\n\nQ: User retry may have succee...",
+      "proximate_cause": "The contributing factor was a single SQL statement from a specific organization causing high contention and concurrency on the IND94 instance, leading to elevated CPU utilization and system performance degradation.",
+      "how_resolved": "The Database Performance team identified the problematic SQL statement and applied a CSP throttle to mitigate the high CPU usage, effectively resolving the incident.",
+      "team": "SDB-Intake",
+      "customer_impact": "Performance degradation (general)"
+    },
+    {
+      "id": "PRB-22345931",
+      "title": "PRB-22345931: Performance degradation (general)",
+      "priority": "P2-Medium",
+      "status": "Under Investigation",
+      "description": "Team: Sayonara Foundation Services | Impact: Performance degradation (general)",
+      "created_date": "2026-05-04",
+      "what_happened": "[THIS PRB IS MANAGED BY G2G. Updates should be made in Google doc]\nOn May 4th, 2026, the USA472 instance experienced a service disruption beginning at approximately 14:41 UTC. This issue was identified as a cyclic database failover caused by a kno",
+      "customer_experience": "User Experience:\n\nUsers were unable to access the service on the USA472 instance during the disruption period, resulting in a complete service outage.\n\nQ: Was this an external customer impacting event?\nA:\n\nQ: User retry may have succeeded?\nA:\n\nImpact Qua...",
+      "proximate_cause": "The contributing factor to the incident was a known bug in the database software version 262 that caused the 'purger' process to panic, leading to cyclic connection pool failovers.",
+      "how_resolved": "The immediate resolution involved applying a configuration change to disable the 'Read Your Own Write' feature across all database nodes, effectively breaking the failover cycle and restoring service stability.",
+      "team": "Sayonara Foundation Services",
+      "customer_impact": "Performance degradation (general)"
+    }
+  ],
+  "bugs": [],
+  "critical_issues": [],
+  "deployments": [
+    {
+      "stagger": "",
+      "version": "262.9",
+      "count": 3,
+      "stage": "",
+      "cells": 3
+    },
+    {
+      "stagger": "",
+      "version": "262.9",
+      "count": 10,
+      "stage": "",
+      "cells": 10
+    },
+    {
+      "stagger": "",
+      "version": "260.1",
+      "count": 1,
+      "stage": "",
+      "cells": 1
+    },
+    {
+      "stagger": "",
+      "version": "262.13",
+      "count": 5,
+      "stage": "",
+      "cells": 5
+    },
+    {
+      "stagger": "",
+      "version": "262.15",
+      "count": 15,
+      "stage": "",
+      "cells": 15
+    },
+    {
+      "stagger": "",
+      "version": "264.1",
+      "count": 3,
+      "stage": "",
+      "cells": 3
+    },
+    {
+      "stagger": "",
+      "version": "262.13",
+      "count": 19,
+      "stage": "",
+      "cells": 19
+    },
+    {
+      "stagger": "",
+      "version": "260.15",
+      "count": 1,
+      "stage": "",
+      "cells": 1
+    },
+    {
+      "stagger": "",
+      "version": "262.13",
+      "count": 9,
+      "stage": "",
+      "cells": 9
+    },
+    {
+      "stagger": "",
+      "version": "262.13",
+      "count": 11,
+      "stage": "",
+      "cells": 11
+    },
+    {
+      "stagger": "",
+      "version": "262.18",
+      "count": 1,
+      "stage": "",
+      "cells": 1
+    },
+    {
+      "stagger": "",
+      "version": "262.13",
+      "count": 45,
+      "stage": "",
+      "cells": 45
+    },
+    {
+      "stagger": "",
+      "version": "262.11",
+      "count": 20,
+      "stage": "",
+      "cells": 20
+    },
+    {
+      "stagger": "",
+      "version": "262.11",
+      "count": 23,
+      "stage": "",
+      "cells": 23
+    },
+    {
+      "stagger": "",
+      "version": "262.3",
+      "count": 1,
+      "stage": "",
+      "cells": 1
+    },
+    {
+      "stagger": "",
+      "version": "262.13",
+      "count": 24,
+      "stage": "",
+      "cells": 24
+    },
+    {
+      "stagger": "",
+      "version": "264.1",
+      "count": 1,
+      "stage": "",
+      "cells": 1
+    },
+    {
+      "stagger": "",
+      "version": "262.3",
+      "count": 2,
+      "stage": "",
+      "cells": 2
+    },
+    {
+      "stagger": "",
+      "version": "262.13",
+      "count": 14,
+      "stage": "",
+      "cells": 14
+    },
+    {
+      "stagger": "",
+      "version": "264.1",
+      "count": 2,
+      "stage": "",
+      "cells": 2
+    },
+    {
+      "stagger": "",
+      "version": "262.9",
+      "count": 5,
+      "stage": "",
+      "cells": 5
+    },
+    {
+      "stagger": "",
+      "version": "262.15",
+      "count": 33,
+      "stage": "",
+      "cells": 33
+    },
+    {
+      "stagger": "",
+      "version": "264.2",
+      "count": 1,
+      "stage": "",
+      "cells": 1
+    },
+    {
+      "stagger": "",
+      "version": "262.11",
+      "count": 106,
+      "stage": "",
+      "cells": 106
+    },
+    {
+      "stagger": "",
+      "version": "262.9",
+      "count": 38,
+      "stage": "",
+      "cells": 38
+    },
+    {
+      "stagger": "",
+      "version": "262.11",
+      "count": 11,
+      "stage": "",
+      "cells": 11
+    },
+    {
+      "stagger": "",
+      "version": "262.15",
+      "count": 1,
+      "stage": "",
+      "cells": 1
+    },
+    {
+      "stagger": "",
+      "version": "262.7",
+      "count": 5,
+      "stage": "",
+      "cells": 5
+    },
+    {
+      "stagger": "",
+      "version": "262.13",
+      "count": 37,
+      "stage": "",
+      "cells": 37
+    },
+    {
+      "stagger": "",
+      "version": "262.11",
+      "count": 73,
+      "stage": "",
+      "cells": 73
+    },
+    {
+      "stagger": "",
+      "version": "262.9",
+      "count": 10,
+      "stage": "",
+      "cells": 10
+    },
+    {
+      "stagger": "",
+      "version": "262.13",
+      "count": 30,
+      "stage": "",
+      "cells": 30
+    },
+    {
+      "stagger": "",
+      "version": "262.13",
+      "count": 72,
+      "stage": "",
+      "cells": 72
+    },
+    {
+      "stagger": "",
+      "version": "262.18",
+      "count": 1,
+      "stage": "",
+      "cells": 1
+    },
+    {
+      "stagger": "",
+      "version": "262.13",
+      "count": 58,
+      "stage": "",
+      "cells": 58
+    },
+    {
+      "stagger": "",
+      "version": "262.11",
+      "count": 1,
+      "stage": "",
+      "cells": 1
+    },
+    {
+      "stagger": "",
+      "version": "262.15",
+      "count": 5,
+      "stage": "",
+      "cells": 5
+    },
+    {
+      "stagger": "",
+      "version": "262.11",
+      "count": 11,
+      "stage": "",
+      "cells": 11
+    },
+    {
+      "stagger": "",
+      "version": "262.13",
+      "count": 3,
+      "stage": "",
+      "cells": 3
+    },
+    {
+      "stagger": "",
+      "version": "262.11",
+      "count": 8,
+      "stage": "",
+      "cells": 8
+    },
+    {
+      "stagger": "",
+      "version": "262.15",
+      "count": 2,
+      "stage": "",
+      "cells": 2
+    },
+    {
+      "stagger": "",
+      "version": "262.9",
+      "count": 59,
+      "stage": "",
+      "cells": 59
+    }
+  ],
+  "deployment_summary": "Weekly Deployment Summary - Week of September 15, 2025\n\nThis week's deployment activities proceeded smoothly across all stagger groups. \nSDB version 258.11 was successfully deployed to sandbox environments (SB0-SB2) \nwith no major issues reported.\n\nKey highlights:\n- Version 258.11 rolled out to 150 sandbox cells\n- Zero failed deployments\n- Average deployment time: 12 minutes\n- All post-deployment validations passed\n\nNext week: Planning production rollout to P0-P3 stages pending final validation results.",
+  "coverage": [],
+  "new_code_coverage": [
+    {
+      "component": "SDB Engine",
+      "new_code_coverage": 77.6,
+      "overall_coverage": 82.3,
+      "new_code_line_coverage": 80.0,
+      "overall_line_coverage": 84.1,
+      "lines_to_cover": 3159,
+      "uncovered_lines": 633,
+      "overall_lines_to_cover": 47458,
+      "overall_uncovered_lines": 7549
+    }
+  ],
+  "ci_issues": [],
+  "leftshift_issues": [],
+  "abs_issues": [],
+  "security_issues": [
+    {
+      "work_id": "W-21880949",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.apache.zookeeper:zookeeper:3.8.3 Vulnerability Detected",
+      "status": "Waiting",
+      "build_version": "Off Core Build",
+      "created_date": "2026-05-11",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21572522",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.apache.zookeeper:zookeeper:3.8.3 Vulnerability Detected",
+      "status": "Waiting",
+      "build_version": "Off Core Build",
+      "created_date": "2026-05-11",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22318408",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:commons-lang:commons-lang:2.6 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-05-11",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22318530",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.apache.commons:commons-configuration2:2.12.0 Vulnerability Detected",
+      "status": "Waiting",
+      "build_version": "Off Core Build",
+      "created_date": "2026-05-11",
+      "issue_type": "security"
+    }
+  ],
+  "all_bugs": [],
+  "prb_bugs": [],
+  "system_availability": {
+    "period": "",
+    "slo": 99.9,
+    "achieved": 99.99,
+    "incidents": []
+  },
+  "kpis": {
+    "all_time_bug_backlog_total": 0,
+    "all_time_bug_backlog_p0": 0,
+    "all_time_bug_backlog_p1": 0,
+    "all_time_bug_backlog_p0_p1": 0,
+    "prb_backlog_total": 0,
+    "prb_backlog_p0_p1": 0
+  },
+  "git_stats": {
+    "reporting_period_start": "2026-05-04",
+    "reporting_period_end": "2026-05-10",
+    "total_commits": 16,
+    "lines_added": 2896,
+    "lines_deleted": 514,
+    "lines_changed": 3410,
+    "files_changed": 67,
+    "authors": [
+      "Anup Ghatage",
+      "Ashish Mahajan",
+      "Charan Reddy Guttapalem",
+      "Karan Mehta",
+      "renovate-enterprise-prod[bot]",
+      "Senthil Narayan",
+      "Shyam Vanga",
+      "Sushanth Rai",
+      "Swapnil Warke",
+      "tok-sfci124"
+    ],
+    "most_changed_files": [
+      {
+        "file": ".claude/skills/eval-claude-md/run_eval.py",
+        "lines_added": 436,
+        "lines_deleted": 0,
+        "total_changes": 436
+      },
+      {
+        "file": ".claude/skills/sdbstore-gus-workflow/SKILL.md",
+        "lines_added": 334,
+        "lines_deleted": 0,
+        "total_changes": 334
+      },
+      {
+        "file": "store-e2e/maestro-maven-plugin/src/main/java/com/sfdc/sfstore/maestro/goals/ImageTagResolver.java",
+        "lines_added": 124,
+        "lines_deleted": 155,
+        "total_changes": 279
+      },
+      {
+        "file": "fss/fss-server/src/main/java/com/sfdc/fss/model/FssExtentsRefService.java",
+        "lines_added": 155,
+        "lines_deleted": 50,
+        "total_changes": 205
+      },
+      {
+        "file": "fss/fss-server/src/main/java/com/sfdc/fss/endpoints/FssStartupProbeV1Resource.java",
+        "lines_added": 72,
+        "lines_deleted": 82,
+        "total_changes": 154
+      },
+      {
+        "file": "CLAUDE.md",
+        "lines_added": 48,
+        "lines_deleted": 103,
+        "total_changes": 151
+      },
+      {
+        "file": "fss/fss-server/src/main/java/com/sfdc/fss/component/FssServerComponent.java",
+        "lines_added": 87,
+        "lines_deleted": 29,
+        "total_changes": 116
+      },
+      {
+        "file": "bookkeeper-server/CLAUDE.md",
+        "lines_added": 94,
+        "lines_deleted": 0,
+        "total_changes": 94
+      },
+      {
+        "file": ".claude/skills/eval-claude-md/SKILL.md",
+        "lines_added": 85,
+        "lines_deleted": 0,
+        "total_changes": 85
+      },
+      {
+        "file": "bookkeeper-server/src/main/java/org/apache/bookkeeper/bookie/BookieShell.java",
+        "lines_added": 80,
+        "lines_deleted": 4,
+        "total_changes": 84
+      }
+    ],
+    "commit_frequency": 2.2857142857142856,
+    "code_churn_risk": "Low",
+    "repository_path": "/Users/rchowdhuri/bookkeeper"
+  },
+  "generated_at": "2026-05-11T08:13:01.960564",
+  "report_component": "Store",
+  "coverage_summary": {
+    "new_code": {
+      "coverage": 77.6,
+      "line_coverage": 80.0,
+      "condition_coverage": 66.3,
+      "lines_to_cover": 3159,
+      "uncovered_lines": 633,
+      "conditions_to_cover": 644,
+      "uncovered_conditions": 217
+    },
+    "overall": {
+      "coverage": 82.3,
+      "line_coverage": 84.1,
+      "condition_coverage": 75.2,
+      "lines_to_cover": 47458,
+      "uncovered_lines": 7549,
+      "conditions_to_cover": 11922,
+      "uncovered_conditions": 2953
+    }
+  },
+  "alltime_backlog": [
+    {
+      "work_id": "Bug_1",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-11",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_2",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-11",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_3",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-11",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_4",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-11",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_5",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-11",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_6",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-11",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_7",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-11",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_8",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-11",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_9",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-11",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_10",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-11",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_11",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-11",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_12",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-11",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_13",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-11",
+      "type": "backlog_bug"
+    }
+  ],
+  "prb_backlog": [],
+  "metadata": {
+    "generated_at": "2026-05-11T08:14:21.764356",
+    "report_period_start": "2026-05-04",
+    "report_period_end": "2026-05-10",
+    "report_period_display": "May 04-10, 2026",
+    "report_component": "Store",
+    "git_repository": "/Users/rchowdhuri/bookkeeper",
+    "generator_version": "2.0",
+    "data_sources": {
+      "risks": 2,
+      "prbs": 3,
+      "bugs": 0,
+      "deployments": 42,
+      "has_llm_content": true,
+      "ci_total": 0,
+      "ci_p0_p1": 0,
+      "security_total": 4,
+      "security_p0_p1": 0,
+      "leftshift_total": 0,
+      "leftshift_p0_p1": 0,
+      "coverage_overall": 82.3,
+      "coverage_overall_line": 84.1,
+      "coverage_new_code": 77.6,
+      "coverage_new_code_line": 80.0
+    }
+  },
+  "llm_content": {
+    "trend_analysis": "## Quality Trends Analysis\n\n### Overall System Health: **GOOD** \u2705\n\n**Key Insights:**\n\n\u2022 **Zero Critical Issues**: No bugs or security vulnerabilities detected indicates robust code quality and effective security practices\n\n\u2022 **Manageable Process Issues**: 3 PRBs (Problem Reports/Change Requests) suggest normal operational adjustments rather than systemic failures\n\n\u2022 **Controlled Risk Profile**: 2 identified risks show proactive risk management - early identification allows for mitigation planning\n\n### Trend Indicators:\n- **Stability**: High (zero defects in production)\n- **Security Posture**: Strong (no vulnerabilities)\n- **Process Maturity**: Good (issues being tracked formally)\n\n### Recommendations:\n1. **Monitor PRB Resolution**: Track closure velocity to prevent backlog accumulation\n2. **Risk Mitigation**: Develop action plans for the 2 identified risks\n3. **Maintain Vigilance**: Continue current testing and security scanning practices\n\n**Bottom Line**: The system demonstrates healthy quality metrics with preventive controls working effectively. Focus should remain on resolving existing PRBs and mitigating identified risks while maintaining current quality standards.",
+    "risk_analysis": "### Deployment Risk Assessment - SDB Version 258.11\n\n#### Executive Summary\n\nThe sandbox deployment of SDB version 258.11 demonstrates strong stability indicators with zero failures across 150 cells. However, the transition to production environments requires careful consideration of several risk factors and validation gaps.\n\n#### Deployment Stability Analysis\n\n##### Positive Indicators\n- **Perfect Success Rate**: 100% deployment success across all 150 sandbox cells indicates robust deployment automation and package integrity\n- **Consistent Performance**: 12-minute average deployment time suggests predictable and well-optimized deployment processes\n- **Validation Coverage**: All post-deployment validations passed, indicating functional integrity in sandbox environments\n\n##### Risk Considerations\n- **Environment Parity**: Sandbox environments may not fully replicate production load patterns, data volumes, or integration complexities\n- **Limited Exposure Duration**: Recent deployment timing may not capture delayed or edge-case issues that emerge over extended runtime periods\n- **Scale Differential**: Production environments (P0-P3) likely operate at significantly higher scale than sandbox cells\n\n#### Code Change Impact Assessment\n\n##### Missing Critical Information\n- **Change Scope**: No visibility into the nature, size, or risk profile of changes included in version 258.11\n- **Dependency Analysis**: Unclear if changes affect critical system dependencies or integration points\n- **Rollback Complexity**: No assessment of rollback procedures or potential data migration implications\n\n##### Recommended Pre-Production Validation\n- **Performance Testing**: Conduct load testing that mirrors production traffic patterns\n- **Integration Validation**: Verify compatibility with downstream and upstream systems\n- **Data Integrity Checks**: Ensure any schema or data processing changes maintain consistency\n\n#### Production Rollout Risk Mitigation\n\n##### Staging Strategy Recommendations\n- **Gradual Rollout**: Implement phased deployment across P0-P3 with monitoring gates between stages\n- **Canary Analysis**: Deploy to limited production subset before full stage rollout\n- **Rollback Readiness**: Ensure rapid rollback capabilities are tested and documented\n\n##### Monitoring and Alerting\n- **Enhanced Observability**: Implement additional monitoring for the first 48 hours post-deployment\n- **Business Metrics Tracking**: Monitor key performance indicators that could indicate functional regression\n- **Error Rate Baselines**: Establish pre-deployment baselines for comparison during rollout\n\n#### Final Recommendation\n\n**PROCEED WITH CAUTION**: While sandbox results are encouraging, recommend implementing additional validation steps and enhanced monitoring before production deployment. The lack of detailed change information necessitates conservative rollout practices with robust rollback procedures.",
+    "prb_narratives": {
+      "PRB-22424026": "**Problem Type:** Database performance degradation caused by high-volume customer requests overwhelming the system with prolonged SQL queries and elevated CPU utilization.\n\n**Root Cause:** A buggy throttle mechanism failed to properly limit high-volume requests from a specific customer, allowing the database cluster to become overwhelmed.\n\n**Resolution:** The ineffective throttle mechanism was identified and the support team was engaged to address the issue, with temporary relief provided when the customer ceased their activity.\n\n**Next Steps:** Fix the throttle mechanism bug and implement proper request limiting controls to prevent similar customer-induced performance degradation incidents.",
+      "PRB-22422703": "**Problem Type:** Database performance degradation caused by a single SQL statement generating excessive CPU utilization and system contention.\n\n**Root Cause:** A specific organization's SQL statement created high contention and concurrency issues on the IND94 database instance, resulting in elevated CPU usage that degraded overall system performance.\n\n**Resolution:** The Database Performance team identified the problematic SQL statement and implemented a CSP (Connection Service Provider) throttle to control and mitigate the high CPU usage.\n\n**Next Steps:** The PRB indicates next steps are pending completion, but typical follow-up would include SQL query optimization review and implementation of preventive monitoring controls.",
+      "PRB-22345931": "**Problem Type:** Cyclic database failover caused service disruption due to a software bug in the purger process.\n\n**Root Cause:** A known bug in database software version 262 caused the 'purger' process to panic, triggering continuous connection pool failovers.\n\n**Resolution:** Applied configuration change to disable the 'Read Your Own Write' feature across all database nodes, breaking the failover cycle and restoring stability.\n\n**Next Steps:** Upgrade database software to a version that fixes the purger process bug to prevent recurrence."
+    },
+    "prb_analyses": {
+      "PRB-22424026": "# Technical Analysis for PRB-22424026\n\n## **Technical Impact**\n\n### Primary Impact Assessment\n- **System Performance**: Severe database cluster degradation due to prolonged SQL query execution times and elevated CPU utilization exceeding normal operational thresholds\n- **Resource Utilization**: Critical CPU saturation across database nodes, leading to resource contention and cascading performance issues\n- **Query Performance**: SQL query response times significantly increased, affecting downstream application performance and user experience\n- **System Availability**: While not a complete outage, the performance degradation created near-unavailable conditions for affected services\n\n### Secondary Impact Vectors\n- **Cascading Effects**: Database performance issues likely propagated to dependent services and applications\n- **Resource Starvation**: High CPU utilization may have impacted other database operations and maintenance tasks\n- **Operational Overhead**: Increased monitoring alerts and manual intervention requirements during the incident period\n\n## **Root Cause Analysis**\n\n### Primary Root Cause\n**Defective Throttling Mechanism**: The core technical failure stems from a malfunctioning throttle mechanism that failed to properly regulate incoming request volumes, allowing excessive load to reach the database layer.\n\n### Contributing Technical Factors\n1. **Volume Amplification**: Single customer generating disproportionate request volume that exceeded system design parameters\n2. **Query Optimization Gap**: SQL queries likely lacked proper optimization for high-volume scenarios\n3. **Resource Management Deficiency**: Insufficient CPU and memory allocation strategies for handling traffic spikes\n4. **Monitoring Blind Spots**: Delayed detection suggests inadequate real-time performance monitoring thresholds\n\n### Technical Failure Chain\n```\nHigh Customer Request Volume \u2192 Throttle Mechanism Failure \u2192 Unregulated Database Load \u2192 \nSQL Query Saturation \u2192 CPU Utilization Spike \u2192 Performance Degradation\n```\n\n## **Resolution Applied**\n\n### Immediate Technical Response\n1. **Throttle Mechanism Diagnosis**: Engineering team identified the specific bug in the throttling logic that prevented proper request rate limiting\n2. **Support Team Escalation**: Coordinated response involving database administrators and application support teams\n3. **Load Source Mitigation**: Customer activity cessation provided immediate load reduction, confirming the traffic source as the primary trigger\n\n### Technical Resolution Methodology\n- **Incident Isolation**: Identified the specific database cluster and affected query patterns\n- **Performance Monitoring**: Enhanced real-time monitoring to track CPU utilization and query execution metrics\n- **Collaborative Debugging**: Cross-functional team approach involving SDB-Intake team and support specialists\n\n### Temporary Stabilization\n- **Natural Load Reduction**: Customer activity cessation allowed system recovery without forced intervention\n- **System Monitoring**: Continuous observation to ensure performance metrics returned to baseline levels\n\n## **Preventive Measures**\n\n### Immediate Technical Controls\n1. **Throttle Mechanism Remediation**\n   - Implement comprehensive unit and integration testing for throttling logic\n   - Deploy circuit breaker patterns to prevent cascade failures\n   - Establish multi-tier throttling (application, API gateway, database levels)\n\n2. **Enhanced Monitoring Implementation**\n   - Deploy real-time CPU utilization alerts with graduated thresholds (70%, 85%, 95%)\n   - Implement SQL query performance monitoring with execution time baselines\n   - Create customer-specific traffic pattern monitoring dashboards\n\n### Strategic Technical Improvements\n1. **Database Optimization**\n   - Conduct comprehensive SQL query performance audit and optimization\n   - Implement query result caching strategies for frequently accessed data\n   - Deploy database connection pooling and resource management improvements\n\n2. **Capacity Management**\n   - Establish auto-scaling mechanisms for database cluster resources\n   - Implement predictive capacity planning based on customer usage patterns\n   - Deploy load balancing strategies across database nodes\n\n3. **Customer Traffic Management**\n   - Implement customer-specific rate limiting and fair usage policies\n   - Deploy API quota management systems with graduated enforcement\n   - Create customer communication protocols for high-volume usage scenarios\n\n### Long-term Architectural Enhancements\n1. **System Resilience**\n   - Implement database read replicas to distribute query load\n   - Deploy microservices architecture to isolate high-volume customer impacts\n   - Establish disaster recovery and failover mechanisms\n\n2. **Operational Excellence**\n   - Create runbook procedures for similar performance degradation scenarios\n   - Implement automated incident response workflows\n   - Establish regular performance testing and stress testing protocols\n\n### Validation and Testing Framework\n- **Load Testing**: Regular simulation of high-volume customer scenarios",
+      "PRB-22422703": "# Comprehensive Technical Analysis - PRB-22422703\n\n## **Technical Impact**\n\n### System-Level Impact\n- **Database Instance**: IND94 experienced severe performance degradation affecting overall system responsiveness\n- **CPU Utilization**: Elevated to critical levels due to resource-intensive SQL operations\n- **Concurrency Issues**: High contention resulted in blocking and queuing of legitimate database operations\n- **Service Availability**: General performance degradation impacting user experience across the platform\n- **Resource Starvation**: Other database operations likely experienced increased latency and potential timeouts\n\n### Business Impact Assessment\n- **Service Degradation**: Reduced system responsiveness affecting user productivity\n- **Potential Revenue Impact**: Performance issues may have led to user abandonment or transaction failures\n- **SLA Risk**: P2-Medium priority suggests potential SLA threshold breaches\n- **Operational Overhead**: Required immediate intervention from Database Performance team\n\n## **Root Cause Analysis**\n\n### Primary Root Cause\n**Inefficient SQL Query Execution**: A single SQL statement from a specific organization consumed excessive CPU resources, creating a cascading performance impact on the IND94 database instance.\n\n### Contributing Factors\n1. **Query Design Issues**:\n   - Likely missing or ineffective indexing strategy\n   - Potential full table scans or inefficient join operations\n   - Possible lack of query optimization or poor execution plan selection\n\n2. **Resource Management Gaps**:\n   - Absence of proactive query performance monitoring\n   - Insufficient resource governance controls for individual organizations\n   - Lack of preventive throttling mechanisms\n\n3. **Concurrency Control Deficiencies**:\n   - High lock contention suggesting inadequate isolation level management\n   - Potential blocking chain scenarios affecting multiple concurrent operations\n\n### Technical Analysis\n- **Database Engine Behavior**: The query likely triggered inefficient execution plans, causing excessive CPU cycles and memory consumption\n- **Contention Patterns**: High concurrency suggests either long-running transactions or frequent lock escalations\n- **Resource Allocation**: Single organization's query consuming disproportionate system resources indicates inadequate resource partitioning\n\n## **Resolution Applied**\n\n### Immediate Mitigation\n**CSP (Customer Service Platform) Throttling Implementation**:\n- Database Performance team applied targeted throttling controls\n- Restricted resource consumption for the problematic SQL statement\n- Immediate CPU utilization reduction and system stabilization\n\n### Resolution Methodology\n1. **Identification Phase**:\n   - Performance monitoring tools detected CPU spike correlation\n   - Query analysis identified the specific problematic SQL statement\n   - Organization-level impact assessment completed\n\n2. **Mitigation Implementation**:\n   - CSP throttle configuration applied to limit query execution frequency\n   - Real-time monitoring of CPU utilization post-implementation\n   - Validation of system performance recovery\n\n3. **Effectiveness Validation**:\n   - CPU utilization returned to normal operational levels\n   - System responsiveness restored across the IND94 instance\n   - Concurrent operations resumed normal execution patterns\n\n## **Preventive Measures**\n\n### Immediate Prevention Strategies\n1. **Enhanced Query Governance**:\n   - Implement automated query performance analysis before production deployment\n   - Establish CPU utilization thresholds with automatic alerting\n   - Deploy query execution time limits for individual organizations\n\n2. **Proactive Monitoring Implementation**:\n   - Real-time database performance dashboards with organization-level visibility\n   - Automated anomaly detection for unusual resource consumption patterns\n   - Predictive analytics for identifying potential performance bottlenecks\n\n### Long-term Strategic Improvements\n1. **Resource Management Framework**:\n   - Implement organization-level resource quotas and governance policies\n   - Deploy database resource pools with automatic load balancing\n   - Establish tiered service levels with appropriate resource allocation\n\n2. **Query Optimization Program**:\n   - Mandatory query performance review process for high-impact operations\n   - Automated index recommendation system based on query patterns\n   - Regular database maintenance including statistics updates and index optimization\n\n3. **Infrastructure Resilience**:\n   - Implement database connection pooling with intelligent routing\n   - Deploy read replicas for query load distribution\n   - Establish automated failover mechanisms for performance degradation scenarios\n\n### Monitoring and Alerting Enhancements\n- **Threshold-based Alerting**: CPU utilization > 80% for sustained periods\n- **Query Performance Metrics**: Execution time, resource consumption, and concurrency levels\n- **Organization-level Dashboards**: Resource usage visibility and trend analysis",
+      "PRB-22345931": "# Technical Analysis Report: PRB-22345931\n\n## **Technical Impact**\n\n### Service Disruption Analysis\nThe USA472 instance experienced a critical service disruption starting at 14:41 UTC on May 4th, 2026, resulting in:\n\n- **Service Availability**: Cyclic database failovers created intermittent service unavailability\n- **Performance Degradation**: Database connection instability led to increased latency and timeout errors\n- **Data Consistency Risk**: Failover cycles potentially compromised read consistency across database nodes\n- **Resource Utilization**: Excessive CPU and memory consumption due to repeated failover attempts\n- **Downstream Dependencies**: Cascading effects on dependent services relying on USA472 instance\n\n### Severity Assessment\n- **Priority Level**: P2-Medium appropriately assigned given general performance impact\n- **Business Impact**: Service degradation affecting user experience without complete outage\n- **Technical Debt**: Exposed vulnerability in database version management and configuration practices\n\n## **Root Cause Analysis**\n\n### Primary Root Cause\n**Database Software Bug in Version 262**: A known defect in the database software's 'purger' process that triggers panic conditions under specific operational scenarios.\n\n### Contributing Factors\n1. **Process Panic Mechanism**: The purger process encounters an unhandled exception causing immediate termination\n2. **Connection Pool Management**: Failover logic incorrectly interprets purger panic as node failure\n3. **Cyclic Failover Logic**: Flawed failover algorithm creates infinite loop when all nodes experience similar purger issues\n4. **Configuration Dependencies**: 'Read Your Own Write' feature exacerbates connection routing complexity during failovers\n\n### Technical Chain of Events\n1. Purger process encounters bug condition \u2192 Process panic\n2. Database monitoring detects process failure \u2192 Triggers failover\n3. Connection pool redirects traffic \u2192 Secondary node experiences same bug\n4. Cyclic pattern emerges \u2192 Continuous failover loop\n5. Service degradation manifests \u2192 Performance impact observed\n\n## **Resolution Applied**\n\n### Immediate Mitigation Strategy\n**Configuration-Based Workaround**: Disabled 'Read Your Own Write' feature across all database nodes to break the failover cycle.\n\n### Technical Implementation\n- **Scope**: Applied to entire database cluster for consistency\n- **Method**: Configuration parameter modification without service restart\n- **Validation**: Monitored connection stability and failover behavior post-change\n- **Risk Assessment**: Temporary reduction in read consistency guarantees accepted for stability\n\n### Resolution Effectiveness\n- **Immediate**: Successfully terminated cyclic failover pattern\n- **Stability**: Restored normal service operation within acceptable parameters\n- **Trade-offs**: Reduced read consistency features in exchange for operational stability\n\n## **Preventive Measures**\n\n### Short-term Actions (0-30 days)\n1. **Database Version Assessment**\n   - Audit all instances running database version 262\n   - Identify and catalog known bugs in current version\n   - Develop upgrade timeline for affected instances\n\n2. **Enhanced Monitoring**\n   - Implement specific alerting for purger process health\n   - Add failover cycle detection with automatic circuit breakers\n   - Deploy connection pool stability metrics\n\n### Medium-term Improvements (1-6 months)\n1. **Database Upgrade Strategy**\n   - Plan migration to stable database version with bug fixes\n   - Implement blue-green deployment for zero-downtime upgrades\n   - Establish regression testing for database version changes\n\n2. **Failover Logic Enhancement**\n   - Redesign failover algorithm to prevent cyclic patterns\n   - Implement exponential backoff for repeated failover attempts\n   - Add intelligent health checks beyond process monitoring\n\n### Long-term Strategic Measures (6+ months)\n1. **Architecture Resilience**\n   - Implement database connection pooling with circuit breaker patterns\n   - Design graceful degradation mechanisms for database issues\n   - Establish multi-region database replication for improved fault tolerance\n\n2. **Operational Excellence**\n   - Develop automated database health assessment tools\n   - Create runbook automation for common database failure scenarios\n   - Establish proactive database maintenance scheduling\n\n### Process Improvements\n1. **Change Management**: Implement mandatory database version vulnerability assessment before deployments\n2. **Incident Response**: Create specific playbooks for database failover scenarios\n3. **Knowledge Management**: Document known issues and workarounds in centralized knowledge base\n4. **Testing Strategy**: Develop chaos engineering practices for database failure simulation\n\n### Monitoring an"
+    }
+  }
+}

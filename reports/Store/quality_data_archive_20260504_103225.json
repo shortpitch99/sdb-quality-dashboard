@@ -1,0 +1,647 @@
+{
+  "risks": [
+    {
+      "feature": "Read your own writes(RYOW)",
+      "status": "Yellow",
+      "priority": "Medium",
+      "description": "Performance enhancement feature for Write Scaling. TLE dark launch mode has been rolled out to multiple cells. However, when rolling out the live mode, we ran into an issue on a couple of cells including the UHG sandbox cell (USA804s) where it seems to run into a possible data corruption issue. However, the guardrails that we implemented in the LSM layer helped detect and prevent those corruptions from persisting. Folowing this, we disabled the rollout of the live mode for RYOW functionality and it has been disabled since mid August when the problem was detected.",
+      "last_updated": "2024-01-15"
+    },
+    {
+      "feature": "Allocated Extent Pool",
+      "status": "Green",
+      "priority": "Medium",
+      "description": "Allocated Extent Pools have been running stably in production for 3 months since enabling on usa16s and usa18s on 08/15. This feature continues to deliver on its primary goal of reducing storage catalog writes while maintaining a minimal and stable storage footprint. This post provides a detailed analysis of the feature's behavior and stability over the past 30 days.",
+      "last_updated": "2025-11-21"
+    }
+  ],
+  "prbs": [
+    {
+      "id": "PRB-22320384",
+      "title": "PRB-22320384: Service disruption (general)",
+      "priority": "P2-Medium",
+      "status": "Waiting 3rd Party",
+      "description": "Team: CRM Database Sustaining Engineering | Impact: Service disruption (general)",
+      "created_date": "2026-05-02",
+      "what_happened": "[THIS PRB IS MANAGED BY G2G. Updates should be made in Google doc]\n*Conditions:* On May 2, 2026, POD276's database cluster5_0 experienced intermittent accessibility issues due to 'maximum number of processes exceeded' errors, impacting",
+      "customer_experience": "User Experience:\n\nUnable to access Business Manager (BM) & Storefront for 3 customers:\nBJWT\nBDQM\nBLBG\n\nQ: Was this an external customer impacting event?\nA:\n\nQ: User retry may have succeeded?\nA:\n\nImpact Quantification:\n\nQ: What # or % of users/tenants/req...",
+      "proximate_cause": "Initial investigated identified \"max no process exceeded\" error. Later there were issues identified with all the cluster nodes.",
+      "how_resolved": "Disable CRS (Content Replication Service) followed by reboot of nodes in sequence.\n- Node 3 -> Node 1 -> Node 2",
+      "team": "CRM Database Sustaining Engineering",
+      "customer_impact": "Service disruption (general)"
+    }
+  ],
+  "bugs": [
+    {
+      "work_id": "W-22049411",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[EA][PROD][PROD_ERROR][sdb2h1] [Ryi-GVqXGULjDMV3dD_qNQ:00000050] Req:LedgerOpenRecoverReq StoreId:e3...",
+      "status": "Triaged",
+      "build_version": "",
+      "created_date": "2026-05-04",
+      "issue_type": "Bug"
+    }
+  ],
+  "critical_issues": [],
+  "deployments": [
+    {
+      "stagger": "R2b.1",
+      "version": "262.11",
+      "count": 15,
+      "stage": "R2b.1",
+      "cells": 15
+    },
+    {
+      "stagger": "R0.2",
+      "version": "262.11",
+      "count": 3,
+      "stage": "R0.2",
+      "cells": 3
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.13",
+      "count": 2,
+      "stage": "SB2.2",
+      "cells": 2
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.3",
+      "count": 2,
+      "stage": "SB1.2",
+      "cells": 2
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "262.9",
+      "count": 99,
+      "stage": "R2a.2",
+      "cells": 99
+    },
+    {
+      "stagger": "R2b.1",
+      "version": "262.9",
+      "count": 10,
+      "stage": "R2b.1",
+      "cells": 10
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.9",
+      "count": 93,
+      "stage": "R2a.1",
+      "cells": 93
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.11",
+      "count": 25,
+      "stage": "SB1.1",
+      "cells": 25
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.3",
+      "count": 1,
+      "stage": "SB0",
+      "cells": 1
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.18",
+      "count": 4,
+      "stage": "SB1.1",
+      "cells": 4
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.13",
+      "count": 20,
+      "stage": "SB1.2",
+      "cells": 20
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.15",
+      "count": 1,
+      "stage": "R2a.1",
+      "cells": 1
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "260.15",
+      "count": 1,
+      "stage": "SB1.2",
+      "cells": 1
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "260.1",
+      "count": 1,
+      "stage": "SB1.2",
+      "cells": 1
+    },
+    {
+      "stagger": "SB2.1",
+      "version": "262.13",
+      "count": 5,
+      "stage": "SB2.1",
+      "cells": 5
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.11",
+      "count": 15,
+      "stage": "SB2.2",
+      "cells": 15
+    },
+    {
+      "stagger": "SB2.1",
+      "version": "262.11",
+      "count": 17,
+      "stage": "SB2.1",
+      "cells": 17
+    },
+    {
+      "stagger": "R1.2",
+      "version": "262.11",
+      "count": 37,
+      "stage": "R1.2",
+      "cells": 37
+    },
+    {
+      "stagger": "R0.1",
+      "version": "262.11",
+      "count": 5,
+      "stage": "R0.1",
+      "cells": 5
+    },
+    {
+      "stagger": "R0.1",
+      "version": "262.18",
+      "count": 2,
+      "stage": "R0.1",
+      "cells": 2
+    },
+    {
+      "stagger": "R1.1",
+      "version": "262.9",
+      "count": 14,
+      "stage": "R1.1",
+      "cells": 14
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "262.11",
+      "count": 113,
+      "stage": "R2a.2",
+      "cells": 113
+    },
+    {
+      "stagger": "R1.2",
+      "version": "262.9",
+      "count": 10,
+      "stage": "R1.2",
+      "cells": 10
+    },
+    {
+      "stagger": "R1.1",
+      "version": "262.11",
+      "count": 44,
+      "stage": "R1.1",
+      "cells": 44
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.18",
+      "count": 3,
+      "stage": "SB0",
+      "cells": 3
+    },
+    {
+      "stagger": "SB1.2",
+      "version": "262.11",
+      "count": 40,
+      "stage": "SB1.2",
+      "cells": 40
+    },
+    {
+      "stagger": "SB1.1",
+      "version": "262.13",
+      "count": 38,
+      "stage": "SB1.1",
+      "cells": 38
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.9",
+      "count": 21,
+      "stage": "R2b.2",
+      "cells": 21
+    },
+    {
+      "stagger": "R2a.1",
+      "version": "262.11",
+      "count": 90,
+      "stage": "R2a.1",
+      "cells": 90
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.7",
+      "count": 5,
+      "stage": "R2b.2",
+      "cells": 5
+    },
+    {
+      "stagger": "R2b.2",
+      "version": "262.11",
+      "count": 33,
+      "stage": "R2b.2",
+      "cells": 33
+    },
+    {
+      "stagger": "R2a.2",
+      "version": "262.7",
+      "count": 11,
+      "stage": "R2a.2",
+      "cells": 11
+    },
+    {
+      "stagger": "SB2.2",
+      "version": "262.3",
+      "count": 1,
+      "stage": "SB2.2",
+      "cells": 1
+    }
+  ],
+  "deployment_summary": "Weekly Deployment Summary - Week of September 15, 2025\n\nThis week's deployment activities proceeded smoothly across all stagger groups. \nSDB version 258.11 was successfully deployed to sandbox environments (SB0-SB2) \nwith no major issues reported.\n\nKey highlights:\n- Version 258.11 rolled out to 150 sandbox cells\n- Zero failed deployments\n- Average deployment time: 12 minutes\n- All post-deployment validations passed\n\nNext week: Planning production rollout to P0-P3 stages pending final validation results.",
+  "coverage": [],
+  "new_code_coverage": [
+    {
+      "component": "SDB Engine",
+      "new_code_coverage": 77.6,
+      "overall_coverage": 82.3,
+      "new_code_line_coverage": 80.0,
+      "overall_line_coverage": 84.1,
+      "lines_to_cover": 3159,
+      "uncovered_lines": 633,
+      "overall_lines_to_cover": 47458,
+      "overall_uncovered_lines": 7549
+    }
+  ],
+  "ci_issues": [],
+  "leftshift_issues": [],
+  "abs_issues": [],
+  "security_issues": [
+    {
+      "work_id": "W-21880949",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.apache.zookeeper:zookeeper:3.8.3 Vulnerability Detected",
+      "status": "Waiting",
+      "build_version": "Off Core Build",
+      "created_date": "2026-05-04",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-21572522",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.apache.zookeeper:zookeeper:3.8.3 Vulnerability Detected",
+      "status": "Waiting",
+      "build_version": "Off Core Build",
+      "created_date": "2026-05-04",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22318408",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:commons-lang:commons-lang:2.6 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-05-04",
+      "issue_type": "security"
+    },
+    {
+      "work_id": "W-22318530",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:org.apache.commons:commons-configuration2:2.12.0 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-05-04",
+      "issue_type": "security"
+    }
+  ],
+  "all_bugs": [],
+  "prb_bugs": [],
+  "system_availability": {
+    "period": "",
+    "slo": 99.9,
+    "achieved": 99.99,
+    "incidents": []
+  },
+  "kpis": {
+    "all_time_bug_backlog_total": 0,
+    "all_time_bug_backlog_p0": 0,
+    "all_time_bug_backlog_p1": 0,
+    "all_time_bug_backlog_p0_p1": 0,
+    "prb_backlog_total": 0,
+    "prb_backlog_p0_p1": 0
+  },
+  "git_stats": {
+    "reporting_period_start": "2026-04-27",
+    "reporting_period_end": "2026-05-03",
+    "total_commits": 8,
+    "lines_added": 2642,
+    "lines_deleted": 199,
+    "lines_changed": 2841,
+    "files_changed": 45,
+    "authors": [
+      "Anup Ghatage",
+      "renovate-enterprise-prod[bot]",
+      "Senthil Narayan",
+      "Sushanth Rai",
+      "tok-sfci124"
+    ],
+    "most_changed_files": [
+      {
+        "file": "bookkeeper-server/src/main/java/org/apache/bookkeeper/meta/ZkLedgerCopyManager.java",
+        "lines_added": 760,
+        "lines_deleted": 0,
+        "total_changes": 760
+      },
+      {
+        "file": "fss/fss-utils/src/main/java/com/sfdc/fssrc/FssRc.java",
+        "lines_added": 236,
+        "lines_deleted": 0,
+        "total_changes": 236
+      },
+      {
+        "file": "fss/fss-docs/FssRc-Usage-Guide.md",
+        "lines_added": 225,
+        "lines_deleted": 0,
+        "total_changes": 225
+      },
+      {
+        "file": "fss/fss-utils/pom.xml",
+        "lines_added": 183,
+        "lines_deleted": 0,
+        "total_changes": 183
+      },
+      {
+        "file": "fss/fss-server/src/main/java/com/sfdc/fss/endpoints/FssFastRestoreV1Resource.java",
+        "lines_added": 123,
+        "lines_deleted": 0,
+        "total_changes": 123
+      },
+      {
+        "file": "fss/fss-utils/src/main/java/com/sfdc/fssrc/FssObjectStoreReader.java",
+        "lines_added": 113,
+        "lines_deleted": 0,
+        "total_changes": 113
+      },
+      {
+        "file": "fss/fss-server/src/main/java/com/sfdc/fss/FssConstants.java",
+        "lines_added": 2,
+        "lines_deleted": 104,
+        "total_changes": 106
+      },
+      {
+        "file": "bookkeeper-server/src/main/java/org/apache/bookkeeper/meta/LedgerCopyManager.java",
+        "lines_added": 100,
+        "lines_deleted": 0,
+        "total_changes": 100
+      },
+      {
+        "file": "fss/fss-utils/src/main/java/com/sfdc/fssrc/FssRcFormatter.java",
+        "lines_added": 98,
+        "lines_deleted": 0,
+        "total_changes": 98
+      },
+      {
+        "file": "fss/fss-dataformat/src/main/java/com/sfdc/fss/proto/FssObjectStorePaths.java",
+        "lines_added": 91,
+        "lines_deleted": 0,
+        "total_changes": 91
+      }
+    ],
+    "commit_frequency": 1.1428571428571428,
+    "code_churn_risk": "Low",
+    "repository_path": "/Users/rchowdhuri/bookkeeper"
+  },
+  "generated_at": "2026-05-04T10:32:17.447905",
+  "report_component": "Store",
+  "coverage_summary": {
+    "new_code": {
+      "coverage": 77.6,
+      "line_coverage": 80.0,
+      "condition_coverage": 66.3,
+      "lines_to_cover": 3159,
+      "uncovered_lines": 633,
+      "conditions_to_cover": 644,
+      "uncovered_conditions": 217
+    },
+    "overall": {
+      "coverage": 82.3,
+      "line_coverage": 84.1,
+      "condition_coverage": 75.2,
+      "lines_to_cover": 47458,
+      "uncovered_lines": 7549,
+      "conditions_to_cover": 11922,
+      "uncovered_conditions": 2953
+    }
+  },
+  "alltime_backlog": [
+    {
+      "work_id": "Bug_1",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_2",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_3",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_4",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_5",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_6",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_7",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_8",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_9",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_10",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_11",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_12",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_13",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_14",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_15",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_16",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-04",
+      "type": "backlog_bug"
+    }
+  ],
+  "prb_backlog": [],
+  "metadata": {
+    "generated_at": "2026-05-04T10:32:32.147937",
+    "report_period_start": "2026-04-27",
+    "report_period_end": "2026-05-03",
+    "report_period_display": "April 27-03, 2026",
+    "report_component": "Store",
+    "git_repository": "/Users/rchowdhuri/bookkeeper",
+    "generator_version": "2.0",
+    "data_sources": {
+      "risks": 2,
+      "prbs": 1,
+      "bugs": 1,
+      "deployments": 33,
+      "has_llm_content": true,
+      "ci_total": 0,
+      "ci_p0_p1": 0,
+      "security_total": 4,
+      "security_p0_p1": 0,
+      "leftshift_total": 0,
+      "leftshift_p0_p1": 0,
+      "coverage_overall": 82.3,
+      "coverage_overall_line": 84.1,
+      "coverage_new_code": 77.6,
+      "coverage_new_code_line": 80.0
+    }
+  },
+  "llm_content": {
+    "trend_analysis": "## Quality Trends Analysis\n\n### Current System Health: **GOOD** \u2705\n\n**Key Observations:**\n\n\u2022 **Low Defect Density**: Only 1 PRB and 1 bug indicate excellent code quality and robust testing processes\n\u2022 **Proactive Risk Management**: 2 identified risks suggest good visibility into potential issues before they impact production\n\u2022 **Strong Security Posture**: Zero security issues demonstrates effective security practices and controls\n\n### Trend Indicators:\n\n**Positive Signals:**\n- Minimal production issues (1 PRB) indicates stable releases\n- Low bug count suggests effective defect prevention\n- Clean security profile shows mature security practices\n\n**Areas for Continued Focus:**\n- Monitor the 2 identified risks to prevent escalation\n- Maintain current quality processes that are yielding low defect rates\n\n### Recommendation:\nThe system demonstrates **healthy quality metrics** with strong preventive measures in place. Continue current quality practices while ensuring the identified risks are actively managed and mitigated to maintain this positive trajectory.\n\n**Overall Assessment**: System is performing well with minimal quality debt and good risk visibility.",
+    "risk_analysis": "### Deployment Risk Assessment - SDB Version 258.11\n\n#### Executive Summary\n\nThe sandbox deployment of SDB version 258.11 demonstrates strong deployment stability with zero failures across 150 cells. However, the assessment reveals several areas requiring attention before production rollout.\n\n#### Deployment Stability Analysis\n\n##### Positive Indicators\n- **Zero Failed Deployments**: 100% success rate across all 150 sandbox cells indicates robust deployment automation and package integrity\n- **Consistent Timing**: 12-minute average deployment time suggests predictable resource requirements and stable infrastructure\n- **Validation Success**: All post-deployment validations passed, indicating functional integrity post-deployment\n\n##### Risk Factors\n- **Limited Environment Scope**: Testing confined to sandbox environments (SB0-SB2) may not fully represent production conditions\n- **Scale Differential**: 150 sandbox cells may not adequately simulate production load and complexity patterns\n- **Validation Coverage**: While validations passed, the scope and depth of testing in sandbox environments is typically limited\n\n#### Code Change Impact Assessment\n\n##### Missing Critical Information\n- **Change Scope**: No details provided on the nature of code changes in version 258.11\n- **Feature Impact**: Unknown whether changes affect core functionality, performance, or security components\n- **Dependency Analysis**: No information on third-party library updates or system dependencies\n\n##### Recommended Analysis\n- Review commit logs and change documentation for version 258.11\n- Identify any database schema changes or configuration modifications\n- Assess backward compatibility requirements\n\n#### Production Rollout Risk Evaluation\n\n##### High-Risk Areas\n- **P0-P3 Stage Complexity**: Production environments typically have higher complexity, load, and integration points\n- **Rollback Preparedness**: No mention of rollback procedures or criteria for deployment halt\n- **Monitoring Strategy**: Absence of enhanced monitoring plans for production deployment\n\n##### Mitigation Recommendations\n- Implement canary deployment strategy starting with P0 (lowest traffic)\n- Establish clear success/failure criteria with automated rollback triggers\n- Deploy enhanced monitoring and alerting during production rollout window\n- Conduct limited user acceptance testing in P0 before broader rollout\n\n#### Final Recommendations\n\n##### Pre-Production Requirements\n1. **Code Review**: Complete technical review of all changes in version 258.11\n2. **Performance Testing**: Execute load testing that mirrors production traffic patterns\n3. **Security Assessment**: Verify no security vulnerabilities introduced\n4. **Rollback Testing**: Validate rollback procedures in sandbox environment\n\n##### Production Deployment Strategy\n- **Phased Approach**: Deploy to P0, monitor for 24-48 hours before P1-P3\n- **Enhanced Monitoring**: Implement real-time performance and error rate monitoring\n- **Communication Plan**: Establish stakeholder notification procedures for any issues\n\n**Overall Risk Level**: **Medium** - While sandbox deployment shows excellent stability, insufficient information about code changes and production-specific testing creates moderate risk for production rollout.",
+    "prb_narratives": {
+      "PRB-22320384": "**Problem Type:** Database cluster experienced intermittent accessibility issues due to maximum process limit exceeded errors affecting multiple nodes.\n\n**Root Cause:** The cluster's process limit was exceeded, initially triggering max process errors that subsequently cascaded to cause issues across all cluster nodes.\n\n**Resolution:** CRS (Content Replication Service) was disabled and cluster nodes were sequentially rebooted in order (Node 3, Node 1, Node 2) to restore service.\n\n**Next Steps:** Process limit monitoring and CRS configuration review should be implemented to prevent future process exhaustion incidents."
+    },
+    "prb_analyses": {
+      "PRB-22320384": "# Technical Analysis Report: PRB-22320384\n\n## **Technical Impact**\n\n### **Severity Assessment**\n- **Impact Level:** High - Database cluster unavailability affecting POD276\n- **Service Disruption:** Complete intermittent accessibility to cluster5_0 database services\n- **Affected Components:** \n  - Primary database cluster (cluster5_0)\n  - All three cluster nodes (Node 1, Node 2, Node 3)\n  - Content Replication Service (CRS)\n- **Business Impact:** General service disruption affecting CRM operations and dependent applications\n- **Recovery Time:** Extended downtime due to sequential node reboots and CRS reconfiguration\n\n### **System Performance Degradation**\nThe \"maximum number of processes exceeded\" error indicates resource exhaustion at the operating system level, leading to:\n- Connection pool saturation\n- Query processing delays\n- Potential data consistency issues during the incident window\n- Cascading failures across all cluster nodes\n\n## **Root Cause Analysis**\n\n### **Primary Root Cause**\n**Process Limit Exhaustion:** The database cluster exceeded the maximum allowable number of concurrent processes, triggering system-level protection mechanisms that prevented new connections and operations.\n\n### **Contributing Factors**\n1. **Resource Management Deficiency:**\n   - Inadequate process limit configuration for peak load scenarios\n   - Insufficient monitoring of process count thresholds\n   - Potential memory leaks or zombie processes accumulating over time\n\n2. **Content Replication Service (CRS) Issues:**\n   - CRS may have been spawning excessive processes\n   - Replication lag causing process accumulation\n   - Possible deadlock conditions in replication threads\n\n3. **Cluster-Wide Propagation:**\n   - Initial process exhaustion on one node cascaded to other cluster members\n   - Failover mechanisms may have amplified the problem by redirecting load\n   - Cluster synchronization issues preventing proper load distribution\n\n### **Technical Analysis**\nThe progression from a single-node process limit issue to cluster-wide problems suggests:\n- Inadequate cluster isolation mechanisms\n- Shared resource dependencies between nodes\n- Insufficient circuit breaker patterns in the application layer\n\n## **Resolution Applied**\n\n### **Immediate Resolution Steps**\n1. **CRS Deactivation:** Disabled Content Replication Service to eliminate a major process consumer\n2. **Sequential Node Recovery:** Implemented controlled restart sequence:\n   - **Node 3 (Primary):** First restart to establish clean baseline\n   - **Node 1 (Secondary):** Second restart after Node 3 stabilization\n   - **Node 2 (Tertiary):** Final restart to complete cluster recovery\n\n### **Resolution Methodology**\n- **Risk Mitigation:** Sequential approach prevented total cluster unavailability\n- **Service Continuity:** Maintained partial service during rolling restarts\n- **Process Reset:** Complete process table cleanup through system reboots\n- **Resource Reclamation:** Memory and file descriptor cleanup via restart cycle\n\n### **Technical Validation**\nPost-resolution verification should include:\n- Process count monitoring restoration\n- Database connectivity validation\n- Cluster synchronization status confirmation\n- CRS impact assessment before potential re-enablement\n\n## **Preventive Measures**\n\n### **Immediate Actions (0-30 days)**\n1. **Enhanced Monitoring Implementation:**\n   - Deploy real-time process count alerting (threshold: 80% of maximum)\n   - Implement database connection pool monitoring\n   - Add cluster health dashboards with process metrics\n\n2. **Configuration Optimization:**\n   - Review and increase OS-level process limits (`ulimit -u`)\n   - Optimize database connection pool settings\n   - Implement connection timeout configurations\n\n### **Short-term Improvements (1-3 months)**\n1. **CRS Architecture Review:**\n   - Conduct thorough analysis of CRS process management\n   - Implement CRS resource throttling mechanisms\n   - Design CRS circuit breaker patterns\n\n2. **Cluster Resilience Enhancement:**\n   - Implement node-level resource isolation\n   - Deploy automated failover with resource validation\n   - Create cluster-wide resource governance policies\n\n### **Long-term Strategic Measures (3-12 months)**\n1. **Infrastructure Modernization:**\n   - Evaluate containerization for better resource isolation\n   - Implement auto-scaling capabilities for database clusters\n   - Deploy chaos engineering practices for resilience testing\n\n2. **Operational Excellence:**\n   - Establish regular capacity planning"
+    }
+  }
+}
