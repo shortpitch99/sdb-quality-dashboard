@@ -327,13 +327,20 @@ class QualityReportDashboard:
         if self._deployment_rows_usable(deployments):
             return deployments
 
-        # Week-level fallback from Engine/global_deployment.csv (history format).
+        # Week-level fallback from Shared/ then Engine deployment history CSV.
         selected_week = getattr(st.session_state, 'selected_week', None)
         week_folder = self._resolve_week_folder_key(selected_week, data)
         if week_folder:
-            global_csv = os.path.join(APP_ROOT, "weeks", week_folder, "Engine", "global_deployment.csv")
-            if os.path.exists(global_csv):
-                parsed = self._parse_global_deployment_history(global_csv)
+            fallback_candidates = [
+                os.path.join(APP_ROOT, "weeks", week_folder, "Shared", "deployment-journey.csv"),
+                os.path.join(APP_ROOT, "weeks", week_folder, "Shared", "deployment.csv"),
+                os.path.join(APP_ROOT, "weeks", week_folder, "Engine", "global_deployment.csv"),
+                os.path.join(APP_ROOT, "weeks", week_folder, "Engine", "deployment.csv"),
+            ]
+            for csv_path in fallback_candidates:
+                if not os.path.exists(csv_path):
+                    continue
+                parsed = self._parse_global_deployment_history(csv_path)
                 if self._deployment_rows_usable(parsed):
                     return parsed
         return deployments
@@ -361,6 +368,21 @@ class QualityReportDashboard:
                 rows = list(reader)
         except Exception:
             return out
+
+        # Normalize alternate pct column names if present.
+        for row in rows:
+            if "pct_of_SB0" in row and "sb0_pct" not in row:
+                row["sb0_pct"] = row.get("pct_of_SB0", 0)
+            if "pct_of_SB1" in row and "sb1_pct" not in row:
+                row["sb1_pct"] = row.get("pct_of_SB1", 0)
+            if "pct_of_R0" in row and "r0_pct" not in row:
+                row["r0_pct"] = row.get("pct_of_R0", 0)
+            if "pct_of_R1" in row and "r1_pct" not in row:
+                row["r1_pct"] = row.get("pct_of_R1", 0)
+            if "pct_of_R2a" in row and "r2a_pct" not in row:
+                row["r2a_pct"] = row.get("pct_of_R2a", 0)
+            if "pct_of_R2b" in row and "r2b_pct" not in row:
+                row["r2b_pct"] = row.get("pct_of_R2b", 0)
 
         dated_rows: List[tuple[datetime, Dict[str, Any]]] = []
         for row in rows:
@@ -2343,21 +2365,53 @@ class QualityReportDashboard:
             # Sort versions for better visualization
             sorted_versions = sorted(version_counts.items(), key=lambda x: x[1], reverse=True)
             
+            # Use a professional color palette
+            colors = ['#4A90E2', '#7B68EE', '#50C878', '#FFB347', '#FF6B6B',
+                     '#9B59B6', '#3498DB', '#1ABC9C', '#F39C12', '#E74C3C',
+                     '#95A5A6', '#34495E', '#16A085', '#27AE60', '#2980B9']
+
             fig = px.pie(
                 values=[count for version, count in sorted_versions],
                 names=[f"v{version}" for version, count in sorted_versions],
-                title=f"📊 Release Version Distribution by Cell Count<br><sub>{total_cells} total cells across fleet</sub>",
-                color_discrete_sequence=px.colors.qualitative.Set3
+                title=f"📊 Release Version Distribution by Cell Count<br><sub style='font-size: 0.85em; color: #666;'>{total_cells:,} total cells across fleet</sub>",
+                color_discrete_sequence=colors
             )
-            
-            # Enhance hover info
+
+            # Enhance visual styling with borders and professional look
             fig.update_traces(
-                textposition='inside', 
-                textinfo='percent+label',
-                hovertemplate='<b>%{label}</b><br>Cells: %{value}<br>Percentage: %{percent}<extra></extra>'
+                textposition='inside',
+                textinfo='label+value+percent',
+                textfont=dict(size=12, color='white', family='Arial, sans-serif'),
+                marker=dict(
+                    line=dict(color='white', width=2.5)  # Subtle white borders around slices
+                ),
+                pull=[0.02] * len(sorted_versions),  # Slight pull effect for visual separation
+                hovertemplate='<b>%{label}</b><br>Cells: %{value:,}<br>Percentage: %{percent}<extra></extra>'
             )
-            
-            fig.update_layout(showlegend=True, height=400)
+
+            fig.update_layout(
+                showlegend=True,
+                height=500,
+                legend=dict(
+                    orientation="v",
+                    yanchor="middle",
+                    y=0.5,
+                    xanchor="left",
+                    x=1.02,
+                    font=dict(size=11, family='Arial, sans-serif'),
+                    bgcolor='rgba(255, 255, 255, 0.8)',
+                    bordercolor='#E0E0E0',
+                    borderwidth=1
+                ),
+                title=dict(
+                    font=dict(size=16, family='Arial, sans-serif', color='#2C3E50'),
+                    x=0.5,
+                    xanchor='center'
+                ),
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+                margin=dict(l=20, r=150, t=80, b=20)
+            )
             st.plotly_chart(fig, use_container_width=True, key="version_pie_chart")
         else:
             st.warning(f"📊 No valid version data for pie chart (found {total_cells} total cells)")
@@ -2367,20 +2421,59 @@ class QualityReportDashboard:
         return tuple(int(n) for n in nums) if nums else (0,)
 
     def _load_global_deployment_history(self, selected_week: Optional[str], data: Optional[Dict[str, Any]] = None) -> pd.DataFrame:
+        """
+        Load deployment history data. Tries Shared/deployment-journey.csv first,
+        falls back to Engine/global_deployment.csv for backward compatibility.
+        Normalizes column names to sb0_pct format.
+        """
         week_folder = self._resolve_week_folder_key(selected_week, data)
         if not week_folder:
             return pd.DataFrame()
-        path = os.path.join(APP_ROOT, "weeks", week_folder, "Engine", "global_deployment.csv")
-        if not os.path.exists(path):
+
+        # Try Shared/deployment-journey.csv first
+        shared_path = os.path.join(APP_ROOT, "weeks", week_folder, "Shared", "deployment-journey.csv")
+        engine_path = os.path.join(APP_ROOT, "weeks", week_folder, "Engine", "global_deployment.csv")
+
+        df = pd.DataFrame()
+        source_format = None
+
+        if os.path.exists(shared_path):
+            try:
+                df = pd.read_csv(shared_path)
+                source_format = "shared"
+            except Exception:
+                pass
+
+        if df.empty and os.path.exists(engine_path):
+            try:
+                df = pd.read_csv(engine_path)
+                source_format = "engine"
+            except Exception:
+                return pd.DataFrame()
+
+        if df.empty:
             return pd.DataFrame()
-        try:
-            df = pd.read_csv(path)
-        except Exception:
-            return pd.DataFrame()
+
+        # Normalize column names
+        if source_format == "shared":
+            # deployment-journey.csv format: pct_of_SB0, pct_of_SB1, etc.
+            column_mapping = {
+                "pct_of_SB0": "sb0_pct",
+                "pct_of_SB1": "sb1_pct",
+                "pct_of_R0": "r0_pct",
+                "pct_of_R1": "r1_pct",
+                "pct_of_R2a": "r2a_pct",
+                "pct_of_R2b": "r2b_pct",
+            }
+            df = df.rename(columns=column_mapping)
+            # Add total_cells if missing (default to 1 for percentage-only data)
+            if "total_cells" not in df.columns:
+                df["total_cells"] = 1
+
+        # Verify required columns
         required = {
             "current_version",
             "week_start",
-            "total_cells",
             "sb0_pct",
             "sb1_pct",
             "r0_pct",
@@ -2390,40 +2483,450 @@ class QualityReportDashboard:
         }
         if not required.issubset(set(df.columns)):
             return pd.DataFrame()
+
         df["week_start"] = pd.to_datetime(df["week_start"], errors="coerce")
         df = df.dropna(subset=["week_start"]).copy()
         if df.empty:
             return df
         df["current_version"] = df["current_version"].astype(str)
-        df["total_cells"] = pd.to_numeric(df["total_cells"], errors="coerce").fillna(0.0)
+        df["total_cells"] = pd.to_numeric(df.get("total_cells", 1), errors="coerce").fillna(1.0)
         for c in ["sb0_pct", "sb1_pct", "r0_pct", "r1_pct", "r2a_pct", "r2b_pct"]:
             df[c] = pd.to_numeric(df[c], errors="coerce").fillna(0.0)
         return df
 
-    def create_global_deployment_journey_single_version(self, selected_week: Optional[str], data: Optional[Dict[str, Any]] = None, key_suffix: str = "") -> None:
-        """Graph 1: Select any version and view stagger progression over latest 8 weeks."""
-        df = self._load_global_deployment_history(selected_week, data)
+    def _load_shared_deployment_journey_history(self, selected_week: Optional[str], data: Optional[Dict[str, Any]] = None) -> pd.DataFrame:
+        """
+        Load shared deployment journey history from:
+        weeks/<cw>/Shared/deployment-journey.csv
+        """
+        week_folder = self._resolve_week_folder_key(selected_week, data)
+        if not week_folder:
+            return pd.DataFrame()
+        path = os.path.join(APP_ROOT, "weeks", week_folder, "Shared", "deployment-journey.csv")
+        if not os.path.exists(path):
+            return pd.DataFrame()
+        try:
+            df = pd.read_csv(path)
+        except Exception:
+            return pd.DataFrame()
+
+        # Check if we have the new column format (pct_of_SB0) or old (sb0_pct)
+        has_new_format = "pct_of_SB0" in df.columns
+
+        if has_new_format:
+            # Rename new format columns to old format for compatibility
+            rename_map = {
+                "pct_of_SB0": "sb0_pct",
+                "pct_of_SB1": "sb1_pct",
+                "pct_of_R0": "r0_pct",
+                "pct_of_R1": "r1_pct",
+                "pct_of_R2a": "r2a_pct",
+                "pct_of_R2b": "r2b_pct",
+            }
+            df = df.rename(columns=rename_map)
+
+        required = {
+            "current_version",
+            "week_start",
+        }
+        if not required.issubset(set(df.columns)):
+            return pd.DataFrame()
+
+        df["week_start"] = pd.to_datetime(df["week_start"], errors="coerce")
+        df = df.dropna(subset=["week_start"]).copy()
         if df.empty:
-            st.info("Global deployment history not available for selected week.")
+            return df
+        df["current_version"] = df["current_version"].astype(str)
+
+        # Add total_cells if missing (for new format that doesn't have it)
+        if "total_cells" not in df.columns:
+            df["total_cells"] = 100.0  # Default placeholder
+
+        df["total_cells"] = pd.to_numeric(df["total_cells"], errors="coerce").fillna(100.0)
+        for c in ["sb0_pct", "sb1_pct", "r0_pct", "r1_pct", "r2a_pct", "r2b_pct"]:
+            if c in df.columns:
+                df[c] = pd.to_numeric(df[c], errors="coerce").fillna(0.0)
+            else:
+                df[c] = 0.0
+        return df
+
+    def _load_plan_schedule_data(self, selected_week: Optional[str], data: Optional[Dict[str, Any]] = None) -> pd.DataFrame:
+        """
+        Load deployment plan schedule CSV(s) from weeks/<cw>/Shared:
+        SDB Releases Deployment Schedule*.csv
+        Returns normalized rows: week_start, stage, version.
+        """
+        week_folder = self._resolve_week_folder_key(selected_week, data)
+        if not week_folder:
+            return pd.DataFrame()
+        # Try Shared directory first, then fall back to Engine
+        shared_dir = os.path.join(APP_ROOT, "weeks", week_folder, "Shared")
+        engine_dir = os.path.join(APP_ROOT, "weeks", week_folder, "Engine")
+
+        plan_files = sorted(glob.glob(os.path.join(shared_dir, "SDB Releases Deployment Schedule*.csv")))
+        if not plan_files:
+            plan_files = sorted(glob.glob(os.path.join(engine_dir, "SDB Releases Deployment Schedule*.csv")))
+        if not plan_files:
+            return pd.DataFrame()
+
+        def map_stage(raw_stage: str) -> Optional[str]:
+            s = str(raw_stage or "").strip().lower()
+            if s == "sb0":
+                return "SB0"
+            if s.startswith("sb1/sb2"):
+                return "SB1/SB2"
+            # R*.w1 and R*.w2 both map to R_COMBINED for post-processing
+            if s.startswith("r*.w1") or s.startswith("r*.w2"):
+                return "R_COMBINED"
+            if s.startswith("r*.w3") or s.startswith("r2a") or s.startswith("r2"):
+                return "R2a"
+            if s.startswith("r*.w4") or s.startswith("r2b"):
+                return "R2b"
+            return None
+
+        rows: List[pd.DataFrame] = []
+        for path in plan_files:
+            try:
+                raw = pd.read_csv(path, dtype=str)
+            except Exception:
+                continue
+            if raw.empty:
+                continue
+            stage_col = raw.columns[0]
+            melted = raw.rename(columns={stage_col: "stage_raw"}).melt(
+                id_vars=["stage_raw"],
+                var_name="week_label",
+                value_name="version",
+            )
+            melted["stage"] = melted["stage_raw"].map(map_stage)
+            melted["version"] = melted["version"].astype(str).str.strip()
+            melted = melted[(melted["stage"].notna()) & (melted["version"] != "") & (melted["version"].str.lower() != "nan")].copy()
+            if melted.empty:
+                continue
+            melted["week_start"] = pd.to_datetime(melted["week_label"], errors="coerce")
+            melted = melted.dropna(subset=["week_start"])
+            if melted.empty:
+                continue
+            rows.append(melted[["week_start", "stage", "version"]])
+
+        if not rows:
+            return pd.DataFrame()
+
+        plan_df = pd.concat(rows, ignore_index=True).drop_duplicates()
+
+        # Post-process: Split R_COMBINED stages
+        # Group R_COMBINED entries by version to get full R deployment period
+        expanded_rows = []
+
+        # First, collect all R_COMBINED entries by version
+        r_combined_by_version = {}
+        other_rows = []
+
+        for _, row in plan_df.iterrows():
+            if row["stage"] == "R_COMBINED":
+                version = row["version"]
+                if version not in r_combined_by_version:
+                    r_combined_by_version[version] = []
+                r_combined_by_version[version].append(row["week_start"])
+            else:
+                other_rows.append(row.to_dict())
+
+        # Now split R_COMBINED into R0, R1, R2a, R2b for each version
+        for version, week_starts in r_combined_by_version.items():
+            # Get the full R deployment period (min to max of all R*.w1 and R*.w2)
+            r_start = min(week_starts)
+            r_end = max(week_starts) + pd.Timedelta(days=7)  # End of last week
+
+            total_duration = (r_end - r_start).total_seconds() / 86400  # Convert to days
+
+            # Split according to percentages: R0=15%, R1=25%, R2a=30%, R2b=30%
+            r0_duration = total_duration * 0.15
+            r1_duration = total_duration * 0.25
+            r2a_duration = total_duration * 0.30
+            r2b_duration = total_duration * 0.30
+
+            # R0: 15% of time
+            expanded_rows.append({
+                "week_start": r_start,
+                "stage": "R0",
+                "version": version
+            })
+
+            # R1: starts after R0, 25% of time
+            r1_start = r_start + pd.Timedelta(days=r0_duration)
+            expanded_rows.append({
+                "week_start": r1_start,
+                "stage": "R1",
+                "version": version
+            })
+
+            # R2a: starts after R1, 30% of time
+            r2a_start = r1_start + pd.Timedelta(days=r1_duration)
+            expanded_rows.append({
+                "week_start": r2a_start,
+                "stage": "R2a",
+                "version": version
+            })
+
+            # R2b: starts after R2a, remaining 30% of time
+            r2b_start = r2a_start + pd.Timedelta(days=r2a_duration)
+            expanded_rows.append({
+                "week_start": r2b_start,
+                "stage": "R2b",
+                "version": version
+            })
+
+        # Combine with other rows
+        expanded_rows.extend(other_rows)
+        plan_df = pd.DataFrame(expanded_rows)
+        if "week_start" in plan_df.columns:
+            plan_df["week_start"] = pd.to_datetime(plan_df["week_start"], errors="coerce").dt.normalize()
+            plan_df = plan_df.dropna(subset=["week_start"]).copy()
+        return plan_df
+
+    def _build_stage_timeline(self, version_plan_sorted: pd.DataFrame) -> Dict[str, Dict[str, pd.Timestamp]]:
+        """Build per-stage plan start/end ranges using exactly one shared rule."""
+        stage_timeline: Dict[str, Dict[str, pd.Timestamp]] = {}
+        if version_plan_sorted is None or version_plan_sorted.empty:
+            return stage_timeline
+        version_plan_sorted = version_plan_sorted.sort_values("week_start").copy()
+        for idx, (_, row) in enumerate(version_plan_sorted.iterrows()):
+            stage = row["stage"]
+            start_date = pd.to_datetime(row["week_start"], errors="coerce")
+            if pd.isna(start_date):
+                continue
+            if idx < len(version_plan_sorted) - 1:
+                next_start = pd.to_datetime(version_plan_sorted.iloc[idx + 1]["week_start"], errors="coerce")
+                end_date = (next_start - pd.Timedelta(days=1)) if pd.notna(next_start) else (start_date + pd.Timedelta(days=6))
+            else:
+                end_date = start_date + pd.Timedelta(days=6)
+            start_date = start_date.normalize()
+            end_date = pd.to_datetime(end_date, errors="coerce").normalize()
+            if stage not in stage_timeline:
+                stage_timeline[stage] = {"start": start_date, "end": end_date}
+            else:
+                stage_timeline[stage]["start"] = min(stage_timeline[stage]["start"], start_date)
+                stage_timeline[stage]["end"] = max(stage_timeline[stage]["end"], end_date)
+        return stage_timeline
+
+    def create_actuals_vs_plan_chart(self, selected_week: Optional[str], data: Optional[Dict[str, Any]] = None, key_suffix: str = "") -> None:
+        """Compare actual vs plan across all stages for one selected release version."""
+        actual_df = self._load_global_deployment_history(selected_week, data)
+        plan_df = self._load_plan_schedule_data(selected_week, data)
+        if actual_df.empty or plan_df.empty:
+            st.info("Actuals vs Plan unavailable: missing actual or plan data for selected week folder.")
             return
 
-        latest_weeks = sorted(df["week_start"].unique())[-8:]
+        actual_df["current_version"] = actual_df["current_version"].astype(str).str.strip()
+        plan_df["version"] = plan_df["version"].astype(str).str.strip()
+        available_versions = sorted(
+            set(actual_df["current_version"]).intersection(set(plan_df["version"])),
+            key=self._version_tuple,
+        )
+        if not available_versions:
+            st.info("Actuals vs Plan unavailable: no release versions overlap between plan and actual data.")
+            return
+
+        default_idx = max(0, len(available_versions) - 1)
+        selected_version = st.selectbox(
+            "Release Version (Actuals vs Plan)",
+            available_versions,
+            index=default_idx,
+            key=f"actual_plan_version_{key_suffix}",
+        )
+
+        stage_cols = {
+            "SB0": "sb0_pct",
+            "SB1/SB2": "sb1_pct",
+            "R0": "r0_pct",
+            "R1": "r1_pct",
+            "R2a": "r2a_pct",
+            "R2b": "r2b_pct",
+        }
+        stage_order = ["SB0", "SB1/SB2", "R0", "R1", "R2a", "R2b"]
+
+        # Actual: per-week stage mix for selected version.
+        actual_version = actual_df[actual_df["current_version"] == selected_version].copy()
+        if actual_version.empty:
+            st.info(f"No actual deployment rows found for version {selected_version}.")
+            return
+
+        actual_parts: List[pd.DataFrame] = []
+        week_cells = actual_version.groupby("week_start", as_index=False)["total_cells"].sum().rename(columns={"total_cells": "week_cells"})
+        for stage, col in stage_cols.items():
+            stage_cells = actual_version["total_cells"] * actual_version[col] / 100.0
+            stage_week = (
+                pd.DataFrame({"week_start": actual_version["week_start"], "stage_cells": stage_cells})
+                .groupby("week_start", as_index=False)["stage_cells"]
+                .sum()
+            )
+            merged_week = week_cells.merge(stage_week, on="week_start", how="left")
+            merged_week["actual_pct"] = np.where(
+                merged_week["week_cells"] > 0,
+                merged_week["stage_cells"] * 100.0 / merged_week["week_cells"],
+                0.0,
+            )
+            merged_week["stage"] = stage
+            actual_parts.append(merged_week[["week_start", "stage", "actual_pct"]])
+        actual_long = pd.concat(actual_parts, ignore_index=True)
+
+        # Plan: stage(s) where selected version is scheduled each week.
+        plan_version = plan_df[plan_df["version"] == selected_version].copy()
+        if plan_version.empty:
+            st.info(f"No planned schedule rows found for version {selected_version}.")
+            return
+        plan_counts = (
+            plan_version.groupby(["week_start", "stage"], as_index=False)
+            .size()
+            .rename(columns={"size": "planned_count"})
+        )
+        plan_total = plan_counts.groupby("week_start", as_index=False)["planned_count"].sum().rename(columns={"planned_count": "week_total_plan"})
+        plan_long = plan_counts.merge(plan_total, on="week_start", how="left")
+        plan_long["plan_pct"] = np.where(
+            plan_long["week_total_plan"] > 0,
+            plan_long["planned_count"] * 100.0 / plan_long["week_total_plan"],
+            0.0,
+        )
+
+        merged = actual_long.merge(
+            plan_long[["week_start", "stage", "plan_pct", "planned_count"]],
+            on=["week_start", "stage"],
+            how="outer",
+        )
+        merged = merged.dropna(subset=["week_start"]).copy()
+        if merged.empty:
+            st.info("Actuals vs Plan unavailable: no trend rows after merging data.")
+            return
+        merged["actual_pct"] = pd.to_numeric(merged["actual_pct"], errors="coerce").fillna(0.0)
+        merged["plan_pct"] = pd.to_numeric(merged["plan_pct"], errors="coerce").fillna(0.0)
+        merged["planned_count"] = pd.to_numeric(merged["planned_count"], errors="coerce").fillna(0.0)
+
+        # Always anchor the chart to global latest 8 weeks from actual history,
+        # so sparse versions still render a consistent 8-week axis with zeros.
+        baseline_weeks = sorted(actual_df["week_start"].dropna().unique())[-8:]
+        if not baseline_weeks:
+            st.info("Actuals vs Plan unavailable for the latest 8-week window.")
+            return
+        baseline_labels = [pd.to_datetime(w).strftime("%Y-%m-%d") for w in baseline_weeks]
+        merged["week_label"] = merged["week_start"].dt.strftime("%Y-%m-%d")
+        merged = merged[merged["week_label"].isin(baseline_labels)].copy()
+
+        # Ensure all stages are represented for each baseline week.
+        week_labels = baseline_labels
+        full_index = pd.MultiIndex.from_product([week_labels, stage_order], names=["week_label", "stage"])
+        merged = (
+            merged.set_index(["week_label", "stage"])
+            .reindex(full_index)
+            .reset_index()
+        )
+        merged["actual_pct"] = pd.to_numeric(merged["actual_pct"], errors="coerce").fillna(0.0)
+        merged["plan_pct"] = pd.to_numeric(merged["plan_pct"], errors="coerce").fillna(0.0)
+        merged["planned_count"] = pd.to_numeric(merged["planned_count"], errors="coerce").fillna(0.0)
+
+        palette = {
+            "SB0": "#5B5CFF",
+            "SB1/SB2": "#2F80FF",
+            "R0": "#00B3C7",
+            "R1": "#2E9E44",
+            "R2a": "#E2A300",
+            "R2b": "#C56A00",
+        }
+        fig = go.Figure()
+        for stage in stage_order:
+            d = merged[merged["stage"] == stage].copy()
+            if d.empty:
+                continue
+            color = palette.get(stage, "#64748B")
+            fig.add_trace(
+                go.Scatter(
+                    x=d["week_label"],
+                    y=d["actual_pct"],
+                    mode="lines+markers",
+                    name=f"{stage} Actual",
+                    line=dict(color=color, width=2),
+                    marker=dict(size=6),
+                    hovertemplate="Week: %{x}<br>Actual: %{y:.1f}%<extra></extra>",
+                )
+            )
+            fig.add_trace(
+                go.Scatter(
+                    x=d["week_label"],
+                    y=d["plan_pct"],
+                    mode="lines+markers",
+                    name=f"{stage} Plan",
+                    line=dict(color=color, width=2, dash="dot"),
+                    marker=dict(size=6, symbol="circle-open"),
+                    hovertemplate="Week: %{x}<br>Plan: %{y:.1f}%<br>Planned entries: %{customdata:.0f}<extra></extra>",
+                    customdata=d["planned_count"],
+                )
+            )
+
+        fig.update_layout(
+            title=f"📈 Actuals vs Plan by Stage — Version v{selected_version}",
+            xaxis_title="Week Start",
+            yaxis_title="Stage share within selected version (%)",
+            yaxis=dict(range=[0, 100]),
+            legend_title="Series",
+            height=520,
+        )
+        fig.update_xaxes(categoryorder="array", categoryarray=week_labels)
+        st.plotly_chart(fig, use_container_width=True, key=f"actual_vs_plan_chart_{key_suffix}")
+
+    def create_global_deployment_journey_single_version(self, selected_week: Optional[str], data: Optional[Dict[str, Any]] = None, key_suffix: str = "") -> None:
+        """Graph 1: Cumulative stagger confirmation trend from shared journey CSV over latest 12 weeks."""
+        df = self._load_shared_deployment_journey_history(selected_week, data)
+        if df.empty:
+            st.info("Shared deployment journey history not available for selected week.")
+            return
+
+        latest_weeks = sorted(df["week_start"].unique())[-12:]
         window = df[df["week_start"].isin(latest_weeks)].copy()
         if window.empty:
-            st.info("No rows available in latest 8-week window.")
+            st.info("No rows available in latest 12-week window.")
             return
 
-        versions = sorted(window["current_version"].unique(), key=self._version_tuple)
-        default_idx = max(0, len(versions) - 1)
-        selected_version = st.selectbox(
-            "Release Version",
-            versions,
-            index=default_idx,
-            key=f"global_journey_selected_version_{key_suffix}",
+        latest_week = pd.to_datetime(latest_weeks[-1])
+        # Only include releases that have non-zero SB0 in the 12-week window.
+        sb0_eligible_versions = sorted(
+            window[window["sb0_pct"] > 0]["current_version"].astype(str).unique().tolist(),
+            key=self._version_tuple,
         )
-        filtered = window[window["current_version"] == selected_version].copy()
+        if not sb0_eligible_versions:
+            st.info("No releases with SB0 > 0.0 found in the latest 12 weeks.")
+            return
+
+        # Determine a default cohort by latest-week SB0 presence (up to 8 versions).
+        latest_rows = window[window["week_start"] == latest_week].copy()
+        sb0_candidates = latest_rows[latest_rows["sb0_pct"] > 0]["current_version"].astype(str).tolist()
+        if sb0_candidates:
+            default_seed = sorted(sb0_candidates, key=self._version_tuple)[-1]
+        else:
+            default_seed = sb0_eligible_versions[-1]
+        ordered_versions = sb0_eligible_versions
+        seed_idx = ordered_versions.index(default_seed) if default_seed in ordered_versions else len(ordered_versions) - 1
+        default_versions = ordered_versions[max(0, seed_idx - 7): seed_idx + 1]
+
+        available_versions = sb0_eligible_versions
+        if not available_versions:
+            st.warning("No versions found in latest 12 weeks.")
+            return
+
+        default_versions = [v for v in default_versions if v in available_versions]
+        if not default_versions and available_versions:
+            default_versions = [available_versions[-1]]
+        selected_versions = st.multiselect(
+            "Versions (one or many)",
+            available_versions,
+            default=default_versions,
+            key=f"global_journey_versions_{key_suffix}",
+        )
+        if not selected_versions:
+            st.info("Select at least one version to plot cumulative stagger trend.")
+            return
+
+        filtered = window[window["current_version"].isin(selected_versions)].copy()
         if filtered.empty:
-            st.warning("No rows in latest 8 weeks for selected version.")
+            st.warning("No rows in latest 8 weeks for selected versions.")
             return
 
         pct_cols = ["sb0_pct", "sb1_pct", "r0_pct", "r1_pct", "r2a_pct", "r2b_pct"]
@@ -2435,62 +2938,72 @@ class QualityReportDashboard:
             "r2a_pct": "R2A",
             "r2b_pct": "R2B",
         }
+        week_labels = [pd.to_datetime(w).strftime("%Y-%m-%d") for w in latest_weeks]
+        all_staggers = ["SB0", "SB1", "R0", "R1", "R2A", "R2B"]
+
         melted = filtered.melt(
-            id_vars=["week_start", "current_version", "total_cells"],
+            id_vars=["week_start", "current_version"],
             value_vars=pct_cols,
             var_name="stagger_key",
             value_name="pct",
-        ).dropna(subset=["pct"]).copy()
+        ).copy()
+        melted["pct"] = pd.to_numeric(melted["pct"], errors="coerce").fillna(0.0)
         melted["stagger"] = melted["stagger_key"].map(stagger_label)
         melted["week_label"] = melted["week_start"].dt.strftime("%Y-%m-%d")
-        melted["stagger_order"] = melted["stagger_key"].map(
-            {"sb0_pct": 1, "sb1_pct": 2, "r0_pct": 3, "r1_pct": 4, "r2a_pct": 5, "r2b_pct": 6}
-        )
-        # Keep all 8 weeks on axis even if the selected version has no row in some weeks.
-        week_labels = [pd.to_datetime(w).strftime("%Y-%m-%d") for w in latest_weeks]
-        all_staggers = ["SB0", "SB1", "R0", "R1", "R2A", "R2B"]
-        full_index = pd.MultiIndex.from_product([week_labels, all_staggers], names=["week_label", "stagger"])
-        melted = (
-            melted.set_index(["week_label", "stagger"])
-            .reindex(full_index)
-            .reset_index()
-        )
-        # Fill only numeric fields with 0; keep string fields as strings.
-        if "pct" in melted.columns:
-            melted["pct"] = pd.to_numeric(melted["pct"], errors="coerce").fillna(0.0)
-        if "total_cells" in melted.columns:
-            melted["total_cells"] = pd.to_numeric(melted["total_cells"], errors="coerce").fillna(0.0)
-        if "current_version" in melted.columns:
-            melted["current_version"] = melted["current_version"].fillna("").astype(str)
-        if "stagger_key" in melted.columns:
-            melted["stagger_key"] = melted["stagger_key"].fillna("").astype(str)
-        melted["stagger_order"] = melted["stagger"].map({"SB0": 1, "SB1": 2, "R0": 3, "R1": 4, "R2A": 5, "R2B": 6})
-        melted = melted.sort_values(["week_label", "stagger_order"])
+        melted["confirmed"] = (melted["pct"] > 0).astype(int)
 
-        fig = px.bar(
-            melted,
+        version_stage_week = (
+            melted.groupby(["current_version", "stagger", "week_label"], as_index=False)["confirmed"]
+            .max()
+        )
+        full_vsw = pd.MultiIndex.from_product(
+            [selected_versions, all_staggers, week_labels],
+            names=["current_version", "stagger", "week_label"],
+        ).to_frame(index=False)
+        version_stage_week = full_vsw.merge(
+            version_stage_week,
+            on=["current_version", "stagger", "week_label"],
+            how="left",
+        )
+        version_stage_week["confirmed"] = pd.to_numeric(version_stage_week["confirmed"], errors="coerce").fillna(0).astype(int)
+        version_stage_week["week_label"] = pd.Categorical(version_stage_week["week_label"], categories=week_labels, ordered=True)
+        version_stage_week = version_stage_week.sort_values(["current_version", "stagger", "week_label"])
+        # Cumulative confirmation: once a version hits a stage, keep it confirmed for later weeks.
+        version_stage_week["confirmed_cum"] = (
+            version_stage_week.groupby(["current_version", "stagger"])["confirmed"].cummax()
+        )
+
+        stage_week = (
+            version_stage_week.groupby(["week_label", "stagger"], as_index=False)["confirmed_cum"]
+            .mean()
+        )
+        stage_week["pct"] = stage_week["confirmed_cum"] * 100.0
+        stage_week["week_label"] = stage_week["week_label"].astype(str)
+        stage_week["stagger_order"] = stage_week["stagger"].map({"SB0": 1, "SB1": 2, "R0": 3, "R1": 4, "R2A": 5, "R2B": 6})
+        stage_week = stage_week.sort_values(["stagger_order", "week_label"])
+
+        fig = px.line(
+            stage_week,
             x="week_label",
             y="pct",
             color="stagger",
-            barmode="group",
-            category_orders={"stagger": ["SB0", "SB1", "R0", "R1", "R2A", "R2B"]},
-            custom_data=["total_cells"],
+            markers=True,
+            category_orders={"stagger": all_staggers},
             title=(
-                "🚀 Release Journey by Stagger (Latest 8 Weeks)"
-                f"<br><sub>Version v{selected_version}</sub>"
+                "🚀 Release Journey by Stagger — Cumulative Confirmation (Latest 12 Weeks)"
+                f"<br><sub>Selected versions: {len(selected_versions)}</sub>"
             ),
         )
         fig.update_traces(
             hovertemplate=(
                 "<b>%{fullData.name}</b><br>"
                 "Week: %{x}<br>"
-                "Percent: %{y:.1f}%<br>"
-                "Total cells: %{customdata[0]}<extra></extra>"
+                "Cumulative confirmed versions: %{y:.1f}%<extra></extra>"
             )
         )
         fig.update_layout(
             xaxis_title="Week Start",
-            yaxis_title="Percentage of cells in stagger (%)",
+            yaxis_title="Cumulative percentage for stagger (%)",
             yaxis=dict(range=[0, 100]),
             legend_title="Stagger",
             height=520,
@@ -2645,6 +3158,1838 @@ class QualityReportDashboard:
         )
         fig.update_xaxes(tickangle=-35)
         st.plotly_chart(fig, use_container_width=True, key=f"global_journey_top6_{key_suffix}")
+
+    def create_deployment_journey_cumulative(self, selected_week: Optional[str], data: Optional[Dict[str, Any]] = None, key_suffix: str = "") -> None:
+        """
+        Multi-line chart showing cumulative completion percentage for N releases over 12 weeks.
+        Each line represents a release's journey through the stagger stages.
+        """
+        # Load deployment journey data from weeks/<cw>/Shared/deployment-journey.csv
+        if selected_week:
+            csv_path = os.path.join(APP_ROOT, "weeks", selected_week, "Shared", "deployment-journey.csv")
+        else:
+            csv_path = None
+
+        if not csv_path or not os.path.exists(csv_path):
+            st.info("Deployment journey data not available. Expected file: weeks/<cw>/Shared/deployment-journey.csv")
+            return
+
+        # Read the CSV
+        df = pd.read_csv(csv_path)
+
+        # Calculate cumulative completion percentage across all staggers
+        # New column names: pct_of_SB0, pct_of_SB1, etc.
+        stagger_cols = ['pct_of_SB0', 'pct_of_SB1', 'pct_of_R0', 'pct_of_R1', 'pct_of_R2a', 'pct_of_R2b']
+
+        # Check if columns exist, if not try old format
+        if not all(col in df.columns for col in stagger_cols):
+            stagger_cols = ['sb0_pct', 'sb1_pct', 'r0_pct', 'r1_pct', 'r2a_pct', 'r2b_pct']
+
+        df['cumulative_pct'] = df[stagger_cols].sum(axis=1)
+
+        # Get unique releases
+        releases = df['current_version'].unique()
+
+        # Create figure
+        fig = go.Figure()
+
+        # Color palette for releases
+        colors = px.colors.qualitative.Plotly + px.colors.qualitative.Set2
+
+        # Add a line for each release
+        for idx, release in enumerate(releases):
+            release_data = df[df['current_version'] == release].sort_values('week_start')
+
+            fig.add_trace(go.Scatter(
+                x=release_data['week_start'],
+                y=release_data['cumulative_pct'],
+                mode='lines+markers',
+                name=f"Release {release}",
+                line=dict(width=2, color=colors[idx % len(colors)]),
+                marker=dict(size=6),
+                hovertemplate=(
+                    f"<b>Release {release}</b><br>"
+                    "Week: %{x}<br>"
+                    "Cumulative: %{y:.1f}%<br>"
+                    "<extra></extra>"
+                )
+            ))
+
+        fig.update_layout(
+            title="📈 Release Deployment Journey - Cumulative Completion Over 12 Weeks",
+            xaxis_title="Week",
+            yaxis_title="Cumulative Completion (%)",
+            yaxis=dict(range=[0, 100]),
+            hovermode='x unified',
+            height=500,
+            legend=dict(
+                orientation="v",
+                yanchor="top",
+                y=1,
+                xanchor="left",
+                x=1.02
+            )
+        )
+
+        st.plotly_chart(fig, use_container_width=True, key=f"deployment_journey_cumulative_{key_suffix}")
+
+    def create_release_journey_gantt(self, selected_week: Optional[str], data: Optional[Dict[str, Any]] = None, key_suffix: str = "") -> None:
+        """
+        Create a dense Gantt chart showing plan vs actual deployment timing for releases.
+        This matches the PNG reference visualization with releases on Y-axis and timeline on X-axis.
+        """
+        # Load deployment journey data
+        actual = self._load_shared_deployment_journey_history(selected_week, data)
+        if actual.empty:
+            actual = self._load_global_deployment_history(selected_week, data)
+
+        # Load plan data
+        plan = self._load_plan_schedule_data(selected_week, data)
+
+        if actual.empty or plan.empty:
+            st.info("Gantt chart unavailable: missing actual or plan data.")
+            return
+
+        # Stage configuration with colors
+        stage_config = [
+            {"name": "SB0", "color": "#6366F1", "label": "SB0 - Sandbox 0"},
+            {"name": "SB1/SB2", "color": "#60A5FA", "label": "SB1/SB2 - Sandbox 1/2"},
+            {"name": "R0", "color": "#06B6D4", "label": "R0 - Release Week 1"},
+            {"name": "R1", "color": "#22C55E", "label": "R1 - Release Week 2"},
+            {"name": "R2a", "color": "#F59E0B", "label": "R2a - Release Week 3"},
+            {"name": "R2b", "color": "#F97316", "label": "R2b - Release Week 4"},
+        ]
+
+        stage_colors = {s["name"]: s["color"] for s in stage_config}
+        stage_col_map = {
+            "SB0": "sb0_pct",
+            "SB1/SB2": "sb1_pct",
+            "R0": "r0_pct",
+            "R1": "r1_pct",
+            "R2a": "r2a_pct",
+            "R2b": "r2b_pct",
+        }
+
+        # Display color legend upfront - readable text
+        legend_html = '<div style="margin: 12px 0; padding: 10px 0; border-bottom: 2px solid #ddd;"><span style="font-size: 16px; font-weight: 700; color: #000; margin-right: 24px;">Stages:</span>'
+        for stage in stage_config:
+            legend_html += f'<span style="display: inline-block; margin-right: 28px;"><span style="display: inline-block; width: 24px; height: 12px; background-color: {stage["color"]}; margin-right: 8px; border: 1px solid #aaa; vertical-align: middle;"></span><span style="font-size: 14px; color: #000; font-weight: 600;">{stage["label"]}</span></span>'
+        legend_html += '</div>'
+        st.markdown(legend_html, unsafe_allow_html=True)
+
+        # Get overlapping releases between plan and actual
+        actual_versions = set(actual["current_version"].astype(str))
+        plan_versions = set(plan["version"].astype(str))
+
+        # Filter to only versions that have plan data (check for actual plan entries with stages)
+        versions_with_plans = []
+        for v in sorted(actual_versions.intersection(plan_versions), key=self._version_tuple):
+            v_plan = plan[plan["version"].astype(str) == v]
+            # Check that plan has actual stage entries, not just empty rows
+            if not v_plan.empty and v_plan["stage"].notna().any():
+                versions_with_plans.append(v)
+
+        versions = versions_with_plans
+
+        if not versions:
+            st.info("No overlapping releases between plan and actual.")
+            return
+
+        # Allow user to select releases to display - professional compact selector
+        default_versions = versions[-12:] if len(versions) > 12 else versions
+
+        # Custom CSS for smaller, professional multiselect with dark gray tags
+        st.markdown("""
+            <style>
+            div[data-baseweb="select"] {
+                font-size: 11px;
+            }
+            div[data-baseweb="select"] > div {
+                min-height: 28px;
+                font-size: 11px;
+            }
+            div[data-baseweb="select"] span {
+                font-size: 11px;
+            }
+            div[data-baseweb="tag"] {
+                font-size: 10px;
+                padding: 2px 6px;
+                margin: 2px;
+                background-color: #4a4a4a !important;
+                color: #ffffff !important;
+            }
+            div[data-baseweb="tag"] span[role="button"] {
+                color: #ffffff !important;
+            }
+            </style>
+        """, unsafe_allow_html=True)
+
+        st.markdown('<div style="margin-top: 8px; margin-bottom: 4px;"><span style="font-size: 13px; font-weight: 700; color: #000;">Releases:</span></div>', unsafe_allow_html=True)
+
+        col1, col2 = st.columns([4, 1])
+        with col1:
+            selected_versions = st.multiselect(
+                "Select versions",
+                versions,
+                default=default_versions,
+                key=f"gantt_versions_{key_suffix}",
+                label_visibility="collapsed"
+            )
+        with col2:
+            st.markdown("<div style='margin-top: 0px;'></div>", unsafe_allow_html=True)
+            if st.button("Select All", key=f"select_all_{key_suffix}", use_container_width=True):
+                selected_versions = versions
+
+        if not selected_versions:
+            st.info("Select at least one release.")
+            return
+
+        # Filter to selected versions
+        actual = actual[actual["current_version"].astype(str).isin(selected_versions)].copy()
+        plan = plan[plan["version"].astype(str).isin(selected_versions)].copy()
+
+        # Get date range for x-axis and time range for visibility check
+        all_dates = list(actual["week_start"].dropna()) + list(plan["week_start"].dropna())
+        if all_dates:
+            min_date = min(all_dates)
+            max_date = max(all_dates)
+        else:
+            min_date = pd.Timestamp.now()
+            max_date = min_date + pd.Timedelta(days=90)
+
+        # Time range for visibility check
+        time_range_start = min_date - pd.Timedelta(days=2)
+        time_range_end = max_date + pd.Timedelta(days=2)
+
+        # Create Gantt chart
+        fig = go.Figure()
+
+        # Y-axis position for each release x stage (6 rows per version)
+        y_pos = 0
+        y_labels = []
+        y_positions = []
+        version_start_positions = []
+
+        # Define alternating gray colors for version labels
+        version_label_colors = ['#2a2a2a', '#505050', '#707070', '#404040', '#606060']
+
+        # Define fixed widths for alignment
+        VERSION_WIDTH = 10  # Width for version field (e.g., "v262.18   ")
+        STAGE_WIDTH = 8     # Width for stage field (e.g., "SB1/SB2 ")
+        TOTAL_LABEL_WIDTH = VERSION_WIDTH + 3 + STAGE_WIDTH  # version + " │ " + stage
+
+        # Process each version (reverse order so newest at top)
+        version_index = 0
+        for version in sorted(selected_versions, key=self._version_tuple, reverse=True):
+            version_actual = actual[actual["current_version"].astype(str) == version].sort_values("week_start")
+            version_plan = plan[plan["version"].astype(str) == version]
+
+            # Build stage timeline for this version - sort by start date
+            version_plan_sorted = version_plan.sort_values("week_start")
+            stage_timeline = {}
+
+            # Calculate end dates: each stage ends the day before the next stage starts
+            for idx, (_, row) in enumerate(version_plan_sorted.iterrows()):
+                stage = row["stage"]
+                start_date = row["week_start"]
+
+                # Find the next stage's start date
+                if idx < len(version_plan_sorted) - 1:
+                    next_start = version_plan_sorted.iloc[idx + 1]["week_start"]
+                    end_date = next_start - pd.Timedelta(days=1)
+                else:
+                    # Last stage - use a week duration
+                    end_date = start_date + pd.Timedelta(days=6)
+
+                # Store or extend the range for this stage
+                if stage not in stage_timeline:
+                    stage_timeline[stage] = {"start": start_date, "end": end_date}
+                else:
+                    # Extend if we see this stage multiple times
+                    stage_timeline[stage]["start"] = min(stage_timeline[stage]["start"], start_date)
+                    stage_timeline[stage]["end"] = max(stage_timeline[stage]["end"], end_date)
+
+            # Skip this version if it has no plan data
+            if not stage_timeline:
+                continue
+
+            # Only add to positions list if we have valid plan data
+            version_y_start = y_pos
+            stages_drawn = 0
+
+            # Get color for this version's labels
+            label_color = version_label_colors[version_index % len(version_label_colors)]
+
+            # First, collect all stages that have plan data for this version
+            stages_with_plan = [stage for stage in ["R2b", "R2a", "R1", "R0", "SB1/SB2", "SB0"] if stage in stage_timeline]
+
+            # Draw each stage on its own row (reversed order: R2b at top, SB0 at bottom)
+            # Only show stages that have plan data
+            stage_idx = 0
+            for stage in ["R2b", "R2a", "R1", "R0", "SB1/SB2", "SB0"]:
+                # Skip this stage if it has no plan
+                if stage not in stage_timeline:
+                    continue
+
+                # Build label with consistent padding
+                version_text = f"v{version}"
+
+                # Show version label on the LAST stage (bottom-most, which is SB0 or earliest stage)
+                is_last_stage = (stage_idx == len(stages_with_plan) - 1)
+
+                if is_last_stage:
+                    # Last stage - show version number (bold and black)
+                    version_padded = f'{version_text:<{VERSION_WIDTH}}'
+                    version_part = f'<b>{version_padded}</b>'
+                else:
+                    # Other stages - blank out version (use non-breaking spaces to maintain width)
+                    blank_spaces = '&nbsp;' * VERSION_WIDTH
+                    version_part = blank_spaces
+
+                # Stage part with consistent width
+                stage_part = f'{stage:<{STAGE_WIDTH}}'
+
+                # Combine with separator
+                colored_label = f'{version_part} │ {stage_part}'
+
+                y_labels.append(colored_label)
+                y_positions.append(y_pos)
+                stages_drawn += 1
+                stage_idx += 1
+
+                stage_color = stage_colors[stage]
+
+                # Draw plan (we know it exists because we checked above)
+                if stage in stage_timeline:
+                    plan_start = stage_timeline[stage]["start"]
+                    plan_end = stage_timeline[stage]["end"]
+
+                    # Draw thin line for plan
+                    fig.add_trace(go.Scatter(
+                        x=[plan_start, plan_end],
+                        y=[y_pos, y_pos],
+                        mode='lines',
+                        line=dict(color=stage_color, width=4, dash='solid'),
+                        showlegend=False,
+                        hovertemplate=f"<b>v{version}</b><br><b>Stage:</b> {stage}<br><b>Plan:</b> {plan_start.strftime('%b %d, %Y')} to {plan_end.strftime('%b %d, %Y')}<extra></extra>",
+                        opacity=0.35
+                    ))
+
+                    # Add donut circle at plan start (only if in time range)
+                    if time_range_start <= plan_start <= time_range_end:
+                        fig.add_trace(go.Scatter(
+                            x=[plan_start],
+                            y=[y_pos],
+                            mode='markers',
+                            marker=dict(
+                                size=10,
+                                color='white',
+                                line=dict(color=stage_color, width=2.8)
+                            ),
+                            showlegend=False,
+                            hovertemplate=f"<b>v{version}</b><br><b>Stage:</b> {stage}<br><b>Plan Start:</b> {plan_start.strftime('%b %d, %Y')}<extra></extra>"
+                        ))
+
+                    # Add donut circle at plan end (only if in time range)
+                    if time_range_start <= plan_end <= time_range_end:
+                        fig.add_trace(go.Scatter(
+                            x=[plan_end],
+                            y=[y_pos],
+                            mode='markers',
+                            marker=dict(
+                                size=10,
+                                color='white',
+                                line=dict(color=stage_color, width=2.8)
+                            ),
+                            showlegend=False,
+                            hovertemplate=f"<b>v{version}</b><br><b>Stage:</b> {stage}<br><b>Plan End:</b> {plan_end.strftime('%b %d, %Y')}<extra></extra>"
+                        ))
+
+                # Draw actual if exists
+                stage_col = stage_col_map.get(stage)
+                if stage_col and stage_col in version_actual.columns:
+                    actual_weeks = version_actual[version_actual[stage_col] > 0].copy()
+
+                    if not actual_weeks.empty:
+                        actual_start = actual_weeks["week_start"].min()
+                        actual_end_observed = actual_weeks["week_start"].max()
+                        max_pct = actual_weeks[stage_col].max()
+
+                        # Calculate proportional end date based on percentage complete
+                        if stage in stage_timeline:
+                            plan_start = stage_timeline[stage]["start"]
+                            plan_end = stage_timeline[stage]["end"]
+                            plan_duration = (plan_end - plan_start).total_seconds() / 86400  # days
+
+                            # Actual end date proportional to percentage
+                            actual_duration = plan_duration * (max_pct / 100.0)
+                            actual_end = actual_start + pd.Timedelta(days=actual_duration)
+                        else:
+                            actual_end = actual_end_observed
+
+                        # Draw thick opaque line for actual (2x thicker than plan)
+                        fig.add_trace(go.Scatter(
+                            x=[actual_start, actual_end],
+                            y=[y_pos, y_pos],
+                            mode='lines',
+                            line=dict(color=stage_color, width=8, dash='solid'),
+                            showlegend=False,
+                            hovertemplate=f"<b>v{version}</b><br><b>Stage:</b> {stage}<br><b>Actual:</b> {actual_start.strftime('%b %d, %Y')} to {actual_end.strftime('%b %d, %Y')}<br><b>Progress:</b> {max_pct:.1f}%<extra></extra>",
+                            opacity=1.0
+                        ))
+
+                        # Add solid opaque circle at actual start (only if in time range)
+                        if time_range_start <= actual_start <= time_range_end:
+                            fig.add_trace(go.Scatter(
+                                x=[actual_start],
+                                y=[y_pos],
+                                mode='markers',
+                                marker=dict(
+                                    size=10,
+                                    color=stage_color,
+                                    opacity=1.0
+                                ),
+                                showlegend=False,
+                                hovertemplate=f"<b>v{version}</b><br><b>Stage:</b> {stage}<br><b>Actual Start:</b> {actual_start.strftime('%b %d, %Y')}<extra></extra>"
+                            ))
+
+                        # Add solid opaque circle at actual end (only if in time range)
+                        if time_range_start <= actual_end <= time_range_end:
+                            fig.add_trace(go.Scatter(
+                                x=[actual_end],
+                                y=[y_pos],
+                                mode='markers',
+                                marker=dict(
+                                    size=10,
+                                    color=stage_color,
+                                    opacity=1.0
+                                ),
+                                showlegend=False,
+                                hovertemplate=f"<b>v{version}</b><br><b>Stage:</b> {stage}<br><b>Actual End:</b> {actual_end.strftime('%b %d, %Y')}<br><b>Progress:</b> {max_pct:.1f}%<extra></extra>"
+                            ))
+
+                y_pos += 1
+
+            # Track version position with actual stage count
+            if stages_drawn > 0:
+                version_start_positions.append((version_y_start, version_index, stages_drawn))
+
+                # Add prominent horizontal separator line after each version's rows
+                fig.add_hline(
+                    y=y_pos - 0.5,
+                    line_width=2,
+                    line_dash="solid",
+                    line_color="#404040",
+                    opacity=0.8
+                )
+
+            version_index += 1
+
+        # Add alternating background shading for each version
+        for y_start, v_idx, num_stages in version_start_positions:
+            if v_idx % 2 == 1:  # Odd-indexed versions get darker shade
+                fig.add_shape(
+                    type="rect",
+                    xref="paper",
+                    yref="y",
+                    x0=0,
+                    x1=1,
+                    y0=y_start - 0.5,
+                    y1=y_start + num_stages - 0.5,  # Use actual number of stages drawn
+                    fillcolor="#f0f0f0",
+                    opacity=0.4,
+                    layer="below",
+                    line_width=0,
+                )
+
+        # Update layout with professional, polished styling
+        fig.update_layout(
+            title={
+                'text': "Release Deployment Timeline - Plan vs Actual",
+                'font': {'size': 16, 'color': '#1a1a1a', 'family': 'Segoe UI, Arial, sans-serif', 'weight': 700},
+                'x': 0.02,
+                'xanchor': 'left'
+            },
+            xaxis_title={
+                'text': "",
+                'font': {'size': 11, 'color': '#000000', 'family': 'Segoe UI, Arial, sans-serif', 'weight': 600}
+            },
+            yaxis_title={
+                'text': "Release & Stage",
+                'font': {'size': 11, 'color': '#000000', 'family': 'Segoe UI, Arial, sans-serif', 'weight': 600}
+            },
+            height=max(350, y_pos * 20),  # Use actual number of rows drawn with slightly more spacing
+            yaxis=dict(
+                tickmode='array',
+                tickvals=y_positions,
+                ticktext=y_labels,
+                tickfont=dict(size=10, color='#000000', family='Courier New, monospace', weight=400),
+                gridcolor='#e8e8e8',
+                gridwidth=0.5,
+                showgrid=True,
+                zeroline=False,
+                side='left',
+                ticklabelposition='outside',
+                automargin=True,
+            ),
+            xaxis=dict(
+                tickfont=dict(size=9, color='#000000', family='Segoe UI, Arial, sans-serif', weight=500),
+                tickformat='%b %d',
+                dtick=604800000,  # 7 days in milliseconds
+                tickangle=0,
+                gridcolor='#d8d8d8',
+                gridwidth=0.8,
+                showgrid=True,
+                zeroline=False,
+                range=[min_date - pd.Timedelta(days=2), max_date + pd.Timedelta(days=2)],
+                side='bottom',
+                position=0.98,  # Position below the top
+            ),
+            hovermode='closest',
+            hoverlabel=dict(
+                bgcolor="white",
+                font_size=11,
+                font_family="Segoe UI, Arial, sans-serif",
+                bordercolor="#cccccc"
+            ),
+            margin=dict(l=150, r=20, t=140, b=50),
+            plot_bgcolor='#ffffff',
+            paper_bgcolor='#f8f9fa',
+            font=dict(family='Segoe UI, Arial, sans-serif', color='#1a1a1a'),
+            showlegend=False,
+        )
+
+        # Add month separators as vertical lines and centered month labels above dates
+        current = min_date.replace(day=1)
+        while current <= max_date:
+            # Calculate next month for centering
+            if current.month == 12:
+                next_month = current.replace(year=current.year + 1, month=1)
+            else:
+                next_month = current.replace(month=current.month + 1)
+
+            # Add vertical line at month boundary
+            fig.add_vline(
+                x=current,
+                line_width=1.5,
+                line_dash="solid",
+                line_color="#aaaaaa",
+                opacity=0.6
+            )
+
+            # Calculate center of month for label placement
+            month_center = current + (next_month - current) / 2
+
+            # Add month label at the very top
+            fig.add_annotation(
+                x=month_center,
+                y=1.0,
+                yref="paper",
+                yanchor="bottom",
+                text=f"<b>{current.strftime('%B %Y')}</b>",
+                showarrow=False,
+                font=dict(size=12, color='#000000', family='Segoe UI, Arial, sans-serif', weight='bold'),
+                xanchor='center'
+            )
+
+            # Move to next month
+            current = next_month
+
+        # Display chart aligned to left
+        col1, col2 = st.columns([8, 2])
+        with col1:
+            st.plotly_chart(fig, use_container_width=True, key=f"release_journey_gantt_{key_suffix}")
+
+        # Three analysis charts in one row
+        st.markdown("---")
+        st.markdown('<div style="margin: 16px 0;"><span style="font-size: 14px; font-weight: 700; color: #000;">Detailed Analysis by Version</span></div>', unsafe_allow_html=True)
+
+        # Single version selector for analysis charts
+        analysis_version = st.selectbox(
+            "Select version for detailed analysis",
+            selected_versions,
+            key=f"analysis_version_{key_suffix}",
+        )
+
+        if analysis_version:
+            analysis_actual = actual[actual["current_version"].astype(str) == analysis_version].sort_values("week_start")
+            analysis_plan = plan[plan["version"].astype(str) == analysis_version]
+
+            chart_col1, chart_col2, chart_col3 = st.columns(3)
+
+            # Chart 2: Deployment Progress - Cumulative Completion
+            with chart_col1:
+                st.markdown("""
+                <div style="background-color: #f0f7ff; padding: 10px; border-radius: 4px; margin-bottom: 12px; font-size: 11px;">
+                <strong>2. Deployment Progress</strong><br/>
+                Shows cumulative completion through the deployment pipeline. Each colored band represents a stage's contribution: SB0→SB1→R0→R1→R2a→R2b = 100%.
+                </div>
+                """, unsafe_allow_html=True)
+                if not analysis_actual.empty:
+                    # Calculate weighted cumulative progress per stage
+                    # Assign weights: SB0=10%, SB1=15%, R0=15%, R1=20%, R2a=20%, R2b=20%
+                    stage_weights = {
+                        "SB0": 0.10,
+                        "SB1/SB2": 0.15,
+                        "R0": 0.15,
+                        "R1": 0.20,
+                        "R2a": 0.20,
+                        "R2b": 0.20,
+                    }
+
+                    # Shared timeline across all 3 charts: earliest-to-latest from actual + plan.
+                    actual_weeks = set(pd.to_datetime(analysis_actual["week_start"], errors="coerce").dropna().dt.normalize().tolist())
+                    plan_weeks = set(pd.to_datetime(analysis_plan["week_start"], errors="coerce").dropna().dt.normalize().tolist())
+                    weeks = sorted(actual_weeks | plan_weeks)
+                    if not weeks:
+                        st.info("No week timeline data available.")
+                        return
+                    progress_data = []
+                    running_stage_max = {s: 0.0 for s in ["SB0", "SB1/SB2", "R0", "R1", "R2a", "R2b"]}
+
+                    actual_by_week = {
+                        pd.to_datetime(r["week_start"]).normalize(): r
+                        for _, r in analysis_actual.sort_values("week_start").iterrows()
+                    }
+
+                    for week in weeks:
+                        week_data = actual_by_week.get(pd.to_datetime(week).normalize())
+                        week_str = f"{week.month}/{week.day}"
+
+                        # Calculate each stage's weighted contribution
+                        for stage in ["SB0", "SB1/SB2", "R0", "R1", "R2a", "R2b"]:
+                            stage_col = stage_col_map.get(stage)
+                            if stage_col in analysis_actual.columns:
+                                pct = week_data.get(stage_col, 0) if week_data is not None else 0
+                                # Each stage contributes (its % complete) × (its weight) to total progress
+                                stage_contribution = (pct / 100.0) * stage_weights[stage] * 100
+                                # Strict cumulative: once reached, contribution cannot decrease.
+                                running_stage_max[stage] = max(running_stage_max[stage], stage_contribution)
+                                progress_data.append({
+                                    "Week": week_str,
+                                    "Stage": stage,
+                                    "Contribution": running_stage_max[stage],
+                                })
+
+                    progress_df = pd.DataFrame(progress_data)
+
+                    # Create stacked area chart
+                    fig1 = go.Figure()
+
+                    # Add each stage as a stacked area trace in order
+                    plan_label_y = {
+                        "SB0": 96,
+                        "SB1/SB2": 84,
+                        "R0": 72,
+                        "R1": 60,
+                        "R2a": 48,
+                        "R2b": 36,
+                    }
+                    for stage in ["SB0", "SB1/SB2", "R0", "R1", "R2a", "R2b"]:
+                        stage_data = progress_df[progress_df["Stage"] == stage]
+                        fig1.add_trace(go.Scatter(
+                            x=stage_data["Week"],
+                            y=stage_data["Contribution"],
+                            name=stage,
+                            mode='lines',
+                            stackgroup='one',  # This creates the stacked effect
+                            fillcolor=stage_colors[stage],
+                            line=dict(width=0.5, color=stage_colors[stage]),
+                            hovertemplate=f'<b>{stage}</b><br>Week: %{{x}}<br>Contribution: %{{y:.1f}}%<extra></extra>'
+                        ))
+
+                    fig1.update_layout(
+                        title=f"Deployment Progress - Cumulative Completion<br><sub>v{analysis_version}</sub>",
+                        height=350,
+                        yaxis_title="Overall Progress %",
+                        xaxis_title="Week",
+                        font=dict(family='Segoe UI, Arial, sans-serif', size=10, color='#000000'),
+                        title_font_size=12,
+                        yaxis=dict(range=[0, 100]),
+                        margin=dict(l=50, r=20, t=60, b=110),
+                        plot_bgcolor='#ffffff',
+                        paper_bgcolor='#f8f9fa',
+                        legend=dict(
+                            orientation="h",
+                            yanchor="bottom",
+                            y=-0.6,
+                            xanchor="center",
+                            x=0.5,
+                            font=dict(size=9),
+                            tracegroupgap=5
+                        ),
+                    )
+
+                    # Use the same week axis/tick spacing as charts 2 and 3.
+                    week_axis_labels = [f"{w.month}/{w.day}" for w in weeks]
+                    tickvals = [week_axis_labels[i] for i in range(len(week_axis_labels)) if i % 2 == 0]
+                    fig1.update_xaxes(
+                        tickangle=0,
+                        tickfont=dict(size=9, color='#000000'),
+                        tickmode='array',
+                        tickvals=tickvals,
+                        categoryorder='array',
+                        categoryarray=week_axis_labels
+                    )
+                    fig1.update_yaxes(tickfont=dict(color='#000000'))
+
+                    st.plotly_chart(fig1, use_container_width=True, key=f"dist_{key_suffix}")
+                else:
+                    st.info("No actual data for this version")
+
+            # Chart 3: Planned vs Actual (12 lines)
+            with chart_col2:
+                st.markdown("""
+                <div style="background-color: #f0f7ff; padding: 10px; border-radius: 4px; margin-bottom: 12px; font-size: 11px;">
+                <strong>3. Planned vs Actual Progress</strong><br/>
+                Actual progress (solid lines) against Plan (dotted lines) on a continuous date scale.
+                Both plan and actual are interpolated between known weekly points for smoother trend comparison.
+                </div>
+                """, unsafe_allow_html=True)
+                if not analysis_actual.empty and not analysis_plan.empty:
+                    fig2 = go.Figure()
+
+                    # Build stage timeline for planned start/end dates (same logic as table).
+                    version_plan_sorted = analysis_plan.sort_values("week_start")
+                    stage_timeline = self._build_stage_timeline(version_plan_sorted)
+
+                    # Use the exact same week axis as Deployment Progress.
+                    all_weeks = weeks
+                    week_label_map = {w: f"{w.month}/{w.day}" for w in all_weeks}
+                    week_labels_for_axis = [week_label_map[w] for w in all_weeks]
+                    date_start = min(all_weeks)
+                    date_end = max(all_weeks)
+                    daily_index = pd.date_range(date_start, date_end, freq='D')
+                    actual_line_colors = {
+                        "SB0": "#3730A3",
+                        "SB1/SB2": "#1D4ED8",
+                        "R0": "#0E7490",
+                        "R1": "#166534",
+                        "R2a": "#B45309",
+                        "R2b": "#9A3412",
+                    }
+
+                    stage_list = ["SB0", "SB1/SB2", "R0", "R1", "R2a", "R2b"]
+                    plan_focus_stages = {"SB0", "SB1/SB2", "R0", "R1", "R2a", "R2b"}
+                    def _hex_to_rgba(hex_color: str, alpha: float) -> str:
+                        c = str(hex_color).lstrip('#')
+                        if len(c) != 6:
+                            return f"rgba(0,0,0,{alpha})"
+                        r = int(c[0:2], 16)
+                        g = int(c[2:4], 16)
+                        b = int(c[4:6], 16)
+                        return f"rgba({r},{g},{b},{alpha})"
+
+                    # Draw all plan areas first (background layer).
+                    for stage in stage_list:
+                        stage_color = stage_colors[stage]
+                        if stage in stage_timeline and stage in plan_focus_stages:
+                            plan_start = stage_timeline[stage]["start"]
+                            plan_end = stage_timeline[stage]["end"]
+                            plan_vals = []
+                            total_days = max((plan_end - plan_start).days, 1)
+                            for d in daily_index:
+                                if d < plan_start:
+                                    plan_vals.append(None)
+                                elif d > plan_end:
+                                    plan_vals.append(None)
+                                else:
+                                    elapsed = (d - plan_start).days
+                                    plan_vals.append(min(100.0, max(0.0, (elapsed / total_days) * 100.0)))
+                            fig2.add_trace(go.Scatter(
+                                x=daily_index,
+                                y=plan_vals,
+                                name=f"{stage} Plan",
+                                mode='lines',
+                                fill='tozeroy',
+                                fillcolor=_hex_to_rgba(stage_color, 0.09),
+                                line=dict(color=stage_color, width=1.0, dash='dot'),
+                                legendgroup=stage,
+                                showlegend=False,
+                                hovertemplate=f'<b>{stage} Plan</b><br>Date: %{{x|%Y-%m-%d}}<br>Planned %: %{{y:.1f}}<extra></extra>',
+                            ))
+
+                    # Draw all actual lines after plan areas so they remain fully visible.
+                    for stage in stage_list:
+                        stage_color = stage_colors[stage]
+                        stage_col = stage_col_map.get(stage)
+                        if stage_col in analysis_actual.columns:
+                            actual_data = analysis_actual[["week_start", stage_col]].copy().dropna(subset=["week_start"])
+                            actual_data = actual_data.rename(columns={stage_col: "pct"}).sort_values("week_start")
+                            actual_data["pct"] = pd.to_numeric(actual_data["pct"], errors="coerce").fillna(0.0)
+                            actual_series = actual_data.set_index("week_start")["pct"]
+                            actual_interp = actual_series.reindex(daily_index).interpolate(method='time').ffill().bfill()
+
+                            fig2.add_trace(go.Scatter(
+                                x=daily_index,
+                                y=actual_interp.values,
+                                name=stage,
+                                mode='lines',
+                                line=dict(color=actual_line_colors.get(stage, stage_color), width=3.2, dash='solid'),
+                                legendgroup=stage,
+                                showlegend=True,
+                                hovertemplate=f'<b>{stage} Actual</b><br>Date: %{{x|%Y-%m-%d}}<br>Actual %: %{{y:.1f}}<extra></extra>',
+                            ))
+
+                    fig2.update_layout(
+                        title=f"Planned vs Actual Progress<br><sub>Actual (solid) vs Plan (dotted) · v{analysis_version}</sub>",
+                        height=350,
+                        yaxis_title="% Complete",
+                        xaxis_title="Week",
+                        font=dict(family='Segoe UI, Arial, sans-serif', size=10, color='#000000'),
+                        title_font_size=12,
+                        yaxis=dict(range=[0, 100]),
+                        legend=dict(
+                            orientation="h",
+                            yanchor="bottom",
+                            y=-0.6,
+                            xanchor="center",
+                            x=0.5,
+                            font=dict(size=9),
+                            tracegroupgap=5
+                        ),
+                        margin=dict(l=50, r=20, t=60, b=110),
+                        plot_bgcolor='#ffffff',
+                        paper_bgcolor='#f8f9fa',
+                    )
+                    # Match Deployment Progress x-axis labeling density.
+                    tickvals2 = [week_labels_for_axis[i] for i in range(len(week_labels_for_axis)) if i % 2 == 0]
+                    tickvals2_dt = [all_weeks[i] for i in range(len(all_weeks)) if i % 2 == 0]
+                    fig2.update_xaxes(
+                        tickangle=0,
+                        tickfont=dict(size=9, color='#000000'),
+                        tickmode='array',
+                        tickvals=tickvals2_dt,
+                        ticktext=tickvals2,
+                    )
+                    fig2.update_yaxes(tickfont=dict(color='#000000'))
+                    st.plotly_chart(fig2, use_container_width=True, key=f"plan_actual_{key_suffix}")
+                else:
+                    st.info("No plan/actual data for comparison")
+
+            # Chart 4: Plan Adherence Over Time
+            with chart_col3:
+                st.markdown("""
+                <div style="background-color: #f0f7ff; padding: 10px; border-radius: 4px; margin-bottom: 12px; font-size: 11px;">
+                <strong>4. Plan Adherence Over Time</strong><br/>
+                Interpolated plan-vs-actual gap by stage at each week.
+                Red = planned-but-missing stage share; green = remaining share (on stage or not planned yet). Bars add to 100%.
+                </div>
+                """, unsafe_allow_html=True)
+                if not analysis_actual.empty and not analysis_plan.empty:
+                    # Build adherence data
+                    adherence_data = []
+                    # Use the exact same week axis as the first two charts.
+                    all_weeks = weeks
+                    # Stage target weights (must sum to 1.0) used to convert stage progress into planned share.
+                    stage_weights = {
+                        "SB0": 0.10,
+                        "SB1/SB2": 0.15,
+                        "R0": 0.15,
+                        "R1": 0.20,
+                        "R2a": 0.20,
+                        "R2b": 0.20,
+                    }
+
+                    # Build stage timeline for this version (same logic as table).
+                    version_plan_sorted = analysis_plan.sort_values("week_start")
+                    stage_timeline = self._build_stage_timeline(version_plan_sorted)
+
+                    week_actual_map = {
+                        pd.to_datetime(r["week_start"], errors="coerce").normalize(): r
+                        for _, r in analysis_actual.iterrows()
+                    }
+
+                    for week in all_weeks:
+                        week_norm = pd.to_datetime(week, errors="coerce").normalize()
+                        week_data = week_actual_map.get(week_norm)
+                        red_pct = 0.0
+
+                        for stage in ["SB0", "SB1/SB2", "R0", "R1", "R2a", "R2b"]:
+                            if stage not in stage_timeline:
+                                continue
+
+                            plan_start = stage_timeline[stage]["start"]
+                            plan_end = stage_timeline[stage]["end"]
+
+                            # Interpolate planned progress for this stage at date T (0 before start, linear ramp, 1 after end).
+                            if week_norm < plan_start:
+                                stage_plan_progress = 0.0
+                            elif week_norm >= plan_end:
+                                stage_plan_progress = 1.0
+                            else:
+                                total_days = max((plan_end - plan_start).days, 1)
+                                elapsed_days = max((week_norm - plan_start).days, 0)
+                                stage_plan_progress = min(max(elapsed_days / total_days, 0.0), 1.0)
+
+                            planned_stage_pct = stage_plan_progress * stage_weights[stage] * 100.0
+                            stage_col = stage_col_map.get(stage)
+                            actual_stage_pct = 0.0
+                            if week_data is not None and stage_col in analysis_actual.columns:
+                                actual_stage_pct = float(week_data.get(stage_col, 0) or 0)
+
+                            # Red is only the planned-but-missing portion for this stage.
+                            red_pct += max(planned_stage_pct - actual_stage_pct, 0.0)
+
+                        red_pct = min(max(red_pct, 0.0), 100.0)
+                        on_time_pct = 100.0 - red_pct
+                        behind_pct = red_pct
+                        adherence_data.append({
+                            "Week": f"{week.month}/{week.day}",
+                            "On Time %": on_time_pct,
+                            "Behind %": behind_pct,
+                        })
+
+                    if adherence_data:
+                        adherence_df = pd.DataFrame(adherence_data)
+
+                        fig3 = go.Figure()
+                        fig3.add_trace(go.Scatter(
+                            x=adherence_df["Week"],
+                            y=adherence_df["On Time %"],
+                            name="On Time",
+                            line=dict(color='#22C55E', width=2),
+                            mode='lines',
+                            stackgroup='one',
+                            groupnorm='percent',
+                            fillcolor='rgba(34,197,94,0.55)',
+                            marker=dict(size=6),
+                            hovertemplate="Week: %{x}<br>On Time: %{y:.1f}%<extra></extra>",
+                        ))
+                        fig3.add_trace(go.Scatter(
+                            x=adherence_df["Week"],
+                            y=adherence_df["Behind %"],
+                            name="Behind Plan",
+                            line=dict(color='#EF4444', width=2),
+                            mode='lines',
+                            stackgroup='one',
+                            fillcolor='rgba(239,68,68,0.55)',
+                            marker=dict(size=6),
+                            hovertemplate="Week: %{x}<br>Behind: %{y:.1f}%<extra></extra>",
+                        ))
+
+                        fig3.update_layout(
+                            title=f"Plan Adherence Over Time<br><sub>v{analysis_version}</sub>",
+                            height=350,
+                            yaxis_title="Adherence %",
+                            xaxis_title="Week",
+                            font=dict(family='Segoe UI, Arial, sans-serif', size=10, color='#000000'),
+                            title_font_size=12,
+                            yaxis=dict(range=[0, 100]),
+                            legend=dict(
+                                orientation="h",
+                                yanchor="bottom",
+                                y=-0.6,
+                                xanchor="center",
+                                x=0.5,
+                                font=dict(size=9),
+                                tracegroupgap=5
+                            ),
+                            margin=dict(l=50, r=20, t=60, b=110),
+                            plot_bgcolor='#ffffff',
+                            paper_bgcolor='#f8f9fa',
+                        )
+                        # Match X-axis labeling style with other graphs (m/d, every other week).
+                        adherence_weeks = [f"{w.month}/{w.day}" for w in all_weeks]
+                        adherence_tickvals = [adherence_weeks[i] for i in range(len(adherence_weeks)) if i % 2 == 0]
+                        fig3.update_xaxes(
+                            tickangle=0,
+                            tickfont=dict(size=9, color='#000000'),
+                            tickmode='array',
+                            tickvals=adherence_tickvals,
+                            categoryorder='array',
+                            categoryarray=adherence_weeks
+                        )
+                        fig3.update_yaxes(tickfont=dict(color='#000000'))
+                        st.plotly_chart(fig3, use_container_width=True, key=f"adherence_{key_suffix}")
+                    else:
+                        st.info("No adherence data available")
+                else:
+                    st.info("No data for adherence analysis")
+
+    def create_plan_vs_actual_table(self, selected_week: Optional[str], data: Optional[Dict[str, Any]] = None, key_suffix: str = "") -> None:
+        """Create the Plan vs Actual Timeline by Stage table."""
+        # Load deployment journey data
+        actual = self._load_shared_deployment_journey_history(selected_week, data)
+        if actual.empty:
+            actual = self._load_global_deployment_history(selected_week, data)
+
+        # Load plan data
+        plan = self._load_plan_schedule_data(selected_week, data)
+
+        if actual.empty or plan.empty:
+            st.info("Table unavailable: missing actual or plan data.")
+            return
+
+        # Stage configuration with colors
+        stage_config = [
+            {"name": "SB0", "color": "#6366F1", "label": "SB0 - Sandbox 0"},
+            {"name": "SB1/SB2", "color": "#60A5FA", "label": "SB1/SB2 - Sandbox 1/2"},
+            {"name": "R0", "color": "#06B6D4", "label": "R0 - Release Week 1"},
+            {"name": "R1", "color": "#22C55E", "label": "R1 - Release Week 2"},
+            {"name": "R2a", "color": "#F59E0B", "label": "R2a - Release Week 3"},
+            {"name": "R2b", "color": "#F97316", "label": "R2b - Release Week 4"},
+        ]
+
+        stage_colors = {s["name"]: s["color"] for s in stage_config}
+        stage_col_map = {
+            "SB0": "sb0_pct",
+            "SB1/SB2": "sb1_pct",
+            "R0": "r0_pct",
+            "R1": "r1_pct",
+            "R2a": "r2a_pct",
+            "R2b": "r2b_pct",
+        }
+
+        # Get overlapping releases between plan and actual
+        actual_versions = set(actual["current_version"].astype(str))
+        plan_versions = set(plan["version"].astype(str))
+
+        # Filter to only versions that have plan data
+        versions_with_plans = []
+        for v in sorted(actual_versions.intersection(plan_versions), key=self._version_tuple):
+            v_plan = plan[plan["version"].astype(str) == v]
+            if not v_plan.empty and v_plan["stage"].notna().any():
+                versions_with_plans.append(v)
+
+        selected_versions = versions_with_plans
+
+        if not selected_versions:
+            st.info("No overlapping releases between plan and actual.")
+            return
+
+        # Create plan vs actual table
+        st.markdown("---")
+        st.markdown('<div style="margin: 12px 0;"><span style="font-size: 14px; font-weight: 700; color: #000;">Plan vs Actual Timeline by Stage</span></div>', unsafe_allow_html=True)
+
+        # Build table data (oldest to newest)
+        table_rows = []
+        for version in sorted(selected_versions, key=self._version_tuple):
+            row_data = {"Version": f"v{version}"}
+
+            version_actual = actual[actual["current_version"].astype(str) == version].sort_values("week_start")
+            version_plan = plan[plan["version"].astype(str) == version]
+
+            # Build stage timeline for this version - shared logic with charts.
+            version_plan_sorted = version_plan.sort_values("week_start")
+            stage_timeline = self._build_stage_timeline(version_plan_sorted)
+
+            for stage, color in stage_colors.items():
+                # Plan dates
+                if stage in stage_timeline:
+                    plan_start = stage_timeline[stage]["start"]
+                    plan_end = stage_timeline[stage]["end"]
+                    row_data[f"{stage}_Plan"] = f"{plan_start.strftime('%b %d, %Y')} - {plan_end.strftime('%b %d, %Y')}"
+                else:
+                    row_data[f"{stage}_Plan"] = "-"
+
+                # Actual dates with percentage complete
+                stage_col = stage_col_map.get(stage)
+                if stage_col and stage_col in version_actual.columns:
+                    actual_weeks = version_actual[version_actual[stage_col] > 0].copy()
+                    if not actual_weeks.empty:
+                        actual_start = actual_weeks["week_start"].min()
+                        actual_end = actual_weeks["week_start"].max()
+                        max_pct = actual_weeks[stage_col].max()
+                        row_data[f"{stage}_Actual"] = f"{actual_start.strftime('%b %d, %Y')} - {actual_end.strftime('%b %d, %Y')} ({max_pct:.1f}%)"
+                    else:
+                        row_data[f"{stage}_Actual"] = "-"
+                else:
+                    row_data[f"{stage}_Actual"] = "-"
+
+            table_rows.append(row_data)
+
+        # Create DataFrame
+        table_df = pd.DataFrame(table_rows)
+
+        # Create HTML table with custom styling
+        table_html = '<div style="overflow-x: auto;"><table style="width: 100%; border-collapse: collapse; font-size: 9px; font-family: Arial, sans-serif;">'
+
+        # Header row with stage colors
+        table_html += '<thead><tr style="background-color: #f0f0f0;">'
+        table_html += '<th style="border: 1px solid #ddd; padding: 6px 8px; text-align: left; font-weight: 700; position: sticky; left: 0; background-color: #f0f0f0; z-index: 10;">Version</th>'
+
+        for stage_info in stage_config:
+            stage = stage_info["name"]
+            color = stage_info["color"]
+            table_html += f'<th colspan="2" style="border: 1px solid #ddd; padding: 6px 8px; text-align: center; font-weight: 700; background-color: {color}; color: white;">{stage}</th>'
+
+        table_html += '</tr><tr style="background-color: #f8f8f8;">'
+        table_html += '<th style="border: 1px solid #ddd; padding: 4px 8px; text-align: left; font-weight: 600; position: sticky; left: 0; background-color: #f8f8f8; z-index: 10;"></th>'
+
+        for stage_info in stage_config:
+            stage = stage_info["name"]
+            table_html += f'<th style="border: 1px solid #ddd; padding: 4px 8px; text-align: center; font-weight: 600; font-size: 8px;">Plan</th>'
+            table_html += f'<th style="border: 1px solid #ddd; padding: 4px 8px; text-align: center; font-weight: 600; font-size: 8px;">Actual</th>'
+
+        table_html += '</tr></thead><tbody>'
+
+        # Data rows
+        for idx, row in table_df.iterrows():
+            bg_color = "#ffffff" if idx % 2 == 0 else "#f9f9f9"
+            table_html += f'<tr style="background-color: {bg_color};">'
+            table_html += f'<td style="border: 1px solid #ddd; padding: 6px 8px; font-weight: 600; position: sticky; left: 0; background-color: {bg_color}; z-index: 5;">{row["Version"]}</td>'
+
+            for stage_info in stage_config:
+                stage = stage_info["name"]
+                plan_val = row.get(f"{stage}_Plan", "-")
+                actual_val = row.get(f"{stage}_Actual", "-")
+
+                table_html += f'<td style="border: 1px solid #ddd; padding: 4px 6px; text-align: center; white-space: nowrap;">{plan_val}</td>'
+                table_html += f'<td style="border: 1px solid #ddd; padding: 4px 6px; text-align: center; white-space: nowrap;">{actual_val}</td>'
+
+            table_html += '</tr>'
+
+        table_html += '</tbody></table></div>'
+
+        st.markdown(table_html, unsafe_allow_html=True)
+
+    def create_release_journey_slick_panel(self, selected_week: Optional[str], data: Optional[Dict[str, Any]] = None, key_suffix: str = "") -> None:
+        """
+        UI-preview panel inspired by the provided Release Journey screenshot:
+        stage summary cards + release journey table + right-side details.
+        """
+        df = self._load_global_deployment_history(selected_week, data)
+        if df.empty:
+            st.info("Release Journey preview unavailable: global deployment history not found for selected week.")
+            return
+
+        latest_week = df["week_start"].max()
+        latest_slice = df[df["week_start"] == latest_week].copy()
+        if latest_slice.empty:
+            st.info("Release Journey preview unavailable: no rows for latest week.")
+            return
+
+        stage_specs = [
+            ("SB0", "sb0_pct", "#5B5CFF"),
+            ("SB1/SB2", "sb1_pct", "#2F80FF"),
+            ("R0", "r0_pct", "#00B3C7"),
+            ("R1", "r1_pct", "#2E9E44"),
+            ("R2a", "r2a_pct", "#E2A300"),
+            ("R2b", "r2b_pct", "#C56A00"),
+        ]
+
+        def _to_sparkline(values: List[float]) -> str:
+            bars = "▁▂▃▄▅▆▇█"
+            cleaned = [float(v) for v in values if pd.notna(v)]
+            if not cleaned:
+                return "—"
+            vmin = min(cleaned)
+            vmax = max(cleaned)
+            if vmax - vmin < 1e-9:
+                return bars[2] * len(cleaned)
+            out = []
+            for v in cleaned:
+                idx = int(round((v - vmin) / (vmax - vmin) * (len(bars) - 1)))
+                idx = max(0, min(len(bars) - 1, idx))
+                out.append(bars[idx])
+            return "".join(out)
+
+        release_totals = (
+            latest_slice.groupby("current_version", as_index=False)["total_cells"]
+            .sum()
+            .sort_values("total_cells", ascending=False)
+        )
+        top_releases = release_totals["current_version"].head(8).tolist()
+        if not top_releases:
+            st.info("Release Journey preview unavailable: no releases in latest week.")
+            return
+
+        selected_release_key = f"rj_preview_release_{key_suffix}"
+        selected_release = st.session_state.get(selected_release_key, top_releases[0])
+        if selected_release not in top_releases:
+            selected_release = top_releases[0]
+
+        selected_release_df = df[df["current_version"] == selected_release].copy()
+        selected_latest_slice = latest_slice[latest_slice["current_version"] == selected_release].copy()
+        if selected_latest_slice.empty:
+            # Safe fallback in case selected release is missing in latest week.
+            selected_latest_slice = latest_slice.copy()
+
+        recent_weeks = sorted(df["week_start"].dropna().unique())[-8:]
+        trend_df = selected_release_df[selected_release_df["week_start"].isin(recent_weeks)].copy()
+        weekly_totals = trend_df.groupby("week_start", as_index=False)["total_cells"].sum().rename(
+            columns={"total_cells": "week_total_cells"}
+        )
+        weekly_stage_trends: Dict[str, pd.DataFrame] = {}
+        for label, col, _ in stage_specs:
+            stage_cells = (
+                trend_df.assign(stage_cells=trend_df["total_cells"] * trend_df[col] / 100.0)
+                .groupby("week_start", as_index=False)["stage_cells"]
+                .sum()
+            )
+            merged_trend = weekly_totals.merge(stage_cells, on="week_start", how="left")
+            merged_trend["stage_cells"] = merged_trend["stage_cells"].fillna(0.0)
+            merged_trend["stage_pct"] = np.where(
+                merged_trend["week_total_cells"] > 0,
+                merged_trend["stage_cells"] * 100.0 / merged_trend["week_total_cells"],
+                0.0,
+            )
+            weekly_stage_trends[label] = merged_trend
+
+        latest_total_cells = float(selected_latest_slice["total_cells"].sum())
+        stage_totals: Dict[str, float] = {}
+        for label, col, _ in stage_specs:
+            stage_totals[label] = float((selected_latest_slice["total_cells"] * selected_latest_slice[col] / 100.0).sum())
+
+        st.markdown(
+            """
+            <style>
+            .rj-preview-wrap { border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; background: #ffffff; }
+            .rj-preview-title { font-size: 1.25rem; font-weight: 700; color: #111827; margin-bottom: 2px; }
+            .rj-preview-sub { color: #6b7280; font-size: 0.9rem; margin-bottom: 12px; }
+            .rj-card { border: 1px solid #dbe4ef; border-radius: 10px; padding: 10px; background: #fbfdff; }
+            .rj-card-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
+            .rj-card-meta { color: #374151; font-size: 0.8rem; }
+            .rj-card-trend { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.9rem; margin-top: 6px; letter-spacing: 0.5px; }
+            .rj-card-trend-label { color: #64748b; font-size: 0.72rem; margin-top: 2px; }
+            .rj-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+            .rj-table th { text-align: left; border-bottom: 1px solid #e5e7eb; padding: 8px 6px; color: #4b5563; }
+            .rj-table td { border-bottom: 1px solid #f3f4f6; padding: 8px 6px; vertical-align: middle; }
+            .rj-pill { display:inline-block; padding:2px 8px; border-radius:10px; font-size:0.72rem; font-weight:600; background:#E8F7ED; color:#1E7A33; }
+            .rj-bar { width: 100%; height: 8px; background:#edf2f7; border-radius: 999px; overflow:hidden; }
+            .rj-fill { height: 100%; border-radius: 999px; }
+            .rj-side { border:1px solid #e5e7eb; border-radius:10px; padding:10px; background:#fafafa; }
+            .rj-kv { font-size:0.8rem; color:#374151; margin: 4px 0; }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        st.markdown('<div class="rj-preview-wrap">', unsafe_allow_html=True)
+        st.markdown(f'<div class="rj-preview-title">Release Journey as of {latest_week.strftime("%b %d, %Y")}</div>', unsafe_allow_html=True)
+        st.markdown(
+            f'<div class="rj-preview-sub">Track release progression through stages • Release R{selected_release}</div>',
+            unsafe_allow_html=True,
+        )
+
+        card_cols = st.columns(len(stage_specs))
+        for col_ui, (label, _, color) in zip(card_cols, stage_specs):
+            cells = int(round(stage_totals[label]))
+            pct = (cells / latest_total_cells * 100.0) if latest_total_cells > 0 else 0.0
+            with col_ui:
+                trend = weekly_stage_trends.get(label, pd.DataFrame())
+                spark = _to_sparkline(trend["stage_pct"].tolist()) if not trend.empty else "—"
+                st.markdown(
+                    f"""
+                    <div class="rj-card">
+                        <div class="rj-card-title" style="color:{color};">{label}</div>
+                        <div class="rj-card-meta">{cells} cells</div>
+                        <div class="rj-card-meta">{pct:.1f}% of release</div>
+                        <div class="rj-card-trend" style="color:{color};">{spark}</div>
+                        <div class="rj-card-trend-label">8-week trend</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+        st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
+        left_col, right_col = st.columns([3, 1])
+
+        # Build rows for the preview table.
+        row_map: Dict[str, Dict[str, Any]] = {}
+        for version in top_releases:
+            row = latest_slice[latest_slice["current_version"] == version]
+            if row.empty:
+                continue
+            total = float(row["total_cells"].sum())
+            stage_data = {}
+            for label, col, color in stage_specs:
+                pct = float((row[col] * row["total_cells"]).sum() / total) if total > 0 else 0.0
+                cells = int(round(total * pct / 100.0))
+                stage_data[label] = {"pct": pct, "cells": cells, "color": color}
+            row_map[version] = {"total": int(round(total)), "stages": stage_data}
+
+        with left_col:
+            table_html = [
+                "<table class='rj-table'>",
+                "<thead><tr><th>Release</th><th>Total Cells</th><th>SB0</th><th>SB1/SB2</th><th>R0</th><th>R1</th><th>R2a</th><th>R2b</th><th>Status</th></tr></thead><tbody>",
+            ]
+            for version in top_releases:
+                if version not in row_map:
+                    continue
+                row = row_map[version]
+                stage_cells = []
+                for label, _, _ in stage_specs:
+                    sd = row["stages"][label]
+                    stage_cells.append(
+                        f"<td><div style='font-size:0.74rem;color:#6b7280;margin-bottom:3px'>{sd['cells']} cells</div>"
+                        f"<div class='rj-bar'><div class='rj-fill' style='width:{max(0,min(100,sd['pct'])):.1f}%;background:{sd['color']};'></div></div></td>"
+                    )
+                status = "Complete" if row["stages"]["R2b"]["pct"] >= 99.0 else "In Progress"
+                status_pill = "<span class='rj-pill'>Complete</span>" if status == "Complete" else "<span class='rj-pill' style='background:#E8F0FF;color:#1D4ED8;'>In Progress</span>"
+                table_html.append(
+                    f"<tr><td><strong>R{version}</strong></td><td>{row['total']}</td>{''.join(stage_cells)}<td>{status_pill}</td></tr>"
+                )
+            table_html.append("</tbody></table>")
+            st.markdown("".join(table_html), unsafe_allow_html=True)
+
+        with right_col:
+            selected_release = st.selectbox(
+                "Release details",
+                top_releases,
+                index=top_releases.index(selected_release) if selected_release in top_releases else 0,
+                key=selected_release_key,
+            )
+            rd = row_map.get(selected_release, {"total": 0, "stages": {}})
+            current_stage = max(
+                stage_specs,
+                key=lambda s: rd["stages"].get(s[0], {}).get("pct", 0.0),
+            )[0]
+            st.markdown("<div class='rj-side'>", unsafe_allow_html=True)
+            st.markdown(f"### R{selected_release}")
+            st.markdown(f"<div class='rj-kv'><b>Week:</b> {latest_week.strftime('%Y-%m-%d')}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='rj-kv'><b>Total Cells:</b> {rd['total']}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='rj-kv'><b>Current Stage:</b> {current_stage}</div>", unsafe_allow_html=True)
+            st.markdown("<hr style='margin:8px 0;border:0;border-top:1px solid #e5e7eb'/>", unsafe_allow_html=True)
+            for label, _, color in stage_specs:
+                pct = rd["stages"].get(label, {}).get("pct", 0.0)
+                st.markdown(
+                    f"<div class='rj-kv'><span style='display:inline-block;width:8px;height:8px;border-radius:50%;background:{color};margin-right:6px'></span>{label}: {pct:.1f}%</div>",
+                    unsafe_allow_html=True,
+                )
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    def create_release_timeline_chart(self, selected_week: Optional[str], data: Optional[Dict[str, Any]] = None, key_suffix: str = "") -> None:
+        """
+        Timeline chart showing plan vs actual deployment with:
+        - X-axis: Timeline with vertical partitioning by month/year at top
+        - Plan: Thin line with hollow circles at start
+        - Actual: Thick line overlaid on plan with solid circles (on-time) or hollow circles (delayed)
+        - Color-coded by stagger stage
+        """
+        # Load plan and actual data
+        actual = self._load_shared_deployment_journey_history(selected_week, data)
+        if actual.empty:
+            actual = self._load_global_deployment_history(selected_week, data)
+        plan = self._load_plan_schedule_data(selected_week, data)
+
+        if actual.empty or plan.empty:
+            st.info("Timeline chart unavailable: missing actual or plan data.")
+            return
+
+        # Get last 12 weeks
+        weeks = sorted(actual["week_start"].dropna().unique())[-12:]
+        if not weeks:
+            st.info("Timeline chart unavailable: no weekly data.")
+            return
+
+        actual = actual[actual["week_start"].isin(weeks)].copy()
+        plan = plan[plan["week_start"].isin(weeks)].copy()
+
+        # Stage configuration
+        stage_colors = {
+            "SB0": "#6366F1",
+            "SB1/SB2": "#3B82F6",
+            "R0": "#06B6D4",
+            "R1": "#22C55E",
+            "R2a": "#F59E0B",
+            "R2b": "#F97316",
+        }
+
+        stage_col_map = {
+            "SB0": "pct_of_SB0",
+            "SB1/SB2": "pct_of_SB1",
+            "R0": "pct_of_R0",
+            "R1": "pct_of_R1",
+            "R2a": "pct_of_R2a",
+            "R2b": "pct_of_R2b",
+        }
+
+        # Get releases
+        actual_versions = set(actual["current_version"].astype(str))
+        plan_versions = set(plan["version"].astype(str))
+        versions = sorted(actual_versions.intersection(plan_versions), key=self._version_tuple)
+
+        if not versions:
+            st.info("No overlapping releases between plan and actual.")
+            return
+
+        # Select releases to display (default to last 8)
+        default_versions = versions[-8:] if len(versions) > 8 else versions
+        selected_versions = st.multiselect(
+            "Select Releases for Timeline",
+            versions,
+            default=default_versions,
+            key=f"timeline_versions_{key_suffix}",
+        )
+
+        if not selected_versions:
+            st.info("Select at least one release.")
+            return
+
+        # Filter data
+        actual = actual[actual["current_version"].astype(str).isin(selected_versions)].copy()
+        plan = plan[plan["version"].astype(str).isin(selected_versions)].copy()
+
+        # Create figure
+        fig = go.Figure()
+
+        # Add timeline background with month/year labels
+        week_dates = [pd.to_datetime(w) for w in weeks]
+
+        # Track y-position for each release
+        y_pos = 0
+        y_labels = []
+        y_positions = []
+
+        for version in selected_versions:
+            version_actual = actual[actual["current_version"].astype(str) == version].sort_values("week_start")
+            version_plan = plan[plan["version"].astype(str) == version]
+
+            y_labels.append(f"v{version}")
+            y_positions.append(y_pos)
+
+            # For each stage, draw plan (thin line + hollow circle) and actual (thick line + circle)
+            for stage, color in stage_colors.items():
+                # Get plan data for this stage
+                stage_plan = version_plan[version_plan["stage"] == stage].sort_values("week_start")
+
+                if not stage_plan.empty:
+                    plan_weeks = pd.to_datetime(stage_plan["week_start"]).tolist()
+
+                    # Draw thin line for plan
+                    fig.add_trace(go.Scatter(
+                        x=plan_weeks,
+                        y=[y_pos] * len(plan_weeks),
+                        mode='lines',
+                        line=dict(color=color, width=1, dash='solid'),
+                        showlegend=False,
+                        hoverinfo='skip'
+                    ))
+
+                    # Draw hollow circle at start of plan
+                    if plan_weeks:
+                        fig.add_trace(go.Scatter(
+                            x=[plan_weeks[0]],
+                            y=[y_pos],
+                            mode='markers',
+                            marker=dict(
+                                size=8,
+                                color='white',
+                                line=dict(color=color, width=2)
+                            ),
+                            showlegend=False,
+                            hovertemplate=f"<b>v{version}</b><br>Stage: {stage}<br>Plan Start: {plan_weeks[0].strftime('%Y-%m-%d')}<extra></extra>"
+                        ))
+
+                # Get actual data for this stage
+                stage_col = stage_col_map.get(stage)
+                if stage_col and stage_col in version_actual.columns:
+                    # Find weeks where this stage has activity
+                    actual_weeks = version_actual[version_actual[stage_col] > 0].copy()
+
+                    if not actual_weeks.empty:
+                        actual_dates = pd.to_datetime(actual_weeks["week_start"]).tolist()
+                        actual_pcts = actual_weeks[stage_col].tolist()
+
+                        # Draw thick line for actual
+                        fig.add_trace(go.Scatter(
+                            x=actual_dates,
+                            y=[y_pos] * len(actual_dates),
+                            mode='lines',
+                            line=dict(color=color, width=4),
+                            showlegend=False,
+                            hoverinfo='skip'
+                        ))
+
+                        # Determine if on-time or delayed by comparing with plan
+                        if not stage_plan.empty:
+                            plan_start = stage_plan["week_start"].min()
+                            actual_start = actual_weeks["week_start"].min()
+
+                            # Solid circle if on-time (within 1 week), hollow if delayed
+                            is_on_time = actual_start <= plan_start + pd.Timedelta(days=7)
+
+                            if is_on_time:
+                                # Solid circle
+                                fig.add_trace(go.Scatter(
+                                    x=[actual_dates[0]],
+                                    y=[y_pos],
+                                    mode='markers',
+                                    marker=dict(size=8, color=color),
+                                    showlegend=False,
+                                    hovertemplate=f"<b>v{version}</b><br>Stage: {stage}<br>Actual Start: {actual_dates[0].strftime('%Y-%m-%d')}<br>Status: On-time<extra></extra>"
+                                ))
+                            else:
+                                # Hollow circle (delayed)
+                                fig.add_trace(go.Scatter(
+                                    x=[actual_dates[0]],
+                                    y=[y_pos],
+                                    mode='markers',
+                                    marker=dict(
+                                        size=8,
+                                        color='white',
+                                        line=dict(color=color, width=2)
+                                    ),
+                                    showlegend=False,
+                                    hovertemplate=f"<b>v{version}</b><br>Stage: {stage}<br>Actual Start: {actual_dates[0].strftime('%Y-%m-%d')}<br>Status: Delayed<extra></extra>"
+                                ))
+
+            y_pos += 1
+
+        # Add month/year labels at top
+        month_boundaries = []
+        current_month = None
+        for i, date in enumerate(week_dates):
+            if date.month != current_month:
+                month_boundaries.append((date, date.strftime("%b %Y")))
+                current_month = date.month
+
+        # Update layout
+        fig.update_layout(
+            title="Release Deployment Timeline - Plan vs Actual",
+            xaxis=dict(
+                title="",
+                tickformat="%m/%d",
+                tickangle=0,
+                side="top",
+                showgrid=True,
+                gridcolor='lightgray',
+                gridwidth=0.5
+            ),
+            yaxis=dict(
+                title="",
+                ticktext=y_labels,
+                tickvals=y_positions,
+                showgrid=True,
+                gridcolor='lightgray',
+                gridwidth=0.5
+            ),
+            height=max(400, len(selected_versions) * 60),
+            hovermode='closest',
+            showlegend=False,
+            plot_bgcolor='white',
+            margin=dict(l=100, r=50, t=100, b=50)
+        )
+
+        # Add vertical lines for month boundaries
+        for date, label in month_boundaries:
+            fig.add_vline(
+                x=date,
+                line=dict(color="gray", width=1, dash="dash"),
+                annotation=dict(
+                    text=label,
+                    font=dict(size=10, color="gray"),
+                    textangle=0,
+                    xanchor="left",
+                    yanchor="bottom",
+                    y=1.05,
+                    yref="paper"
+                )
+            )
+
+        # Add legend for symbols
+        st.markdown("""
+        <div style='font-size: 0.9em; color: #666; margin-bottom: 10px;'>
+        <b>Legend:</b>
+        ○ Hollow circle = Plan start or Delayed actual |
+        ● Solid circle = On-time actual |
+        ─ Thin line = Plan |
+        ━ Thick line = Actual
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.plotly_chart(fig, use_container_width=True, key=f"release_timeline_{key_suffix}")
+
+    def create_promotion_plan_actuals_slick(self, selected_week: Optional[str], data: Optional[Dict[str, Any]] = None, key_suffix: str = "") -> None:
+        """Slick, PNG-inspired promotion plan vs actuals graph suite."""
+        actual = self._load_shared_deployment_journey_history(selected_week, data)
+        if actual.empty:
+            actual = self._load_global_deployment_history(selected_week, data)
+        plan = self._load_plan_schedule_data(selected_week, data)
+        if actual.empty or plan.empty:
+            st.info("Promotion Plan vs Actuals unavailable: missing actual or plan data.")
+            return
+
+        weeks = sorted(actual["week_start"].dropna().unique())[-12:]
+        if not weeks:
+            st.info("Promotion Plan vs Actuals unavailable: no weekly rows.")
+            return
+        actual = actual[actual["week_start"].isin(weeks)].copy()
+        plan = plan[plan["week_start"].isin(weeks)].copy()
+        week_labels = [pd.to_datetime(w).strftime("%Y-%m-%d") for w in weeks]
+
+        stage_cols = {
+            "SB0": "sb0_pct",
+            "SB1/SB2": "sb1_pct",
+            "R0": "r0_pct",
+            "R1": "r1_pct",
+            "R2A": "r2a_pct",
+            "R2B": "r2b_pct",
+        }
+        stage_order = list(stage_cols.keys())
+        stage_colors = {
+            "SB0": "#6366F1",
+            "SB1/SB2": "#3B82F6",
+            "R0": "#06B6D4",
+            "R1": "#22C55E",
+            "R2A": "#F59E0B",
+            "R2B": "#F97316",
+        }
+
+        actual_versions = set(actual["current_version"].astype(str))
+        plan_versions = set(plan["version"].astype(str))
+        versions = sorted(actual_versions.intersection(plan_versions), key=self._version_tuple)
+        if not versions:
+            st.info("No overlapping release versions between plan and actual for this window.")
+            return
+        default_versions = versions[-8:] if len(versions) > 8 else versions
+        selected_versions = st.multiselect(
+            "Releases",
+            versions,
+            default=default_versions,
+            key=f"promo_actual_versions_{key_suffix}",
+        )
+        if not selected_versions:
+            st.info("Select at least one release.")
+            return
+
+        actual = actual[actual["current_version"].astype(str).isin(selected_versions)].copy()
+        plan = plan[plan["version"].astype(str).isin(selected_versions)].copy()
+
+        latest_week = pd.to_datetime(weeks[-1])
+        latest_actual = actual[actual["week_start"] == latest_week].copy()
+        total_plan_releases = len(set(plan["version"].astype(str)))
+        releases_in_flight = len(set(latest_actual["current_version"].astype(str)))
+        cells_deployed = int(round(pd.to_numeric(latest_actual["total_cells"], errors="coerce").fillna(0).sum()))
+
+        # Build stage adherence for latest week.
+        stage_rows = []
+        for stage, col in stage_cols.items():
+            actual_count = int((pd.to_numeric(latest_actual[col], errors="coerce").fillna(0.0) > 0).sum())
+            plan_count = int(
+                plan[
+                    (plan["week_start"] == latest_week)
+                    & (plan["stage"] == stage.replace("A", "a").replace("B", "b") if stage.startswith("R2") else plan["stage"])
+                ].shape[0]
+            )
+            # Robust stage mapping for plan format.
+            if plan_count == 0:
+                plan_stage_name = {"SB0": "SB0", "SB1/SB2": "SB1/SB2", "R0": "R0", "R1": "R1", "R2A": "R2a", "R2B": "R2b"}[stage]
+                plan_count = int(
+                    plan[
+                        (plan["week_start"] == latest_week)
+                        & (plan["stage"] == plan_stage_name)
+                    ].shape[0]
+                )
+            on_time = min(actual_count, plan_count)
+            behind = max(plan_count - actual_count, 0)
+            adherence = (on_time / plan_count * 100.0) if plan_count > 0 else 0.0
+            stage_rows.append(
+                {
+                    "stage": stage,
+                    "on_time": on_time,
+                    "behind": behind,
+                    "adherence": adherence,
+                }
+            )
+        stage_df = pd.DataFrame(stage_rows)
+        overall_behind = int(stage_df["behind"].sum())
+        overall_on_time = int(stage_df["on_time"].sum())
+        overall_adherence = (overall_on_time / max(1, overall_on_time + overall_behind)) * 100.0
+
+        k1, k2, k3, k4, k5 = st.columns(5)
+        k1.metric("Total Releases (Plan)", total_plan_releases)
+        k2.metric("Releases In Flight (Actual)", releases_in_flight)
+        k3.metric("Cells Deployed (Actual)", f"{cells_deployed:,}")
+        k4.metric("Plan Adherence", f"{overall_adherence:.0f}%")
+        k5.metric("Releases Behind Plan", overall_behind)
+
+        left, right = st.columns([3.2, 1.2])
+        with left:
+            # 1) Plan vs actual pipeline: first-hit stage dates for each release.
+            traces = []
+            for v in sorted(selected_versions, key=self._version_tuple, reverse=True):
+                rv = actual[actual["current_version"].astype(str) == str(v)].copy().sort_values("week_start")
+                if rv.empty:
+                    continue
+                x_vals = []
+                y_vals = []
+                marker_colors = []
+                for stage, col in stage_cols.items():
+                    hit = rv[pd.to_numeric(rv[col], errors="coerce").fillna(0) > 0]
+                    if hit.empty:
+                        continue
+                    x_vals.append(pd.to_datetime(hit.iloc[0]["week_start"]).strftime("%Y-%m-%d"))
+                    y_vals.append(f"v{v}")
+                    marker_colors.append(stage_colors[stage])
+                if len(x_vals) < 1:
+                    continue
+                traces.append(
+                    go.Scatter(
+                        x=x_vals,
+                        y=y_vals,
+                        mode="lines+markers",
+                        marker=dict(size=7, color=marker_colors),
+                        line=dict(width=3, color="#94A3B8"),
+                        name=f"v{v}",
+                        showlegend=False,
+                        hovertemplate="Release %{y}<br>Week %{x}<extra></extra>",
+                    )
+                )
+            fig_pipeline = go.Figure(data=traces)
+            fig_pipeline.update_layout(
+                title="1. Plan vs Actual — Releases in Promotion Pipeline",
+                xaxis_title="Week",
+                yaxis_title="Releases",
+                height=360,
+                margin=dict(l=10, r=10, t=40, b=10),
+            )
+            fig_pipeline.update_xaxes(categoryorder="array", categoryarray=week_labels)
+            st.plotly_chart(fig_pipeline, use_container_width=True, key=f"promo_pipeline_{key_suffix}")
+
+        with right:
+            st.markdown("#### Plan Adherence (By Stage)")
+            st.dataframe(
+                stage_df.rename(
+                    columns={
+                        "stage": "Stage",
+                        "on_time": "On Time",
+                        "behind": "Behind",
+                        "adherence": "Adherence %",
+                    }
+                ),
+                use_container_width=True,
+                hide_index=True,
+            )
+
+        c1, c2, c3 = st.columns([1.5, 1.5, 1.2])
+        with c1:
+            # 2) Actual stage distribution by week (stacked).
+            actual_long = actual.melt(
+                id_vars=["week_start", "current_version", "total_cells"],
+                value_vars=list(stage_cols.values()),
+                var_name="stage_col",
+                value_name="pct",
+            ).copy()
+            inv_map = {v: k for k, v in stage_cols.items()}
+            actual_long["stage"] = actual_long["stage_col"].map(inv_map)
+            actual_long["cells"] = (
+                pd.to_numeric(actual_long["total_cells"], errors="coerce").fillna(0.0)
+                * pd.to_numeric(actual_long["pct"], errors="coerce").fillna(0.0)
+                / 100.0
+            )
+            dist = (
+                actual_long.groupby(["week_start", "stage"], as_index=False)["cells"].sum()
+                .merge(
+                    actual_long.groupby("week_start", as_index=False)["cells"].sum().rename(columns={"cells": "total"}),
+                    on="week_start",
+                    how="left",
+                )
+            )
+            dist["pct"] = np.where(dist["total"] > 0, dist["cells"] * 100.0 / dist["total"], 0.0)
+            dist["week_label"] = pd.to_datetime(dist["week_start"]).dt.strftime("%Y-%m-%d")
+            fig_dist = px.bar(
+                dist,
+                x="week_label",
+                y="pct",
+                color="stage",
+                category_orders={"stage": stage_order},
+                color_discrete_map=stage_colors,
+                title="2. Actual Progress — Cells Distribution by Stage (Weekly)",
+            )
+            fig_dist.update_layout(barmode="stack", height=320, yaxis=dict(range=[0, 100]), margin=dict(l=10, r=10, t=40, b=10))
+            fig_dist.update_xaxes(categoryorder="array", categoryarray=week_labels)
+            st.plotly_chart(fig_dist, use_container_width=True, key=f"promo_dist_{key_suffix}")
+
+        with c2:
+            # 3) Cumulative cells reaching each stage (actual + plan proxy counts).
+            cum_actual = []
+            cum_plan = []
+            for stage, col in stage_cols.items():
+                d = (
+                    actual.assign(cells=lambda x: pd.to_numeric(x["total_cells"], errors="coerce").fillna(0.0) * pd.to_numeric(x[col], errors="coerce").fillna(0.0) / 100.0)
+                    .groupby("week_start", as_index=False)["cells"]
+                    .sum()
+                    .sort_values("week_start")
+                )
+                d["cum"] = d["cells"].cumsum()
+                d["stage"] = stage
+                d["week_label"] = pd.to_datetime(d["week_start"]).dt.strftime("%Y-%m-%d")
+                cum_actual.append(d[["week_label", "stage", "cum"]].assign(series="Actual"))
+
+                stage_plan_name = {"SB0": "SB0", "SB1/SB2": "SB1/SB2", "R0": "R0", "R1": "R1", "R2A": "R2a", "R2B": "R2b"}[stage]
+                p = (
+                    plan[plan["stage"] == stage_plan_name]
+                    .groupby("week_start", as_index=False)
+                    .size()
+                    .rename(columns={"size": "cells"})
+                    .sort_values("week_start")
+                )
+                p["cum"] = p["cells"].cumsum()
+                p["stage"] = stage
+                p["week_label"] = pd.to_datetime(p["week_start"]).dt.strftime("%Y-%m-%d")
+                cum_plan.append(p[["week_label", "stage", "cum"]].assign(series="Plan"))
+            cum_df = pd.concat(cum_actual + cum_plan, ignore_index=True)
+            fig_cum = px.line(
+                cum_df,
+                x="week_label",
+                y="cum",
+                color="stage",
+                line_dash="series",
+                category_orders={"stage": stage_order},
+                color_discrete_map=stage_colors,
+                title="3. Planned vs Actual — Cumulative Cells Reaching Each Stage",
+            )
+            fig_cum.update_layout(height=320, margin=dict(l=10, r=10, t=40, b=10))
+            fig_cum.update_xaxes(categoryorder="array", categoryarray=week_labels)
+            st.plotly_chart(fig_cum, use_container_width=True, key=f"promo_cum_{key_suffix}")
+
+        with c3:
+            # 4) Plan adherence over time.
+            wk_rows = []
+            for wk in week_labels:
+                wk_actual = actual[pd.to_datetime(actual["week_start"]).dt.strftime("%Y-%m-%d") == wk]
+                wk_plan = plan[pd.to_datetime(plan["week_start"]).dt.strftime("%Y-%m-%d") == wk]
+                stage_ok = 0
+                for stage, col in stage_cols.items():
+                    stage_plan_name = {"SB0": "SB0", "SB1/SB2": "SB1/SB2", "R0": "R0", "R1": "R1", "R2A": "R2a", "R2B": "R2b"}[stage]
+                    pcount = int((wk_plan["stage"] == stage_plan_name).sum())
+                    acount = int((pd.to_numeric(wk_actual[col], errors="coerce").fillna(0) > 0).sum())
+                    if acount >= pcount:
+                        stage_ok += 1
+                on_time_pct = stage_ok / max(1, len(stage_cols)) * 100.0
+                wk_rows.append({"week_label": wk, "On Time %": on_time_pct, "Behind %": 100.0 - on_time_pct})
+            adh = pd.DataFrame(wk_rows)
+            fig_adh = go.Figure()
+            fig_adh.add_trace(go.Scatter(x=adh["week_label"], y=adh["On Time %"], mode="lines+markers", name="On Time (%)", line=dict(color="#22C55E", width=2)))
+            fig_adh.add_trace(go.Scatter(x=adh["week_label"], y=adh["Behind %"], mode="lines+markers", name="Behind (%)", line=dict(color="#EF4444", width=2)))
+            fig_adh.update_layout(title="4. Plan Adherence Over Time", height=320, yaxis=dict(range=[0, 100]), margin=dict(l=10, r=10, t=40, b=10))
+            fig_adh.update_xaxes(categoryorder="array", categoryarray=week_labels)
+            st.plotly_chart(fig_adh, use_container_width=True, key=f"promo_adh_{key_suffix}")
+
+        # 5) Release detail table (latest week).
+        st.markdown("#### 5. Release Detail — Plan vs Actual (Latest Week)")
+        detail_rows = []
+        latest_lbl = pd.to_datetime(latest_week).strftime("%Y-%m-%d")
+        for v in sorted(selected_versions, key=self._version_tuple):
+            v_actual = actual[actual["current_version"].astype(str) == str(v)].copy().sort_values("week_start")
+            if v_actual.empty:
+                continue
+            latest_v = v_actual[pd.to_datetime(v_actual["week_start"]).dt.strftime("%Y-%m-%d") == latest_lbl]
+            if latest_v.empty:
+                latest_v = v_actual.tail(1)
+            row = latest_v.iloc[0]
+            stage_vals = {s: f"{float(row.get(c, 0.0)):.1f}%" for s, c in stage_cols.items()}
+            status = "On Track" if float(row.get("r2b_pct", 0.0)) >= 50.0 else "Behind"
+            detail_rows.append(
+                {
+                    "Release": f"v{v}",
+                    "Week": pd.to_datetime(row["week_start"]).strftime("%Y-%m-%d"),
+                    "SB0": stage_vals["SB0"],
+                    "SB1/SB2": stage_vals["SB1/SB2"],
+                    "R0": stage_vals["R0"],
+                    "R1": stage_vals["R1"],
+                    "R2A": stage_vals["R2A"],
+                    "R2B": stage_vals["R2B"],
+                    "Status": status,
+                }
+            )
+        if detail_rows:
+            st.dataframe(pd.DataFrame(detail_rows), use_container_width=True, hide_index=True)
     
     def create_deployment_insights(self, data: Dict[str, Any]):
         """Create enhanced deployment insights using only deployment.csv metrics and deployment.txt LLM analysis."""
@@ -4870,15 +7215,24 @@ def render_component_development_metrics(component: str, display_name: Optional[
         st.markdown("---")
         st.markdown('<h3 id="deployment-analysis">🚀 <a href="https://bdmpresto-superset-server.sfproxy.uip.aws-esvc1-useast2.aws.sfdc.cl/superset/sqllab?savedQueryId=25468" target="_blank">Deployment Analysis</a></h3>', unsafe_allow_html=True)
         st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            dashboard.create_deployment_stacked_bar(data)
-        with col2:
-            dashboard.create_version_pie_chart(data)
+        dashboard.create_version_pie_chart(data)
 
-        st.markdown("#### Release Stagger Journey from `weeks/<selected_week>/Engine/global_deployment.csv`")
-        dashboard.create_global_deployment_journey_single_version(selected_week, data, key_suffix=component.lower())
-        dashboard.create_global_deployment_journey_top6(selected_week, data, key_suffix=component.lower())
+        st.markdown("#### 1. Release Deployment Timeline - Plan vs Actual")
+        st.markdown("""
+        <div style="background-color: #f0f7ff; padding: 12px; border-radius: 6px; border-left: 4px solid #3b82f6; margin-bottom: 16px; font-size: 13px;">
+        <strong>How to read this chart:</strong><br/>
+        • <strong>Y-axis:</strong> Each release version is split into 6 deployment stages (SB0 → SB1/SB2 → R0 → R1 → R2a → R2b)<br/>
+        • <strong>X-axis:</strong> Timeline showing dates across weeks and months<br/>
+        • <strong>Thin lines with hollow circles:</strong> Planned deployment schedule<br/>
+        • <strong>Thick lines with solid circles:</strong> Actual deployment progress (line length shows % complete)<br/>
+        • <strong>Colors:</strong> Each stage has a unique color shown in the legend above
+        </div>
+        """, unsafe_allow_html=True)
+        dashboard.create_release_journey_gantt(selected_week, data, key_suffix=component.lower())
+
+        dashboard.create_release_journey_slick_panel(selected_week, data, key_suffix=component.lower())
+
+        dashboard.create_plan_vs_actual_table(selected_week, data, key_suffix=component.lower())
         
         # Add deployment insights
         dashboard.create_deployment_insights(data)

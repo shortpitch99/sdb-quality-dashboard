@@ -131,7 +131,18 @@ missing_files=()
 
 # Data directory (resolved above for lowercase folder names)
 data_dir="$DATA_DIR"
+shared_dir="weeks/$WEEK/Shared"
 echo "📂 Looking for data files in: $data_dir/"
+
+# Prefer shared deployment sources, then component-local fallback.
+DEPLOYMENT_CSV_FOR_RUN=""
+if [ -f "$shared_dir/deployment.csv" ]; then
+    DEPLOYMENT_CSV_FOR_RUN="$shared_dir/deployment.csv"
+elif [ -f "$data_dir/deployment.csv" ]; then
+    DEPLOYMENT_CSV_FOR_RUN="$data_dir/deployment.csv"
+elif [ -f "$shared_dir/deployment-journey.csv" ]; then
+    DEPLOYMENT_CSV_FOR_RUN="$shared_dir/deployment-journey.csv"
+fi
 
 if [ ! -f "$data_dir/risks.txt" ]; then
     missing_files+=("risks.txt")
@@ -147,8 +158,8 @@ if [ "$USE_SF_REPORTS" != "1" ]; then
   fi
 fi
 
-if [ ! -f "$data_dir/deployment.csv" ]; then
-    missing_files+=("deployment.csv")
+if [ -z "$DEPLOYMENT_CSV_FOR_RUN" ]; then
+    missing_files+=("deployment.csv (expected in $shared_dir or $data_dir)")
 fi
 
 if [ ! -f "$data_dir/coverage.txt" ]; then
@@ -184,6 +195,7 @@ if [ ${#missing_files[@]} -ne 0 ]; then
 fi
 
 echo "✅ All data files found!"
+echo "📈 Deployment source for report: $DEPLOYMENT_CSV_FOR_RUN"
 
 # Update the *component* git repo (Store→bookkeeper, SDD→sdd, Engine→SDB) so code-change metrics are current
 echo "🔄 Updating git repository for code-churn: $GIT_REPO_PATH"
@@ -225,6 +237,7 @@ GEN_CMD=(
   python3 quality_report_generator.py
   --week "$WEEK"
   --component "$COMPONENT"
+  --deployment-csv "$DEPLOYMENT_CSV_FOR_RUN"
   --report-type comprehensive
   --skip-confirmation
 )

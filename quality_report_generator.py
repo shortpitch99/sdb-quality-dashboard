@@ -1405,20 +1405,119 @@ Next week: Planning production rollout to P0-P3 stages pending final validation 
         try:
             with open(csv_file, 'r') as f:
                 reader = csv.DictReader(f, delimiter=',')
-                for row in reader:
-                    # Parse SuperSet export format: stagger, version, SUM(count)
+                rows = list(reader)
+
+            if not rows:
+                self.data['deployments'] = []
+                self.data['deployment_metadata'] = {'source_file': csv_file, 'format': 'empty'}
+                print(f"✓ Loaded 0 deployment records from {csv_file}")
+                return []
+
+            cols = set(rows[0].keys())
+
+            # Format A: SuperSet snapshot (stagger, version, SUM(count)).
+            if {'stagger', 'version'}.issubset(cols):
+                count_key = 'SUM(count)' if 'SUM(count)' in cols else ('count' if 'count' in cols else 'cells')
+                for row in rows:
+                    try:
+                        count_val = int(float(row.get(count_key, 0) or 0))
+                    except Exception:
+                        count_val = 0
                     deployment_record = {
                         'stagger': row.get('stagger', ''),
                         'version': row.get('version', ''),
-                        'count': int(row.get('SUM(count)', 0)) if row.get('SUM(count)') else 0,
-                        'stage': row.get('stagger', ''),  # Alias for compatibility
-                        'cells': int(row.get('SUM(count)', 0)) if row.get('SUM(count)') else 0  # Alias for compatibility
+                        'count': count_val,
+                        'stage': row.get('stagger', ''),
+                        'cells': count_val
                     }
                     deployments.append(deployment_record)
-                    
+                self.data['deployment_metadata'] = {
+                    'source_file': csv_file,
+                    'format': 'snapshot',
+                    'count_key': count_key,
+                }
+
+            # Format B: Journey/history CSV (current_version, week_start, total_cells, *_pct).
+            elif {'current_version', 'week_start', 'total_cells'}.issubset(cols):
+                pct_col_map = [
+                    ('sb0_pct', 'SB0'),
+                    ('sb1_pct', 'SB1'),
+                    ('r0_pct', 'R0'),
+                    ('r1_pct', 'R1'),
+                    ('r2a_pct', 'R2a'),
+                    ('r2b_pct', 'R2b'),
+                ]
+                # Support alternative pct_of_* headers.
+                alt_pct_map = {
+                    'pct_of_SB0': 'sb0_pct',
+                    'pct_of_SB1': 'sb1_pct',
+                    'pct_of_R0': 'r0_pct',
+                    'pct_of_R1': 'r1_pct',
+                    'pct_of_R2a': 'r2a_pct',
+                    'pct_of_R2b': 'r2b_pct',
+                }
+                normalized_rows = []
+                for row in rows:
+                    r = dict(row)
+                    for src, dst in alt_pct_map.items():
+                        if src in r and dst not in r:
+                            r[dst] = r.get(src, 0)
+                    normalized_rows.append(r)
+
+                dated_rows = []
+                for row in normalized_rows:
+                    try:
+                        dt = datetime.strptime(str(row.get('week_start', '')).strip(), '%Y-%m-%d')
+                    except Exception:
+                        continue
+                    dated_rows.append((dt, row))
+                if dated_rows:
+                    latest_dt = max(d for d, _ in dated_rows)
+                    latest_rows = [r for d, r in dated_rows if d == latest_dt]
+                    for row in latest_rows:
+                        version = str(row.get('current_version', '')).strip()
+                        try:
+                            total_cells = float(row.get('total_cells', 0) or 0)
+                        except Exception:
+                            total_cells = 0.0
+                        if not version or total_cells <= 0:
+                            continue
+                        for pct_key, stage in pct_col_map:
+                            try:
+                                pct = float(row.get(pct_key, 0) or 0)
+                            except Exception:
+                                pct = 0.0
+                            cells = int(round(total_cells * pct / 100.0))
+                            if cells <= 0:
+                                continue
+                            deployments.append({
+                                'stagger': stage,
+                                'version': version,
+                                'count': cells,
+                                'stage': stage,
+                                'cells': cells,
+                            })
+                    self.data['deployment_metadata'] = {
+                        'source_file': csv_file,
+                        'format': 'history_latest_snapshot',
+                        'latest_week_start': latest_dt.strftime('%Y-%m-%d'),
+                    }
+                else:
+                    self.data['deployment_metadata'] = {
+                        'source_file': csv_file,
+                        'format': 'history_latest_snapshot',
+                        'latest_week_start': '',
+                    }
+            else:
+                self.data['deployment_metadata'] = {
+                    'source_file': csv_file,
+                    'format': 'unknown_columns',
+                }
+
         except Exception as e:
             print(f"Error loading deployment data: {e}")
             deployments = []
+            self.data['deployment_metadata'] = {'source_file': csv_file, 'format': 'error', 'error': str(e)}
         
         self.data['deployments'] = deployments
         print(f"✓ Loaded {len(deployments)} deployment records from {csv_file}")
@@ -2627,6 +2726,7 @@ Reported: 2024-01-13
         overall_cov = cov_summary.get('overall', {}) if isinstance(cov_summary, dict) else {}
 
         gs = self.data.get('git_stats') or {}
+        dep_meta = self.data.get('deployment_metadata') or {}
         metadata = {
             'generated_at': datetime.now().isoformat(),
             'report_period_start': dates['period_start_full'],
@@ -2640,6 +2740,9 @@ Reported: 2024-01-13
                 'prbs': len(self.data.get('prbs', [])),
                 'bugs': len(self.data.get('bugs', [])),
                 'deployments': len(self.data.get('deployments', [])),
+                'deployment_source_file': dep_meta.get('source_file', ''),
+                'deployment_source_format': dep_meta.get('format', ''),
+                'deployment_latest_week_start': dep_meta.get('latest_week_start', ''),
                 'has_llm_content': 'llm_content' in self.data,
                 # Extended metrics
                 'ci_total': len(ci_items),
@@ -3346,19 +3449,36 @@ def main():
                 pass
             return 1
         
-        # Set all file paths to use the week/component subdirectory
-        args.risk_file = os.path.join(component_dir, os.path.basename(args.risk_file))
-        args.prb_file = os.path.join(component_dir, os.path.basename(args.prb_file))
-        args.bugs_file = os.path.join(component_dir, os.path.basename(args.bugs_file))
-        args.deployment_csv = os.path.join(component_dir, os.path.basename(args.deployment_csv))
-        args.coverage_txt = os.path.join(component_dir, os.path.basename(args.coverage_txt))
-        args.ci_file = os.path.join(component_dir, os.path.basename(args.ci_file))
-        args.leftshift_file = os.path.join(component_dir, os.path.basename(args.leftshift_file))
-        args.abs_file = os.path.join(component_dir, os.path.basename(args.abs_file))
-        args.security_file = os.path.join(component_dir, os.path.basename(args.security_file))
-        args.allbugs_file = os.path.join(component_dir, os.path.basename(args.allbugs_file))
-        args.prb_bugs_file = os.path.join(component_dir, os.path.basename(args.prb_bugs_file))
-        args.availability_file = os.path.join(component_dir, os.path.basename(args.availability_file))
+        def _resolve_week_file(raw_path: str, default_dir: str) -> str:
+            p = str(raw_path or '').strip()
+            if not p:
+                return p
+            if os.path.isabs(p):
+                return p
+            # If caller already passed a relative path with directories (e.g., weeks/cw19/Shared/deployment.csv
+            # or Shared/deployment.csv), resolve from repo root/week dir first.
+            if os.path.sep in p:
+                if os.path.exists(p):
+                    return p
+                week_rel = os.path.join(week_dir, p)
+                if os.path.exists(week_rel):
+                    return week_rel
+                return week_rel
+            return os.path.join(default_dir, os.path.basename(p))
+
+        # Set all file paths to use the week/component subdirectory, while allowing explicit shared paths.
+        args.risk_file = _resolve_week_file(args.risk_file, component_dir)
+        args.prb_file = _resolve_week_file(args.prb_file, component_dir)
+        args.bugs_file = _resolve_week_file(args.bugs_file, component_dir)
+        args.deployment_csv = _resolve_week_file(args.deployment_csv, component_dir)
+        args.coverage_txt = _resolve_week_file(args.coverage_txt, component_dir)
+        args.ci_file = _resolve_week_file(args.ci_file, component_dir)
+        args.leftshift_file = _resolve_week_file(args.leftshift_file, component_dir)
+        args.abs_file = _resolve_week_file(args.abs_file, component_dir)
+        args.security_file = _resolve_week_file(args.security_file, component_dir)
+        args.allbugs_file = _resolve_week_file(args.allbugs_file, component_dir)
+        args.prb_bugs_file = _resolve_week_file(args.prb_bugs_file, component_dir)
+        args.availability_file = _resolve_week_file(args.availability_file, component_dir)
         
         # Set report-end-date for historical weeks
         current_week = 38  # This week is cw38
