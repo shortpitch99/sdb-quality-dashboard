@@ -1405,7 +1405,16 @@ Next week: Planning production rollout to P0-P3 stages pending final validation 
         try:
             with open(csv_file, 'r') as f:
                 reader = csv.DictReader(f, delimiter=',')
-                rows = list(reader)
+                raw_rows = list(reader)
+
+            # Normalize header keys defensively (trim whitespace/BOM), keeping original values.
+            rows = []
+            for row in raw_rows:
+                norm = {}
+                for k, v in row.items():
+                    nk = str(k).strip().lstrip('\ufeff') if k is not None else ''
+                    norm[nk] = v
+                rows.append(norm)
 
             if not rows:
                 self.data['deployments'] = []
@@ -1437,8 +1446,52 @@ Next week: Planning production rollout to P0-P3 stages pending final validation 
                     'count_key': count_key,
                 }
 
-            # Format B: Journey/history CSV (current_version, week_start, total_cells, *_pct).
-            elif {'current_version', 'week_start', 'total_cells'}.issubset(cols):
+            # Format B: Journey/history CSV (current_version, week_start, stagger, cumulative_cells, ...).
+            elif {'current_version', 'week_start', 'stagger', 'cumulative_cells'}.issubset(cols):
+                dated_rows = []
+                for row in rows:
+                    try:
+                        dt = datetime.strptime(str(row.get('week_start', '')).strip(), '%Y-%m-%d')
+                    except Exception:
+                        continue
+                    dated_rows.append((dt, row))
+
+                if dated_rows:
+                    latest_dt = max(d for d, _ in dated_rows)
+                    latest_rows = [r for d, r in dated_rows if d == latest_dt]
+                    for row in latest_rows:
+                        version = str(row.get('current_version', '')).strip()
+                        stage = str(row.get('stagger', '')).strip()
+                        if not version or not stage:
+                            continue
+                        try:
+                            cells = int(round(float(row.get('cumulative_cells', 0) or 0)))
+                        except Exception:
+                            cells = 0
+                        if cells <= 0:
+                            continue
+                        deployments.append({
+                            'stagger': stage,
+                            'version': version,
+                            'count': cells,
+                            'stage': stage,
+                            'cells': cells,
+                        })
+
+                    self.data['deployment_metadata'] = {
+                        'source_file': csv_file,
+                        'format': 'history_stagger_latest_snapshot',
+                        'latest_week_start': latest_dt.strftime('%Y-%m-%d'),
+                    }
+                else:
+                    self.data['deployment_metadata'] = {
+                        'source_file': csv_file,
+                        'format': 'history_stagger_latest_snapshot',
+                        'latest_week_start': '',
+                    }
+
+            # Format C: Journey/history CSV (current_version, week_start, [total_cells], *_pct).
+            elif {'current_version', 'week_start'}.issubset(cols):
                 pct_col_map = [
                     ('sb0_pct', 'SB0'),
                     ('sb1_pct', 'SB1'),
@@ -1463,6 +1516,15 @@ Next week: Planning production rollout to P0-P3 stages pending final validation 
                         if src in r and dst not in r:
                             r[dst] = r.get(src, 0)
                     normalized_rows.append(r)
+                available_pct_keys = {k for k, _ in pct_col_map if any(k in r for r in normalized_rows)}
+                if not available_pct_keys:
+                    self.data['deployment_metadata'] = {
+                        'source_file': csv_file,
+                        'format': 'unknown_columns',
+                    }
+                    self.data['deployments'] = []
+                    print(f"✓ Loaded 0 deployment records from {csv_file}")
+                    return []
 
                 dated_rows = []
                 for row in normalized_rows:
@@ -1474,20 +1536,26 @@ Next week: Planning production rollout to P0-P3 stages pending final validation 
                 if dated_rows:
                     latest_dt = max(d for d, _ in dated_rows)
                     latest_rows = [r for d, r in dated_rows if d == latest_dt]
+                    has_total_cells = any('total_cells' in r for r in latest_rows)
                     for row in latest_rows:
                         version = str(row.get('current_version', '')).strip()
+                        if not version:
+                            continue
                         try:
                             total_cells = float(row.get('total_cells', 0) or 0)
                         except Exception:
                             total_cells = 0.0
-                        if not version or total_cells <= 0:
-                            continue
                         for pct_key, stage in pct_col_map:
                             try:
                                 pct = float(row.get(pct_key, 0) or 0)
                             except Exception:
                                 pct = 0.0
-                            cells = int(round(total_cells * pct / 100.0))
+                            if has_total_cells and total_cells > 0:
+                                cells = int(round(total_cells * pct / 100.0))
+                            else:
+                                # No total cells in source: derive proportional pseudo-counts
+                                # from percentages so visualizations still have meaningful weights.
+                                cells = int(round(pct * 10.0)) if pct > 0 else 0
                             if cells <= 0:
                                 continue
                             deployments.append({
@@ -1499,7 +1567,7 @@ Next week: Planning production rollout to P0-P3 stages pending final validation 
                             })
                     self.data['deployment_metadata'] = {
                         'source_file': csv_file,
-                        'format': 'history_latest_snapshot',
+                        'format': 'history_latest_snapshot' if has_total_cells else 'history_latest_snapshot_pct_only',
                         'latest_week_start': latest_dt.strftime('%Y-%m-%d'),
                     }
                 else:

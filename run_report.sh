@@ -136,12 +136,12 @@ echo "📂 Looking for data files in: $data_dir/"
 
 # Prefer shared deployment sources, then component-local fallback.
 DEPLOYMENT_CSV_FOR_RUN=""
-if [ -f "$shared_dir/deployment.csv" ]; then
+if [ -f "$shared_dir/deployment-journey.csv" ]; then
+    DEPLOYMENT_CSV_FOR_RUN="$shared_dir/deployment-journey.csv"
+elif [ -f "$shared_dir/deployment.csv" ]; then
     DEPLOYMENT_CSV_FOR_RUN="$shared_dir/deployment.csv"
 elif [ -f "$data_dir/deployment.csv" ]; then
     DEPLOYMENT_CSV_FOR_RUN="$data_dir/deployment.csv"
-elif [ -f "$shared_dir/deployment-journey.csv" ]; then
-    DEPLOYMENT_CSV_FOR_RUN="$shared_dir/deployment-journey.csv"
 fi
 
 if [ ! -f "$data_dir/risks.txt" ]; then

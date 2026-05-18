@@ -2510,11 +2510,39 @@ class QualityReportDashboard:
         except Exception:
             return pd.DataFrame()
 
-        # Check if we have the new column format (pct_of_SB0) or old (sb0_pct)
+        # Support multiple journey formats:
+        # 1) Wide pct columns: pct_of_SB0... or sb0_pct...
+        # 2) Long stagger rows: current_version, week_start, stagger, cumulative_cells, stagger_total_cells, pct_of_stagger
         has_new_format = "pct_of_SB0" in df.columns
+        has_long_stagger_format = {"stagger", "pct_of_stagger"}.issubset(set(df.columns))
 
-        if has_new_format:
-            # Rename new format columns to old format for compatibility
+        if has_long_stagger_format:
+            tmp = df.copy()
+            tmp["stagger"] = tmp["stagger"].astype(str).str.strip()
+            tmp["pct_of_stagger"] = pd.to_numeric(tmp["pct_of_stagger"], errors="coerce").fillna(0.0)
+            pivot = (
+                tmp.pivot_table(
+                    index=["current_version", "week_start"],
+                    columns="stagger",
+                    values="pct_of_stagger",
+                    aggfunc="max",
+                    fill_value=0.0,
+                )
+                .reset_index()
+            )
+            pivot.columns.name = None
+            df = pivot
+            rename_map = {
+                "SB0": "sb0_pct",
+                "SB1": "sb1_pct",
+                "R0": "r0_pct",
+                "R1": "r1_pct",
+                "R2a": "r2a_pct",
+                "R2b": "r2b_pct",
+            }
+            df = df.rename(columns=rename_map)
+        elif has_new_format:
+            # Rename new wide-format columns to canonical names.
             rename_map = {
                 "pct_of_SB0": "sb0_pct",
                 "pct_of_SB1": "sb1_pct",
@@ -2895,18 +2923,140 @@ class QualityReportDashboard:
             st.info("No releases with SB0 > 0.0 found in the latest 12 weeks.")
             return
 
-        # Determine a default cohort by latest-week SB0 presence (up to 8 versions).
+        # Determine a default cohort centered on the most dominant latest-week release:
+        # 2 versions behind + dominant + 6 versions ahead (up to 9 total).
+        # Only include versions that actually have cells in the latest week.
         latest_rows = window[window["week_start"] == latest_week].copy()
-        sb0_candidates = latest_rows[latest_rows["sb0_pct"] > 0]["current_version"].astype(str).tolist()
-        if sb0_candidates:
-            default_seed = sorted(sb0_candidates, key=self._version_tuple)[-1]
-        else:
+        latest_rows = latest_rows[latest_rows["current_version"].astype(str).isin(sb0_eligible_versions)].copy()
+        if latest_rows.empty:
             default_seed = sb0_eligible_versions[-1]
+            active_latest_versions: List[str] = sb0_eligible_versions.copy()
+        else:
+            pct_cols = ["sb0_pct", "sb1_pct", "r0_pct", "r1_pct", "r2a_pct", "r2b_pct"]
+            for c in pct_cols:
+                if c not in latest_rows.columns:
+                    latest_rows[c] = 0.0
+                latest_rows[c] = pd.to_numeric(latest_rows[c], errors="coerce").fillna(0.0)
+            latest_rows["total_cells"] = pd.to_numeric(latest_rows.get("total_cells", 0), errors="coerce").fillna(0.0)
+            latest_rows["pct_sum"] = latest_rows[pct_cols].sum(axis=1)
+            latest_rows["non_sb0_pct_sum"] = latest_rows[["sb1_pct", "r0_pct", "r1_pct", "r2a_pct", "r2b_pct"]].sum(axis=1)
+            # Consider a version active if it has any stage occupancy in latest week.
+            latest_rows["has_cells"] = latest_rows["pct_sum"] > 0.0
+            active_latest_versions = (
+                latest_rows[latest_rows["has_cells"]]["current_version"].astype(str).unique().tolist()
+            )
+            # Exclude releases that are SB0-only in latest week for this graph.
+            non_sb0_latest_versions = (
+                latest_rows[latest_rows["non_sb0_pct_sum"] > 0.0]["current_version"].astype(str).unique().tolist()
+            )
+            if non_sb0_latest_versions:
+                active_latest_versions = [v for v in active_latest_versions if v in set(non_sb0_latest_versions)]
+            latest_rows["dominance_score"] = latest_rows["total_cells"]
+            # If total_cells is unavailable/flat (e.g., placeholder values), fallback to stage share sum.
+            if float(latest_rows["dominance_score"].max()) <= 0 or latest_rows["dominance_score"].nunique(dropna=True) <= 1:
+                latest_rows["dominance_score"] = latest_rows["pct_sum"]
+            latest_rows = latest_rows[latest_rows["has_cells"]].copy()
+            if non_sb0_latest_versions:
+                latest_rows = latest_rows[latest_rows["current_version"].astype(str).isin(non_sb0_latest_versions)].copy()
+            if latest_rows.empty:
+                default_seed = sb0_eligible_versions[-1]
+                active_latest_versions = sb0_eligible_versions.copy()
+            else:
+                dominant_row = latest_rows.sort_values(["dominance_score"], ascending=False).iloc[0]
+                default_seed = str(dominant_row["current_version"])
         ordered_versions = sb0_eligible_versions
         seed_idx = ordered_versions.index(default_seed) if default_seed in ordered_versions else len(ordered_versions) - 1
-        default_versions = ordered_versions[max(0, seed_idx - 7): seed_idx + 1]
+        active_set = set(active_latest_versions)
+        # Prefer overlap with plan schedule releases when available.
+        plan_df = self._load_plan_schedule_data(selected_week, data)
+        if not plan_df.empty and "version" in plan_df.columns:
+            planned_versions = set(plan_df["version"].astype(str).str.strip().tolist())
+            overlapped = active_set.intersection(planned_versions)
+            if overlapped:
+                active_set = overlapped
+        # Prefer dominant release from deployment snapshot counts when available.
+        dominant_from_snapshot: Optional[str] = None
+        week_folder = self._resolve_week_folder_key(selected_week, data)
+        if week_folder:
+            snapshot_candidates = [
+                os.path.join(APP_ROOT, "weeks", week_folder, "Shared", "deployment.csv"),
+                os.path.join(APP_ROOT, "weeks", week_folder, "Engine", "deployment.csv"),
+            ]
+            for snap_path in snapshot_candidates:
+                if not os.path.exists(snap_path):
+                    continue
+                try:
+                    snap = pd.read_csv(snap_path)
+                except Exception:
+                    continue
+                if snap.empty:
+                    continue
+                version_col = "version" if "version" in snap.columns else ("current_version" if "current_version" in snap.columns else None)
+                count_col = None
+                for c in ["SUM(count)", "count", "cells"]:
+                    if c in snap.columns:
+                        count_col = c
+                        break
+                if not version_col or not count_col:
+                    continue
+                snap[version_col] = snap[version_col].astype(str).str.strip()
+                snap[count_col] = pd.to_numeric(snap[count_col], errors="coerce").fillna(0.0)
+                counts = (
+                    snap.groupby(version_col, as_index=False)[count_col]
+                    .sum()
+                    .sort_values(count_col, ascending=False)
+                )
+                if counts.empty:
+                    continue
+                for _, row in counts.iterrows():
+                    v = str(row[version_col])
+                    if v in active_set:
+                        dominant_from_snapshot = v
+                        break
+                if dominant_from_snapshot:
+                    break
 
-        available_versions = sb0_eligible_versions
+        if dominant_from_snapshot and dominant_from_snapshot in ordered_versions and dominant_from_snapshot in active_set:
+            default_seed = dominant_from_snapshot
+            seed_idx = ordered_versions.index(default_seed)
+
+        if default_seed not in active_set:
+            # Re-anchor seed to nearest active version if the previous seed is not planned/active.
+            active_ordered = [v for v in ordered_versions if v in active_set]
+            if active_ordered:
+                # Choose closest by index in semantic order.
+                nearest = min(active_ordered, key=lambda v: abs(ordered_versions.index(v) - seed_idx))
+                default_seed = nearest
+                seed_idx = ordered_versions.index(default_seed)
+
+        older_active = [v for v in ordered_versions[:seed_idx] if v in active_set]
+        newer_active = [v for v in ordered_versions[seed_idx + 1 :] if v in active_set]
+        seed_active = default_seed in active_set
+
+        selected_older = older_active[-2:]
+        selected_newer = newer_active[:6]
+        default_versions = selected_older + ([default_seed] if seed_active else []) + selected_newer
+
+        # Keep pulling on each side (same direction) until we hit up to 9 versions.
+        older_pool_extra = older_active[: max(0, len(older_active) - len(selected_older))]
+        newer_pool_extra = newer_active[len(selected_newer) :]
+        while len(default_versions) < 9 and (older_pool_extra or newer_pool_extra):
+            if older_pool_extra and len(selected_older) <= 2:
+                default_versions.insert(0, older_pool_extra[-1])
+                older_pool_extra = older_pool_extra[:-1]
+                continue
+            if newer_pool_extra and len(selected_newer) <= 6:
+                default_versions.append(newer_pool_extra[0])
+                newer_pool_extra = newer_pool_extra[1:]
+                continue
+            if older_pool_extra:
+                default_versions.insert(0, older_pool_extra[-1])
+                older_pool_extra = older_pool_extra[:-1]
+            elif newer_pool_extra:
+                default_versions.append(newer_pool_extra[0])
+                newer_pool_extra = newer_pool_extra[1:]
+
+        available_versions = [v for v in ordered_versions if v in active_set]
         if not available_versions:
             st.warning("No versions found in latest 12 weeks.")
             return
@@ -4249,9 +4399,12 @@ class QualityReportDashboard:
         UI-preview panel inspired by the provided Release Journey screenshot:
         stage summary cards + release journey table + right-side details.
         """
-        df = self._load_global_deployment_history(selected_week, data)
+        # Use shared journey history as primary source for this preview.
+        df = self._load_shared_deployment_journey_history(selected_week, data)
         if df.empty:
-            st.info("Release Journey preview unavailable: global deployment history not found for selected week.")
+            df = self._load_global_deployment_history(selected_week, data)
+        if df.empty:
+            st.info("Release Journey preview unavailable: deployment journey history not found for selected week.")
             return
 
         latest_week = df["week_start"].max()
@@ -4285,12 +4438,84 @@ class QualityReportDashboard:
                 out.append(bars[idx])
             return "".join(out)
 
-        release_totals = (
-            latest_slice.groupby("current_version", as_index=False)["total_cells"]
-            .sum()
-            .sort_values("total_cells", ascending=False)
-        )
-        top_releases = release_totals["current_version"].head(8).tolist()
+        # Use latest deployment snapshot counts for ranking/total cells in preview table/cards.
+        deployment_counts_map: Dict[str, float] = {}
+        week_folder = self._resolve_week_folder_key(selected_week, data)
+        if week_folder:
+            snapshot_candidates = [
+                os.path.join(APP_ROOT, "weeks", week_folder, "Shared", "deployment.csv"),
+                os.path.join(APP_ROOT, "weeks", week_folder, "Engine", "deployment.csv"),
+            ]
+            for snap_path in snapshot_candidates:
+                if not os.path.exists(snap_path):
+                    continue
+                try:
+                    snap = pd.read_csv(snap_path)
+                except Exception:
+                    continue
+                if snap.empty:
+                    continue
+                version_col = "version" if "version" in snap.columns else ("current_version" if "current_version" in snap.columns else None)
+                count_col = None
+                for c in ["SUM(count)", "count", "cells"]:
+                    if c in snap.columns:
+                        count_col = c
+                        break
+                if not version_col or not count_col:
+                    continue
+                snap[version_col] = snap[version_col].astype(str).str.strip()
+                snap[count_col] = pd.to_numeric(snap[count_col], errors="coerce").fillna(0.0)
+                counts_df = (
+                    snap.groupby(version_col, as_index=False)[count_col]
+                    .sum()
+                    .sort_values(count_col, ascending=False)
+                )
+                deployment_counts_map = {str(r[version_col]): float(r[count_col]) for _, r in counts_df.iterrows() if float(r[count_col]) > 0}
+                if deployment_counts_map:
+                    break
+
+        # Keep preview/table aligned with Release Journey cohort logic.
+        ordered_versions = sorted(latest_slice["current_version"].astype(str).unique().tolist(), key=self._version_tuple)
+        # Active versions in latest week.
+        active_set = set()
+        for v in ordered_versions:
+            vr = latest_slice[latest_slice["current_version"].astype(str) == v]
+            if vr.empty:
+                continue
+            non_sb0 = 0.0
+            for col in ["sb1_pct", "r0_pct", "r1_pct", "r2a_pct", "r2b_pct"]:
+                if col in vr.columns:
+                    non_sb0 += float(pd.to_numeric(vr[col], errors="coerce").fillna(0.0).mean())
+            if non_sb0 > 0:
+                active_set.add(v)
+        if not active_set:
+            active_set = set(ordered_versions)
+
+        plan_df = self._load_plan_schedule_data(selected_week, data)
+        if not plan_df.empty and "version" in plan_df.columns:
+            planned = set(plan_df["version"].astype(str).str.strip().tolist())
+            overlap = active_set.intersection(planned)
+            if overlap:
+                active_set = overlap
+
+        # Seed on dominant by real deployment counts where possible.
+        seed = None
+        if deployment_counts_map:
+            for v, _ in sorted(deployment_counts_map.items(), key=lambda kv: kv[1], reverse=True):
+                if v in active_set:
+                    seed = v
+                    break
+        if not seed:
+            seed = sorted(active_set, key=self._version_tuple)[-1] if active_set else None
+
+        top_releases = []
+        if seed and seed in ordered_versions:
+            idx = ordered_versions.index(seed)
+            older = [v for v in ordered_versions[:idx] if v in active_set][-2:]
+            newer = [v for v in ordered_versions[idx + 1 :] if v in active_set][:6]
+            top_releases = older + [seed] + newer
+        if not top_releases:
+            top_releases = [v for v in ordered_versions if v in active_set][:9]
         if not top_releases:
             st.info("Release Journey preview unavailable: no releases in latest week.")
             return
@@ -4308,29 +4533,20 @@ class QualityReportDashboard:
 
         recent_weeks = sorted(df["week_start"].dropna().unique())[-8:]
         trend_df = selected_release_df[selected_release_df["week_start"].isin(recent_weeks)].copy()
-        weekly_totals = trend_df.groupby("week_start", as_index=False)["total_cells"].sum().rename(
-            columns={"total_cells": "week_total_cells"}
-        )
         weekly_stage_trends: Dict[str, pd.DataFrame] = {}
         for label, col, _ in stage_specs:
-            stage_cells = (
-                trend_df.assign(stage_cells=trend_df["total_cells"] * trend_df[col] / 100.0)
-                .groupby("week_start", as_index=False)["stage_cells"]
-                .sum()
-            )
-            merged_trend = weekly_totals.merge(stage_cells, on="week_start", how="left")
-            merged_trend["stage_cells"] = merged_trend["stage_cells"].fillna(0.0)
-            merged_trend["stage_pct"] = np.where(
-                merged_trend["week_total_cells"] > 0,
-                merged_trend["stage_cells"] * 100.0 / merged_trend["week_total_cells"],
-                0.0,
+            merged_trend = (
+                trend_df.groupby("week_start", as_index=False)[col]
+                .mean()
+                .rename(columns={col: "stage_pct"})
             )
             weekly_stage_trends[label] = merged_trend
 
-        latest_total_cells = float(selected_latest_slice["total_cells"].sum())
+        latest_total_cells = float(deployment_counts_map.get(selected_release, float(selected_latest_slice["total_cells"].sum())))
         stage_totals: Dict[str, float] = {}
         for label, col, _ in stage_specs:
-            stage_totals[label] = float((selected_latest_slice["total_cells"] * selected_latest_slice[col] / 100.0).sum())
+            stage_pct = float(selected_latest_slice[col].mean()) if col in selected_latest_slice.columns and not selected_latest_slice.empty else 0.0
+            stage_totals[label] = float(latest_total_cells * stage_pct / 100.0)
 
         st.markdown(
             """
@@ -4392,10 +4608,10 @@ class QualityReportDashboard:
             row = latest_slice[latest_slice["current_version"] == version]
             if row.empty:
                 continue
-            total = float(row["total_cells"].sum())
+            total = float(deployment_counts_map.get(version, float(row["total_cells"].sum())))
             stage_data = {}
             for label, col, color in stage_specs:
-                pct = float((row[col] * row["total_cells"]).sum() / total) if total > 0 else 0.0
+                pct = float(row[col].mean()) if total > 0 and col in row.columns else 0.0
                 cells = int(round(total * pct / 100.0))
                 stage_data[label] = {"pct": pct, "cells": cells, "color": color}
             row_map[version] = {"total": int(round(total)), "stages": stage_data}
