@@ -4010,13 +4010,14 @@ class QualityReportDashboard:
                     date_start = min(all_weeks)
                     date_end = max(all_weeks)
                     daily_index = pd.date_range(date_start, date_end, freq='D')
+                    # Use a lighter actual palette for easier contrast over plan bands.
                     actual_line_colors = {
-                        "SB0": "#3730A3",
-                        "SB1/SB2": "#1D4ED8",
-                        "R0": "#0E7490",
-                        "R1": "#166534",
-                        "R2a": "#B45309",
-                        "R2b": "#9A3412",
+                        "SB0": "#6366F1",
+                        "SB1/SB2": "#3B82F6",
+                        "R0": "#06B6D4",
+                        "R1": "#22C55E",
+                        "R2a": "#F59E0B",
+                        "R2b": "#F97316",
                     }
 
                     stage_list = ["SB0", "SB1/SB2", "R0", "R1", "R2a", "R2b"]
@@ -4075,7 +4076,8 @@ class QualityReportDashboard:
                                 y=actual_interp.values,
                                 name=stage,
                                 mode='lines',
-                                line=dict(color=actual_line_colors.get(stage, stage_color), width=3.2, dash='solid'),
+                                line=dict(color=actual_line_colors.get(stage, stage_color), width=2.8, dash='solid'),
+                                opacity=0.9,
                                 legendgroup=stage,
                                 showlegend=True,
                                 hovertemplate=f'<b>{stage} Actual</b><br>Date: %{{x|%Y-%m-%d}}<br>Actual %: %{{y:.1f}}<extra></extra>',
