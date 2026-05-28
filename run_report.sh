@@ -134,14 +134,19 @@ data_dir="$DATA_DIR"
 shared_dir="weeks/$WEEK/Shared"
 echo "📂 Looking for data files in: $data_dir/"
 
-# Prefer shared deployment sources, then component-local fallback.
+# Prefer shared deployment sources (actuals), then component-local fallback.
+# deployment-journey.csv in Shared is typically a plan, so prefer deployment.csv for actuals
 DEPLOYMENT_CSV_FOR_RUN=""
-if [ -f "$shared_dir/deployment-journey.csv" ]; then
-    DEPLOYMENT_CSV_FOR_RUN="$shared_dir/deployment-journey.csv"
-elif [ -f "$shared_dir/deployment.csv" ]; then
+if [ -f "$shared_dir/deployment.csv" ]; then
     DEPLOYMENT_CSV_FOR_RUN="$shared_dir/deployment.csv"
+    echo "ℹ️  Using actual deployment data from Shared/deployment.csv"
+elif [ -f "$data_dir/deployment-journey.csv" ]; then
+    DEPLOYMENT_CSV_FOR_RUN="$data_dir/deployment-journey.csv"
 elif [ -f "$data_dir/deployment.csv" ]; then
     DEPLOYMENT_CSV_FOR_RUN="$data_dir/deployment.csv"
+elif [ -f "$shared_dir/deployment-journey.csv" ]; then
+    DEPLOYMENT_CSV_FOR_RUN="$shared_dir/deployment-journey.csv"
+    echo "⚠️  Using deployment plan from Shared/deployment-journey.csv (may not reflect actuals)"
 fi
 
 if [ ! -f "$data_dir/risks.txt" ]; then
@@ -162,7 +167,12 @@ if [ -z "$DEPLOYMENT_CSV_FOR_RUN" ]; then
     missing_files+=("deployment.csv (expected in $shared_dir or $data_dir)")
 fi
 
-if [ ! -f "$data_dir/coverage.txt" ]; then
+# Coverage.txt: fetch from GUS report for "Core App Efficiency" when using Reports API,
+# otherwise require local coverage.txt file
+if [ "$USE_SF_REPORTS" = "1" ] && [ "$COMPONENT" = "Core App Efficiency" ]; then
+    # Core App Efficiency: coverage comes from GUS report 00OEE0000038PNh2AM
+    echo "ℹ️  Coverage will be fetched from GUS report (Core Optimizer/SFSQL)"
+elif [ ! -f "$data_dir/coverage.txt" ]; then
     missing_files+=("coverage.txt")
 fi
 

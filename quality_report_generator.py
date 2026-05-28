@@ -95,6 +95,16 @@ _ENG_SF: Dict[str, str] = {
     'alltime_backlog': '00OEE000002XRUv2AO',
     'prb_backlog': '00OEE000002ZnZN2A0',
 }
+_CORE_SF: Dict[str, str] = {
+    'bugs': '00OEE0000038GfN2AU',  # P0/P1 Prod Investigations for Core Optimizer/SFSQL
+    'ci': '00OEE0000038NnJ2AU',  # Core Optimizer/SFSQL CI Issues report
+    'leftshift': '00OEE0000038PHF2A2',  # Core Optimizer/SFSQL Left Shift Issues
+    'abs': '00OEE0000038eZd2AI',  # Core Optimizer/SFSQL P0/P1 ABS Bug Report
+    'security': '00OEE0000038PM52AM',  # Core Optimizer/SFSQL Security Issues
+    'alltime_backlog': '00OEE0000038PIr2AM',  # Core Optimizer/SFSQL All-time Bug Backlog
+    'prb_backlog': '00OEE0000038PKT2A2',  # Core Optimizer/SFSQL PRB Backlog
+    'coverage': '00OEE0000038PNh2AM',  # Core Optimizer/SFSQL Code Coverage
+}
 SALESFORCE_REPORT_IDS_BY_COMPONENT: Dict[str, Dict[str, str]] = {
     'Engine': _ENG_SF,
     'Store': {
@@ -115,7 +125,7 @@ SALESFORCE_REPORT_IDS_BY_COMPONENT: Dict[str, Dict[str, str]] = {
         'alltime_backlog': '00OEE0000030oKr2AI',
         'prb_backlog': '00OEE0000030oEP2AY',
     },
-    'Core App Efficiency': _ENG_SF,
+    'Core App Efficiency': _CORE_SF,
 }
 
 
@@ -138,12 +148,17 @@ def apply_salesforce_report_ids_for_component(args: argparse.Namespace) -> None:
         args.sf_report_alltime_backlog = m['alltime_backlog']
     if getattr(args, 'sf_report_prb_backlog', None) is None:
         args.sf_report_prb_backlog = m['prb_backlog']
+    # Coverage report (special case for Core App Efficiency)
+    if getattr(args, 'sf_report_coverage', None) is None:
+        args.sf_report_coverage = m.get('coverage')  # May be None for non-Core components
     print(
         f"📎 Salesforce reports for component={args.component}: "
         f"bugs={args.sf_report_bugs} ci={args.sf_report_ci} security={args.sf_report_security} "
         f"leftshift={args.sf_report_leftshift} abs={args.sf_report_abs} "
         f"alltime={args.sf_report_alltime_backlog} prb_backlog={args.sf_report_prb_backlog}"
     )
+    if args.sf_report_coverage:
+        print(f"📎 Coverage report: {args.sf_report_coverage} (Core Optimizer/SFSQL only)")
 
 
 @dataclass
@@ -473,31 +488,38 @@ class QualityDataCollector:
         prbs: List[PRBItem] = []
         
         for i, r in enumerate(rows):
-            # The report structure for 00OEE000001TXjB2AW doesn't have SM_Problem__c.Name or SM_Problem__c.Id
-            # Instead, we need to create PRB IDs from available data
-            
             work_id = str(r.get('SM_Problem__c.Initial_Work_Issue__c.Name_label') or '')
             description = str(r.get('SM_Problem__c.Problem_Description__c') or '')
-            
-            # Skip if no meaningful data
-            if not work_id and not description:
-                continue
-                
-            # Create synthetic PRB ID from work ID
-            if work_id and work_id != 'None':
-                prb_id = f"PRB-{work_id.replace('W-', '')}"
-            else:
-                # Fallback: use date and row index
-                prb_id = f"PRB-{datetime.now().strftime('%Y%m%d')}{i+1:02d}"
-            
-            # Extract priority from description (SEV-X pattern)
-            priority = 'P2-Medium'  # default
+
+            # Extract PRB ID from Problem Description field (format: "PRB-XXXXXXX (Internal Retro) | ...")
+            prb_id = ''
             import re
-            sev_match = re.search(r'SEV-(\d+)', description)
-            if sev_match:
-                sev_level = sev_match.group(1)
-                priority_map = {'0': 'P0-Critical', '1': 'P1-High', '2': 'P2-Medium', '3': 'P3-Low', '4': 'P4-Minimal'}
-                priority = priority_map.get(sev_level, 'P2-Medium')
+            if description:
+                prb_match = re.search(r'(PRB-\d{7})', description)
+                if prb_match:
+                    prb_id = prb_match.group(1)
+
+            # Skip if no PRB ID found
+            if not prb_id:
+                print(f"⚠️  Skipping row {i+1}: No PRB ID found in description")
+                continue
+            
+            # Extract priority from description (format: "PRB-XXXXXXX (Internal Retro) | P1 | ...")
+            priority = 'P2-Medium'  # default
+            if description:
+                # Look for P0, P1, P2, P3 pattern
+                p_match = re.search(r'\|\s*(P[0-4])\s*\|', description)
+                if p_match:
+                    p_level = p_match.group(1)
+                    priority_map = {'P0': 'P0-Critical', 'P1': 'P1-High', 'P2': 'P2-Medium', 'P3': 'P3-Low', 'P4': 'P4-Minimal'}
+                    priority = priority_map.get(p_level, 'P2-Medium')
+                else:
+                    # Fallback to SEV-X pattern
+                    sev_match = re.search(r'SEV-(\d+)', description)
+                    if sev_match:
+                        sev_level = sev_match.group(1)
+                        priority_map = {'0': 'P0-Critical', '1': 'P1-High', '2': 'P2-Medium', '3': 'P3-Low', '4': 'P4-Minimal'}
+                        priority = priority_map.get(sev_level, 'P2-Medium')
             
             status = str(r.get('SM_Problem__c.Problem_State__c') or 'Open')
             created = r.get('SM_Problem__c.CreatedDate')
@@ -685,7 +707,81 @@ class QualityDataCollector:
         
         # PRB backlog processing complete
         return prb_backlog_items
-    
+
+    def load_coverage_from_report(self, report_id: str, session: Dict[str, str], api_version: str = "v62.0") -> List[NewCodeCoverage]:
+        """Load code coverage data from Salesforce report (Core Optimizer/SFSQL only)."""
+        data = self._fetch_report(report_id, session, api_version)
+        if not data:
+            print("Failed to fetch Coverage report; coverage data will be empty")
+            return []
+
+        rows = self._get_rows_from_report(data)
+
+        # Initialize coverage data structure
+        new_code_data = {
+            'coverage': 0.0,
+            'line_coverage': 0.0,
+            'lines_to_cover': 0,
+            'uncovered_lines': 0,
+            'condition_coverage': 0.0,
+            'conditions_to_cover': 0,
+            'uncovered_conditions': 0
+        }
+        overall_data = {
+            'coverage': 0.0,
+            'line_coverage': 0.0,
+            'lines_to_cover': 0,
+            'uncovered_lines': 0,
+            'condition_coverage': 0.0,
+            'conditions_to_cover': 0,
+            'uncovered_conditions': 0
+        }
+
+        # Parse coverage metrics from GUS report (Core Optimizer format)
+        # The report has ADM_Coverage__c.Actual_Coverage__c field with multiple rows
+        coverage_values = []
+        for r in rows:
+            # Core Optimizer report uses ADM_Coverage__c.Actual_Coverage__c
+            coverage_pct = r.get('ADM_Coverage__c.Actual_Coverage__c')
+
+            if coverage_pct:
+                try:
+                    coverage_values.append(float(coverage_pct))
+                except (ValueError, TypeError):
+                    pass
+
+        # Calculate average coverage from all rows
+        if coverage_values:
+            avg_coverage = sum(coverage_values) / len(coverage_values)
+            overall_data['coverage'] = avg_coverage
+            overall_data['line_coverage'] = avg_coverage
+            new_code_data['coverage'] = avg_coverage
+            new_code_data['line_coverage'] = avg_coverage
+            print(f"✓ Parsed {len(coverage_values)} coverage records from Core Optimizer report")
+            print(f"  Coverage values: {[f'{v:.2f}%' for v in coverage_values]}")
+            print(f"  Average coverage: {avg_coverage:.2f}%")
+        else:
+            print("⚠️ No coverage values found in GUS report. Report may have unexpected structure.")
+            print("   Falling back to empty coverage data.")
+            return []
+
+        # Create NewCodeCoverage objects
+        # For GUS reports (Core Optimizer), we only have percentage data, not line counts
+        coverage = NewCodeCoverage(
+            component='Core Optimizer/SFSQL',
+            new_code_coverage=new_code_data.get('coverage', overall_data['coverage']),
+            overall_coverage=overall_data['coverage'],
+            new_code_line_coverage=new_code_data.get('line_coverage', overall_data['line_coverage']),
+            overall_line_coverage=overall_data['line_coverage'],
+            lines_to_cover=0,  # Not available from GUS report
+            uncovered_lines=0,  # Not available from GUS report
+            overall_lines_to_cover=0,  # Not available from GUS report
+            overall_uncovered_lines=0  # Not available from GUS report
+        )
+
+        print(f"✓ Loaded coverage from GUS report: Overall={overall_data['line_coverage']:.1f}%")
+        return [coverage]
+
     def load_risk_data(self, risk_file: str) -> List[RiskItem]:
         """Load risk/feature tracking data from text file."""
         risks = []
@@ -3493,7 +3589,8 @@ def main():
     parser.add_argument('--sf-report-security', default=None, help='Report ID for Security Issues (default: per --component)')
     parser.add_argument('--sf-report-alltime-backlog', default=None, help='Report ID for All-time Bug Backlog (default: per --component)')
     parser.add_argument('--sf-report-prb-backlog', default=None, help='Report ID for Backlog from PRB (default: per --component)')
-    
+    parser.add_argument('--sf-report-coverage', default=None, help='Report ID for Code Coverage (Core Optimizer/SFSQL only)')
+
     args = parser.parse_args()
     apply_salesforce_report_ids_for_component(args)
     
@@ -3585,11 +3682,16 @@ def main():
             print("⚠️ Could not establish Salesforce session; falling back to file-based inputs")
             use_reports = False
 
-    print("Loading PRB/incident data...")
-    if use_reports:
-        collector.load_prb_from_report(args.sf_report_prb, session, args.sf_api_version)
+    # PRBs are fleet-wide metrics - only load for Engine component
+    if args.component == "Engine":
+        print("Loading PRB/incident data (Fleet-wide metrics)...")
+        if use_reports:
+            collector.load_prb_from_report(args.sf_report_prb, session, args.sf_api_version)
+        else:
+            collector.load_prb_data(args.prb_file)
     else:
-        collector.load_prb_data(args.prb_file)
+        print("Skipping PRB data (Fleet-wide metrics only loaded for Engine component)")
+        collector.data['prbs'] = []
 
     print("Loading bugs data (Production issues)...")
     if use_reports:
@@ -3599,18 +3701,59 @@ def main():
         collector.load_bugs_data(args.bugs_file)
     
     # Critical issues are already loaded as part of bugs data - no need for separate extraction
-    
-    print("Loading deployment data...")
-    collector.load_deployment_data(args.deployment_csv)
+
+    # Deployment data is fleet-wide - only load for Engine component
+    if args.component == "Engine":
+        print("Loading deployment data (Fleet-wide metrics)...")
+        collector.load_deployment_data(args.deployment_csv)
+    else:
+        print("Skipping deployment data (Fleet-wide metrics only loaded for Engine component)")
+        collector.data['deployments'] = []
+        collector.data['deployment_metadata'] = {'source_file': 'none', 'format': 'skipped_non_engine'}
     
     print("Initializing coverage metrics (legacy JSON format no longer required)...")
     collector.load_coverage_metrics()  # Initialize with empty data
 
     print("Loading new code coverage data...")
-    collector.load_new_code_coverage(args.coverage_txt)
+    # Special case: Core App Efficiency can fetch coverage from GUS report
+    if use_reports and args.component == "Core App Efficiency" and hasattr(args, 'sf_report_coverage') and args.sf_report_coverage:
+        print(f"  → Fetching coverage from GUS report (Core Optimizer/SFSQL): {args.sf_report_coverage}")
+        coverage_data = collector.load_coverage_from_report(args.sf_report_coverage, session, args.sf_api_version)
+        collector.data['new_code_coverage'] = [vars(cov) for cov in coverage_data]
+
+        # Also populate coverage_summary for dashboard
+        if coverage_data:
+            cov = coverage_data[0]
+            collector.data['coverage_summary'] = {
+                'new_code': {
+                    'coverage': cov.new_code_coverage,
+                    'line_coverage': cov.new_code_line_coverage,
+                    'condition_coverage': 0.0,
+                    'lines_to_cover': cov.lines_to_cover,
+                    'uncovered_lines': cov.uncovered_lines,
+                    'conditions_to_cover': 0,
+                    'uncovered_conditions': 0
+                },
+                'overall': {
+                    'coverage': cov.overall_coverage,
+                    'line_coverage': cov.overall_line_coverage,
+                    'condition_coverage': 0.0,
+                    'lines_to_cover': cov.overall_lines_to_cover,
+                    'uncovered_lines': cov.overall_uncovered_lines,
+                    'conditions_to_cover': 0,
+                    'uncovered_conditions': 0
+                }
+            }
+    else:
+        # Standard path: load from coverage.txt file
+        collector.load_new_code_coverage(args.coverage_txt)
     
-    print("Loading deployment summary...")
-    collector.load_deployment_summary("deployment.txt")
+    # Deployment summary is also fleet-wide
+    if args.component == "Engine":
+        print("Loading deployment summary (Fleet-wide metrics)...")
+        collector.load_deployment_summary("deployment.txt")
+    else:
+        print("Skipping deployment summary (Fleet-wide metrics only loaded for Engine component)")
     
     print("Loading development codeline health data...")
     if use_reports:
@@ -3656,8 +3799,13 @@ def main():
         collector.data['prb_backlog'] = list(pb_file)
     elif not pb_api and pb_file:
         collector.data['prb_backlog'] = list(pb_file)
-    print("Loading system availability from avail.txt...")
-    collector.load_system_availability(args.availability_file)
+    # System availability is fleet-wide
+    if args.component == "Engine":
+        print("Loading system availability from avail.txt (Fleet-wide metrics)...")
+        collector.load_system_availability(args.availability_file)
+    else:
+        print("Skipping system availability (Fleet-wide metrics only loaded for Engine component)")
+        collector.data['system_availability'] = {}
 
     # Compute custom KPIs
     print("Computing custom KPIs (ALL-TIME BUG BACKLOG, PRB BACKLOG)...")
@@ -3674,16 +3822,27 @@ def main():
             return 1
     
     # Analyze git repository for code churn
-    git_repo_resolved = resolve_git_repo_path(args.component, args.git_repo_path)
-    print("Analyzing git repository for code changes...")
-    print(f"📂 Git repository: {git_repo_resolved} (component={args.component})")
-    dates = get_report_dates(custom_end_date)
-    print(f"📊 Report period: {dates['period_full']}")
-    collector.analyze_git_repository(
-        git_repo_resolved,
-        dates['period_start_full'],
-        dates['period_end_full'],
-    )
+    # Skip for Core App Efficiency - code changes set to 0
+    if args.component == "Core App Efficiency":
+        print("Skipping git code-churn analysis for Core App Efficiency (set to 0)")
+        collector.data['code_changes'] = {
+            'files_changed': 0,
+            'lines_added': 0,
+            'lines_deleted': 0,
+            'commits': 0,
+            'authors': []
+        }
+    else:
+        git_repo_resolved = resolve_git_repo_path(args.component, args.git_repo_path)
+        print("Analyzing git repository for code changes...")
+        print(f"📂 Git repository: {git_repo_resolved} (component={args.component})")
+        dates = get_report_dates(custom_end_date)
+        print(f"📊 Report period: {dates['period_full']}")
+        collector.analyze_git_repository(
+            git_repo_resolved,
+            dates['period_start_full'],
+            dates['period_end_full'],
+        )
     
     # Create output directory
     os.makedirs(args.output_dir, exist_ok=True)
