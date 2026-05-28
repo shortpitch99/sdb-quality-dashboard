@@ -1,0 +1,871 @@
+{
+  "risks": [
+    {
+      "feature": "Read your own writes(RYOW)",
+      "status": "Yellow",
+      "priority": "Medium",
+      "description": "Performance enhancement feature for Write Scaling. TLE dark launch mode has been rolled out to multiple cells. However, when rolling out the live mode, we ran into an issue on a couple of cells including the UHG sandbox cell (USA804s) where it seems to run into a possible data corruption issue. However, the guardrails that we implemented in the LSM layer helped detect and prevent those corruptions from persisting. Folowing this, we disabled the rollout of the live mode for RYOW functionality and it has been disabled since mid August when the problem was detected.",
+      "last_updated": "2024-01-15"
+    },
+    {
+      "feature": "Allocated Extent Pool",
+      "status": "Green",
+      "priority": "Medium",
+      "description": "Allocated Extent Pools have been running stably in production for 3 months since enabling on usa16s and usa18s on 08/15. This feature continues to deliver on its primary goal of reducing storage catalog writes while maintaining a minimal and stable storage footprint. This post provides a detailed analysis of the feature's behavior and stability over the past 30 days.",
+      "last_updated": "2025-11-21"
+    }
+  ],
+  "prbs": [
+    {
+      "id": "PRB-22461518",
+      "title": "PRB-22461518: Service disruption (general)",
+      "priority": "P2-Medium",
+      "status": "Waiting 3rd Party",
+      "description": "Team: CRM Database Sustaining Engineering | Impact: Service disruption (general)",
+      "created_date": "2026-05-13",
+      "what_happened": "[THIS PRB IS MANAGED BY G2G. Updates should be made in Google doc]\nSRE received high APT and Conpool alerts and observed latency exceeding 3500 milliseconds for more than 5 minutes, which qualified as a full service disruption. The CDSE team was e",
+      "customer_experience": "User Experience:\n\nService disruption\n\nQ: Was this an external customer impacting event?\nA:\n\nQ: User retry may have succeeded?\nA:\n\nImpact Quantification:\n\nQ: What # or % of users/tenants/requests got impacted? (aggregated across all infra units)\nA:\n\nImpac...",
+      "proximate_cause": "Identified issues high APT with the Connection Pool signal within the GBR46 cell.",
+      "how_resolved": "The CDSE team identified a problematic node and performed a Managed Operation to discard it, resolving the issue and restoring services.",
+      "team": "CRM Database Sustaining Engineering",
+      "customer_impact": "Service disruption (general)"
+    },
+    {
+      "id": "PRB-22482866",
+      "title": "PRB-22482866: Performance degradation (general)",
+      "priority": "P2-Medium",
+      "status": "Under Investigation",
+      "description": "Team: CRM Database Sustaining Engineering | Impact: Performance degradation (general)",
+      "created_date": "2026-05-14",
+      "what_happened": "[THIS PRB IS MANAGED BY G2G. Updates should be made in Google doc]\nIND132 running large transaction",
+      "customer_experience": "User Experience:\n\nCell ind132 experienced a runaway transaction consuming significant database resources on the sdb-a-57-5 pod in the sam-restricted8 cluster.\nThe continuous rollback-and-retry cycle degraded database performance on the affected node, wit...",
+      "proximate_cause": "A ScrutinyCustomIndexNew job was triggered on 2026-05-13 at 1:30 PM IST by BT user 0052w000002Pz6i. This scrutiny process spawned a CUSTOM_INDEX_JOB that executed chunked DELETE operations against the core.cust_idx_val_date_num table. The DELETE chunks b...",
+      "how_resolved": "App host termination The CAPE team was paged and terminated the app session on pod ind132-casam-app-green-84846dd6fc-jffvv, which killed the runaway transaction. Confirmed resolved at 10:19 AM (UTC+8) the transaction went away.",
+      "team": "CRM Database Sustaining Engineering",
+      "customer_impact": "Performance degradation (general)"
+    }
+  ],
+  "bugs": [],
+  "critical_issues": [],
+  "deployments": [
+    {
+      "stagger": "R1",
+      "version": "260.15",
+      "count": 16,
+      "stage": "R1",
+      "cells": 16
+    },
+    {
+      "stagger": "R2a",
+      "version": "260.15",
+      "count": 228,
+      "stage": "R2a",
+      "cells": 228
+    },
+    {
+      "stagger": "R2b",
+      "version": "260.15",
+      "count": 34,
+      "stage": "R2b",
+      "cells": 34
+    },
+    {
+      "stagger": "SB0",
+      "version": "260.15",
+      "count": 2,
+      "stage": "SB0",
+      "cells": 2
+    },
+    {
+      "stagger": "SB1",
+      "version": "260.15",
+      "count": 8,
+      "stage": "SB1",
+      "cells": 8
+    },
+    {
+      "stagger": "SB0",
+      "version": "260.9",
+      "count": 1,
+      "stage": "SB0",
+      "cells": 1
+    },
+    {
+      "stagger": "SB1",
+      "version": "260.9",
+      "count": 1,
+      "stage": "SB1",
+      "cells": 1
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.10",
+      "count": 5,
+      "stage": "SB0",
+      "cells": 5
+    },
+    {
+      "stagger": "R0",
+      "version": "262.11",
+      "count": 9,
+      "stage": "R0",
+      "cells": 9
+    },
+    {
+      "stagger": "R1",
+      "version": "262.11",
+      "count": 109,
+      "stage": "R1",
+      "cells": 109
+    },
+    {
+      "stagger": "R2a",
+      "version": "262.11",
+      "count": 443,
+      "stage": "R2a",
+      "cells": 443
+    },
+    {
+      "stagger": "R2b",
+      "version": "262.11",
+      "count": 100,
+      "stage": "R2b",
+      "cells": 100
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.11",
+      "count": 12,
+      "stage": "SB0",
+      "cells": 12
+    },
+    {
+      "stagger": "SB1",
+      "version": "262.11",
+      "count": 143,
+      "stage": "SB1",
+      "cells": 143
+    },
+    {
+      "stagger": "R1",
+      "version": "262.12",
+      "count": 1,
+      "stage": "R1",
+      "cells": 1
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.12",
+      "count": 8,
+      "stage": "SB0",
+      "cells": 8
+    },
+    {
+      "stagger": "SB1",
+      "version": "262.12",
+      "count": 4,
+      "stage": "SB1",
+      "cells": 4
+    },
+    {
+      "stagger": "R0",
+      "version": "262.13",
+      "count": 9,
+      "stage": "R0",
+      "cells": 9
+    },
+    {
+      "stagger": "R1",
+      "version": "262.13",
+      "count": 91,
+      "stage": "R1",
+      "cells": 91
+    },
+    {
+      "stagger": "R2a",
+      "version": "262.13",
+      "count": 221,
+      "stage": "R2a",
+      "cells": 221
+    },
+    {
+      "stagger": "R2b",
+      "version": "262.13",
+      "count": 62,
+      "stage": "R2b",
+      "cells": 62
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.13",
+      "count": 11,
+      "stage": "SB0",
+      "cells": 11
+    },
+    {
+      "stagger": "SB1",
+      "version": "262.13",
+      "count": 139,
+      "stage": "SB1",
+      "cells": 139
+    },
+    {
+      "stagger": "R1",
+      "version": "262.14",
+      "count": 1,
+      "stage": "R1",
+      "cells": 1
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.14",
+      "count": 9,
+      "stage": "SB0",
+      "cells": 9
+    },
+    {
+      "stagger": "SB1",
+      "version": "262.14",
+      "count": 4,
+      "stage": "SB1",
+      "cells": 4
+    },
+    {
+      "stagger": "R1",
+      "version": "262.15",
+      "count": 1,
+      "stage": "R1",
+      "cells": 1
+    },
+    {
+      "stagger": "R2a",
+      "version": "262.15",
+      "count": 3,
+      "stage": "R2a",
+      "cells": 3
+    },
+    {
+      "stagger": "R2b",
+      "version": "262.15",
+      "count": 2,
+      "stage": "R2b",
+      "cells": 2
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.15",
+      "count": 11,
+      "stage": "SB0",
+      "cells": 11
+    },
+    {
+      "stagger": "SB1",
+      "version": "262.15",
+      "count": 100,
+      "stage": "SB1",
+      "cells": 100
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.16",
+      "count": 8,
+      "stage": "SB0",
+      "cells": 8
+    },
+    {
+      "stagger": "SB1",
+      "version": "262.16",
+      "count": 4,
+      "stage": "SB1",
+      "cells": 4
+    },
+    {
+      "stagger": "R1",
+      "version": "262.17",
+      "count": 1,
+      "stage": "R1",
+      "cells": 1
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.17",
+      "count": 11,
+      "stage": "SB0",
+      "cells": 11
+    },
+    {
+      "stagger": "SB1",
+      "version": "262.17",
+      "count": 6,
+      "stage": "SB1",
+      "cells": 6
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.18",
+      "count": 9,
+      "stage": "SB0",
+      "cells": 9
+    },
+    {
+      "stagger": "SB1",
+      "version": "262.18",
+      "count": 4,
+      "stage": "SB1",
+      "cells": 4
+    },
+    {
+      "stagger": "R0",
+      "version": "262.3",
+      "count": 9,
+      "stage": "R0",
+      "cells": 9
+    },
+    {
+      "stagger": "R1",
+      "version": "262.3",
+      "count": 108,
+      "stage": "R1",
+      "cells": 108
+    },
+    {
+      "stagger": "R2a",
+      "version": "262.3",
+      "count": 409,
+      "stage": "R2a",
+      "cells": 409
+    },
+    {
+      "stagger": "R2b",
+      "version": "262.3",
+      "count": 97,
+      "stage": "R2b",
+      "cells": 97
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.3",
+      "count": 3,
+      "stage": "SB0",
+      "cells": 3
+    },
+    {
+      "stagger": "SB1",
+      "version": "262.3",
+      "count": 87,
+      "stage": "SB1",
+      "cells": 87
+    },
+    {
+      "stagger": "R0",
+      "version": "262.7",
+      "count": 8,
+      "stage": "R0",
+      "cells": 8
+    },
+    {
+      "stagger": "R1",
+      "version": "262.7",
+      "count": 110,
+      "stage": "R1",
+      "cells": 110
+    },
+    {
+      "stagger": "R2a",
+      "version": "262.7",
+      "count": 435,
+      "stage": "R2a",
+      "cells": 435
+    },
+    {
+      "stagger": "R2b",
+      "version": "262.7",
+      "count": 93,
+      "stage": "R2b",
+      "cells": 93
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.7",
+      "count": 4,
+      "stage": "SB0",
+      "cells": 4
+    },
+    {
+      "stagger": "SB1",
+      "version": "262.7",
+      "count": 187,
+      "stage": "SB1",
+      "cells": 187
+    },
+    {
+      "stagger": "R0",
+      "version": "262.9",
+      "count": 9,
+      "stage": "R0",
+      "cells": 9
+    },
+    {
+      "stagger": "R1",
+      "version": "262.9",
+      "count": 110,
+      "stage": "R1",
+      "cells": 110
+    },
+    {
+      "stagger": "R2a",
+      "version": "262.9",
+      "count": 418,
+      "stage": "R2a",
+      "cells": 418
+    },
+    {
+      "stagger": "R2b",
+      "version": "262.9",
+      "count": 98,
+      "stage": "R2b",
+      "cells": 98
+    },
+    {
+      "stagger": "SB0",
+      "version": "262.9",
+      "count": 5,
+      "stage": "SB0",
+      "cells": 5
+    },
+    {
+      "stagger": "SB1",
+      "version": "262.9",
+      "count": 130,
+      "stage": "SB1",
+      "cells": 130
+    },
+    {
+      "stagger": "R1",
+      "version": "264.1",
+      "count": 1,
+      "stage": "R1",
+      "cells": 1
+    },
+    {
+      "stagger": "SB0",
+      "version": "264.1",
+      "count": 9,
+      "stage": "SB0",
+      "cells": 9
+    },
+    {
+      "stagger": "SB1",
+      "version": "264.1",
+      "count": 3,
+      "stage": "SB1",
+      "cells": 3
+    },
+    {
+      "stagger": "R1",
+      "version": "264.2",
+      "count": 1,
+      "stage": "R1",
+      "cells": 1
+    },
+    {
+      "stagger": "SB0",
+      "version": "264.2",
+      "count": 9,
+      "stage": "SB0",
+      "cells": 9
+    },
+    {
+      "stagger": "SB1",
+      "version": "264.2",
+      "count": 3,
+      "stage": "SB1",
+      "cells": 3
+    },
+    {
+      "stagger": "SB0",
+      "version": "264.3",
+      "count": 7,
+      "stage": "SB0",
+      "cells": 7
+    },
+    {
+      "stagger": "SB1",
+      "version": "264.3",
+      "count": 2,
+      "stage": "SB1",
+      "cells": 2
+    },
+    {
+      "stagger": "R1",
+      "version": "264.4",
+      "count": 1,
+      "stage": "R1",
+      "cells": 1
+    },
+    {
+      "stagger": "SB0",
+      "version": "264.4",
+      "count": 2,
+      "stage": "SB0",
+      "cells": 2
+    }
+  ],
+  "deployment_summary": "Weekly Deployment Summary - Week of September 15, 2025\n\nThis week's deployment activities proceeded smoothly across all stagger groups. \nSDB version 258.11 was successfully deployed to sandbox environments (SB0-SB2) \nwith no major issues reported.\n\nKey highlights:\n- Version 258.11 rolled out to 150 sandbox cells\n- Zero failed deployments\n- Average deployment time: 12 minutes\n- All post-deployment validations passed\n\nNext week: Planning production rollout to P0-P3 stages pending final validation results.",
+  "coverage": [],
+  "new_code_coverage": [
+    {
+      "component": "SDB Engine",
+      "new_code_coverage": 77.6,
+      "overall_coverage": 82.3,
+      "new_code_line_coverage": 80.0,
+      "overall_line_coverage": 84.1,
+      "lines_to_cover": 3159,
+      "uncovered_lines": 633,
+      "overall_lines_to_cover": 47458,
+      "overall_uncovered_lines": 7549
+    }
+  ],
+  "ci_issues": [],
+  "leftshift_issues": [],
+  "abs_issues": [],
+  "security_issues": [
+    {
+      "work_id": "W-22318408",
+      "team": "Unknown",
+      "priority": "P2",
+      "severity": "P2",
+      "subject": "[FIX VULN]  3PP Program sfci/sfstorage/bookkeeper/sdbstore-docker-rhel9:maven:commons-lang:commons-lang:2.6 Vulnerability Detected",
+      "status": "New",
+      "build_version": "Off Core Build",
+      "created_date": "2026-05-18",
+      "issue_type": "security"
+    }
+  ],
+  "all_bugs": [],
+  "prb_bugs": [],
+  "system_availability": {
+    "period": "",
+    "slo": 99.9,
+    "achieved": 99.99,
+    "incidents": []
+  },
+  "kpis": {
+    "all_time_bug_backlog_total": 0,
+    "all_time_bug_backlog_p0": 0,
+    "all_time_bug_backlog_p1": 0,
+    "all_time_bug_backlog_p0_p1": 0,
+    "prb_backlog_total": 0,
+    "prb_backlog_p0_p1": 0
+  },
+  "git_stats": {
+    "reporting_period_start": "2026-05-11",
+    "reporting_period_end": "2026-05-17",
+    "total_commits": 21,
+    "lines_added": 2589,
+    "lines_deleted": 272,
+    "lines_changed": 2861,
+    "files_changed": 59,
+    "authors": [
+      "Anup Ghatage",
+      "Ashish Mahajan",
+      "JV Jujjuri",
+      "Karan Mehta",
+      "Malahal Naineni",
+      "renovate-enterprise-prod[bot]",
+      "Senthil Narayan",
+      "Shyam Vanga",
+      "Sushanth Rai",
+      "tok-sfci124"
+    ],
+    "most_changed_files": [
+      {
+        "file": "bookkeeper-server/src/main/java/org/apache/bookkeeper/replication/LedgerCopyWorker.java",
+        "lines_added": 561,
+        "lines_deleted": 0,
+        "total_changes": 561
+      },
+      {
+        "file": "bookkeeper-server/src/main/java/org/apache/bookkeeper/topologyplacement/TopologyUpdater.java",
+        "lines_added": 428,
+        "lines_deleted": 25,
+        "total_changes": 453
+      },
+      {
+        "file": "fss/fss-server/src/main/java/com/sfdc/fss/endpoints/FssRegisterCellV1Resource.java",
+        "lines_added": 125,
+        "lines_deleted": 77,
+        "total_changes": 202
+      },
+      {
+        "file": "fss/fss-server/src/main/java/com/sfdc/fss/model/FssExtentsRefService.java",
+        "lines_added": 171,
+        "lines_deleted": 4,
+        "total_changes": 175
+      },
+      {
+        "file": "bookkeeper-server/src/main/java/org/apache/bookkeeper/topologyplacement/TopologyInfoNodeManager.java",
+        "lines_added": 144,
+        "lines_deleted": 4,
+        "total_changes": 148
+      },
+      {
+        "file": "cloud-store/src/main/java/org/apache/bookkeeper/cloudstore/s3/S3StoreDriverImpl.java",
+        "lines_added": 115,
+        "lines_deleted": 11,
+        "total_changes": 126
+      },
+      {
+        "file": ".claude/skills/sdbstore-gus-workflow/SKILL.md",
+        "lines_added": 93,
+        "lines_deleted": 21,
+        "total_changes": 114
+      },
+      {
+        "file": "fss/CLAUDE.md",
+        "lines_added": 99,
+        "lines_deleted": 5,
+        "total_changes": 104
+      },
+      {
+        "file": "bookkeeper-server/src/main/java/org/apache/bookkeeper/conf/ServerConfiguration.java",
+        "lines_added": 103,
+        "lines_deleted": 0,
+        "total_changes": 103
+      },
+      {
+        "file": "fss/fss-server/src/main/java/com/sfdc/fss/endpoints/FssFastRestoreV1Resource.java",
+        "lines_added": 69,
+        "lines_deleted": 18,
+        "total_changes": 87
+      }
+    ],
+    "commit_frequency": 3.0,
+    "code_churn_risk": "Low",
+    "repository_path": "/Users/rchowdhuri/bookkeeper"
+  },
+  "generated_at": "2026-05-18T07:07:07.297951",
+  "report_component": "Store",
+  "deployment_metadata": {
+    "source_file": "weeks/cw20/Shared/deployment-journey.csv",
+    "format": "history_stagger_latest_snapshot",
+    "latest_week_start": "2026-05-18"
+  },
+  "coverage_summary": {
+    "new_code": {
+      "coverage": 77.6,
+      "line_coverage": 80.0,
+      "condition_coverage": 66.3,
+      "lines_to_cover": 3159,
+      "uncovered_lines": 633,
+      "conditions_to_cover": 644,
+      "uncovered_conditions": 217
+    },
+    "overall": {
+      "coverage": 82.3,
+      "line_coverage": 84.1,
+      "condition_coverage": 75.2,
+      "lines_to_cover": 47458,
+      "uncovered_lines": 7549,
+      "conditions_to_cover": 11922,
+      "uncovered_conditions": 2953
+    }
+  },
+  "alltime_backlog": [
+    {
+      "work_id": "Bug_1",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-18",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_2",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-18",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_3",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-18",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_4",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-18",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_5",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-18",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_6",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-18",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_7",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-18",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_8",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-18",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_9",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-18",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_10",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-18",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_11",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-18",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_12",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-18",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_13",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-18",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_14",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-18",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_15",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-18",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_16",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-18",
+      "type": "backlog_bug"
+    },
+    {
+      "work_id": "Bug_17",
+      "severity": "P2",
+      "team": "Unknown",
+      "subject": "Bug from All-time Backlog Report",
+      "status": "Open",
+      "created_date": "2026-05-18",
+      "type": "backlog_bug"
+    }
+  ],
+  "prb_backlog": [],
+  "metadata": {
+    "generated_at": "2026-05-18T07:08:04.276054",
+    "report_period_start": "2026-05-11",
+    "report_period_end": "2026-05-17",
+    "report_period_display": "May 11-17, 2026",
+    "report_component": "Store",
+    "git_repository": "/Users/rchowdhuri/bookkeeper",
+    "generator_version": "2.0",
+    "data_sources": {
+      "risks": 2,
+      "prbs": 2,
+      "bugs": 0,
+      "deployments": 66,
+      "deployment_source_file": "weeks/cw20/Shared/deployment-journey.csv",
+      "deployment_source_format": "history_stagger_latest_snapshot",
+      "deployment_latest_week_start": "2026-05-18",
+      "has_llm_content": true,
+      "ci_total": 0,
+      "ci_p0_p1": 0,
+      "security_total": 1,
+      "security_p0_p1": 0,
+      "leftshift_total": 0,
+      "leftshift_p0_p1": 0,
+      "coverage_overall": 82.3,
+      "coverage_overall_line": 84.1,
+      "coverage_new_code": 77.6,
+      "coverage_new_code_line": 80.0
+    }
+  },
+  "llm_content": {
+    "trend_analysis": "## Quality Trends Analysis\n\n### Overall System Health: **GOOD** \u2705\n\n**Key Observations:**\n\n\u2022 **Zero Critical Issues**: No bugs or security vulnerabilities detected, indicating robust code quality and security posture\n\u2022 **Controlled Risk Profile**: Only 2 risks identified suggests proactive risk management\n\u2022 **Minimal Process Issues**: 2 PRBs (Problem Reports/Bugs) represent manageable operational concerns\n\n### Trend Indicators:\n\n**Positive Signals:**\n- Clean security baseline with no vulnerabilities\n- Low defect density indicates effective development practices\n- Risk count suggests good visibility into potential issues\n\n**Areas for Monitoring:**\n- Track PRB resolution time and root cause patterns\n- Monitor if the 2 identified risks materialize into actual issues\n- Ensure continued security scanning coverage\n\n### Recommendation:\nThe system demonstrates **healthy quality metrics** with strong defect prevention. Focus on:\n1. Resolving existing PRBs promptly\n2. Implementing mitigation plans for identified risks\n3. Maintaining current quality practices that are preventing bug introduction\n\n**Overall Assessment**: System is operating within acceptable quality thresholds with good preventive controls in place.",
+    "risk_analysis": "### Deployment Risk Assessment - SDB Version 258.11\n\n#### Executive Summary\n\nThe deployment of SDB version 258.11 to sandbox environments demonstrates strong stability indicators with zero failures across 150 cells. However, the upcoming production rollout requires careful consideration of several risk factors and validation gaps.\n\n#### Deployment Stability Analysis\n\n##### Positive Indicators\n- **Perfect Success Rate**: 0% failure rate across 150 sandbox deployments indicates robust deployment automation\n- **Consistent Performance**: 12-minute average deployment time suggests predictable resource utilization\n- **Validation Coverage**: All post-deployment validations passed, indicating functional integrity\n- **Environment Stability**: Successful deployment across multiple sandbox groups (SB0-SB2) demonstrates cross-environment compatibility\n\n##### Risk Factors\n- **Limited Environment Scope**: Testing confined to sandbox environments may not capture production-specific issues\n- **Missing Performance Baselines**: No comparison with previous version deployment metrics provided\n- **Validation Depth Unknown**: Scope and coverage of post-deployment validations not specified\n\n#### Code Change Impact Assessment\n\n##### High-Risk Areas\n- **Unknown Change Scope**: No details provided on the nature of changes in version 258.11\n- **Database Schema Changes**: SDB version suggests potential database modifications requiring careful rollback planning\n- **Integration Dependencies**: Impact on downstream systems and APIs not assessed\n\n##### Mitigation Requirements\n- **Rollback Strategy**: Ensure tested rollback procedures for database changes\n- **Monitoring Enhancement**: Implement enhanced monitoring during production rollout\n- **Staged Validation**: Conduct thorough validation at each production stage (P0-P3)\n\n#### Production Rollout Recommendations\n\n##### Pre-Deployment Actions\n- Complete comprehensive regression testing in production-like environments\n- Validate rollback procedures with database state verification\n- Establish clear success criteria for each production stage\n- Implement enhanced monitoring and alerting thresholds\n\n##### Deployment Strategy\n- **Phased Approach**: Maintain planned P0-P3 staging with validation gates\n- **Monitoring Windows**: Extend observation periods between stages\n- **Resource Allocation**: Ensure adequate support coverage during rollout windows\n- **Communication Plan**: Establish clear escalation paths and stakeholder notifications\n\n#### Risk Rating: **MEDIUM-LOW**\n\nThe sandbox deployment success provides confidence, but production rollout requires enhanced validation and monitoring due to limited visibility into change scope and production-specific risk factors.",
+    "prb_narratives": {
+      "PRB-22461518": "**Problem Type:** Database connection pool performance degradation causing service disruption with latency exceeding 3500ms for over 5 minutes.\n\n**Root Cause:** A problematic node within the GBR46 cell was causing high Application Processing Time (APT) and connection pool issues.\n\n**Resolution:** The CDSE team performed a Managed Operation to discard the faulty node, which restored normal service performance.\n\n**Next Steps:** No specific follow-up actions were documented in this PRB report.",
+      "PRB-22482866": "**Problem Type:** Database performance degradation caused by a runaway large transaction executing chunked DELETE operations.\n\n**Root Cause:** A ScrutinyCustomIndexNew job triggered a CUSTOM_INDEX_JOB that executed excessive chunked DELETE operations against the core.cust_idx_val_date_num table, creating a resource-intensive transaction on database instance IND132.\n\n**Resolution:** The CAPE team terminated the problematic app session on pod ind132-casam-app-green-84846dd6fc-jffvv, which successfully killed the runaway transaction and restored normal performance.\n\n**Next Steps:** The PRB indicates next steps are pending, suggesting further investigation into preventing similar scrutiny job resource exhaustion and implementing better transaction monitoring controls."
+    },
+    "prb_analyses": {
+      "PRB-22461518": "# Technical Analysis Report: PRB-22461518\n\n## **Technical Impact**\n\n### Service Disruption Severity\n- **Primary Impact**: Complete service disruption lasting >5 minutes with latency exceeding 3,500ms (3.5x normal threshold)\n- **Performance Degradation**: Application Performance Threshold (APT) alerts triggered, indicating severe response time degradation\n- **Connection Pool Saturation**: High connection pool utilization in GBR46 cell, creating cascading bottlenecks\n- **Customer-Facing Impact**: General service disruption affecting CRM database operations and dependent downstream services\n- **Monitoring System Response**: Multiple alert systems (APT, Conpool) triggered simultaneously, indicating systemic performance failure\n\n### Business Continuity Impact\n- Service availability dropped below SLA thresholds\n- Potential data access delays for CRM operations\n- Risk of transaction timeouts and failed database operations\n\n## **Root Cause Analysis**\n\n### Primary Technical Root Cause\n**Problematic Database Node in GBR46 Cell**: A single database node within the GBR46 cell experienced critical performance degradation, creating a bottleneck that affected the entire connection pool infrastructure.\n\n### Contributing Factors Analysis\n1. **Connection Pool Exhaustion**: The failing node consumed excessive connection pool resources while providing degraded performance\n2. **Load Balancing Inefficiency**: Traffic continued routing to the problematic node despite performance degradation\n3. **Insufficient Health Check Sensitivity**: Node health monitoring failed to detect and isolate the problematic node proactively\n4. **Resource Contention**: The degraded node likely experienced CPU, memory, or I/O bottlenecks affecting query processing\n\n### Technical Failure Chain\n1. Database node performance degradation initiated\n2. Connection pool resources became saturated on problematic node\n3. Query response times exceeded 3,500ms threshold\n4. APT monitoring detected sustained latency violations\n5. Cascading effect impacted overall GBR46 cell performance\n6. Service disruption threshold breached (>5 minutes)\n\n## **Resolution Applied**\n\n### Immediate Response Methodology\n**Managed Operation Node Removal**: The CDSE team executed a controlled managed operation to remove the problematic node from the active connection pool.\n\n### Resolution Steps Executed\n1. **Problem Identification**: SRE monitoring systems identified performance anomalies through APT and Conpool alerts\n2. **Node Isolation**: CDSE team pinpointed the specific problematic node within GBR46 cell\n3. **Impact Assessment**: Verified that node removal would not cause additional service disruption\n4. **Managed Operation Execution**: Performed controlled removal of the degraded node from active service\n5. **Service Restoration Verification**: Confirmed latency returned to acceptable levels and connection pool utilization normalized\n\n### Technical Validation\n- Connection pool metrics returned to baseline levels\n- APT alerts cleared, indicating restored performance\n- Service availability restored within acceptable parameters\n\n## **Preventive Measures**\n\n### Immediate Technical Improvements\n1. **Enhanced Node Health Monitoring**\n   - Implement more granular health checks with lower latency thresholds (e.g., 1,000ms warning, 2,000ms critical)\n   - Deploy proactive node performance monitoring with predictive alerting\n   - Configure automated node isolation for sustained performance degradation\n\n2. **Connection Pool Optimization**\n   - Implement dynamic connection pool sizing based on node performance metrics\n   - Configure connection timeout policies to prevent resource exhaustion\n   - Deploy connection pool circuit breakers for failing nodes\n\n### Strategic Infrastructure Enhancements\n3. **Automated Failover Mechanisms**\n   - Implement automated node removal for sustained performance degradation\n   - Deploy intelligent load balancing with real-time performance weighting\n   - Configure automatic traffic redistribution during node failures\n\n4. **Monitoring and Alerting Improvements**\n   - Establish graduated alerting thresholds (warning at 1,500ms, critical at 2,500ms)\n   - Implement predictive analytics for node performance trending\n   - Deploy comprehensive dashboard for real-time GBR cell health monitoring\n\n5. **Operational Process Enhancements**\n   - Develop runbook automation for common node performance issues\n   - Implement regular node performance baseline assessments\n   - Establish proactive node maintenance scheduling based on performance metrics\n\n### Long-term Architectural Considerations\n6. **Infrastructure Resilience**\n   - Evaluate node redundancy within GBR46",
+      "PRB-22482866": "# Comprehensive Technical Analysis - PRB-22482866\n\n## **Technical Impact**\n\n### Primary Impact Assessment\n- **System Performance**: Severe performance degradation across the CRM database infrastructure due to resource-intensive DELETE operations on the `core.cust_idx_val_date_num` table\n- **Database Load**: Excessive I/O and CPU utilization from chunked DELETE operations causing system-wide slowdown\n- **Application Availability**: Pod `ind132-casam-app-green-84846dd6fc-jffvv` became unresponsive, requiring forced termination\n- **User Experience**: General performance degradation affecting all users accessing CRM services during the incident window (1:30 PM IST - 10:19 AM UTC+8)\n\n### Secondary Impact Vectors\n- **Transaction Log Growth**: Large transaction likely caused significant transaction log expansion\n- **Lock Contention**: DELETE operations on core table potentially blocked other database operations\n- **Memory Consumption**: Runaway transaction consumed excessive memory resources on the application host\n\n## **Root Cause Analysis**\n\n### Technical Root Cause\nThe incident was triggered by a **ScrutinyCustomIndexNew job** initiated by BT user `0052w000002Pz6i` at 2026-05-13 1:30 PM IST. The root cause chain:\n\n1. **Job Initiation**: ScrutinyCustomIndexNew process spawned a `CUSTOM_INDEX_JOB`\n2. **Inefficient Execution**: The job executed chunked DELETE operations against the critical `core.cust_idx_val_date_num` table\n3. **Resource Exhaustion**: DELETE chunks became a runaway transaction, consuming excessive system resources\n4. **Cascading Failure**: The large transaction caused the application pod to become unresponsive\n\n### Contributing Factors\n- **Insufficient Resource Limits**: No apparent safeguards to prevent runaway transactions\n- **Lack of Query Optimization**: DELETE operations may not have been properly optimized for the table structure\n- **Missing Monitoring**: No proactive alerts for long-running transactions or resource consumption thresholds\n- **Inadequate Chunking Strategy**: DELETE chunk sizes may have been too large for the system capacity\n\n## **Resolution Applied**\n\n### Immediate Resolution Methodology\n1. **Incident Detection**: Performance degradation identified and escalated to CAPE team\n2. **Emergency Response**: CAPE team paged for immediate intervention\n3. **Forced Termination**: Application session terminated on pod `ind132-casam-app-green-84846dd6fc-jffvv`\n4. **Transaction Cleanup**: Runaway transaction automatically rolled back upon session termination\n5. **Verification**: System performance confirmed restored at 10:19 AM (UTC+8)\n\n### Resolution Effectiveness\n- **Recovery Time**: Approximately 20+ hours from incident start to resolution\n- **Data Integrity**: No data loss due to transaction rollback mechanism\n- **Service Restoration**: Full service availability restored post-termination\n\n## **Preventive Measures**\n\n### Immediate Prevention Strategies\n1. **Transaction Timeout Implementation**\n   - Configure maximum transaction duration limits (e.g., 30 minutes)\n   - Implement automatic rollback for transactions exceeding thresholds\n\n2. **Resource Monitoring Enhancement**\n   - Deploy real-time monitoring for CPU, memory, and I/O utilization\n   - Set up alerts for transactions consuming >X% of system resources\n\n3. **Query Optimization Review**\n   - Analyze and optimize DELETE operation patterns for `core.cust_idx_val_date_num`\n   - Implement proper indexing strategies for DELETE operations\n   - Review chunking algorithms for optimal performance\n\n### Long-term Prevention Framework\n1. **Automated Job Management**\n   - Implement job queuing with resource allocation limits\n   - Add pre-execution resource availability checks\n   - Create job scheduling during low-traffic periods\n\n2. **Database Performance Governance**\n   - Establish database operation review process for high-impact jobs\n   - Implement query execution plan analysis before production deployment\n   - Create performance testing requirements for scrutiny jobs\n\n3. **Infrastructure Resilience**\n   - Deploy circuit breaker patterns for resource-intensive operations\n   - Implement graceful degradation mechanisms\n   - Add automated scaling capabilities for database workloads\n\n4. **Operational Excellence**\n   - Develop runbook for similar incidents with clear escalation paths\n   - Implement"
+    }
+  }
+}
