@@ -1106,10 +1106,11 @@ class QualityReportDashboard:
                 critical_prod_bugs_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['prod_bugs']})</span>"
             p0p1_href = p0p1_prod_bugs_metric_href(tab_component)
             p0p1_extra = ' target="_blank" rel="noopener noreferrer"' if p0p1_href.startswith('https') else ''
+            prod_bugs_label = "🐛 P0/P1 Prod Investigations" if tab_component == "Core App Efficiency" else "🐛 P0/P1 Prod Bugs"
             st.markdown(f"""
             <a href="{p0p1_href}"{p0p1_extra} style="text-decoration: none; color: inherit;">
                 <div class="metric-card metric-card-clickable">
-                    <div class="metric-label">🐛 P0/P1 Prod Bugs</div>
+                    <div class="metric-label">{prod_bugs_label}</div>
                 <div class="metric-value">{critical_prod_bugs_display}</div>
                     <div class="metric-total">of {total_bugs} total</div>
                     <div class="metric-delta {prod_delta_class}">
@@ -1457,10 +1458,11 @@ class QualityReportDashboard:
                     critical_prod_bugs_display += f" <span style='font-size: 1.0rem; color: #666;'>({changes['prod_bugs']})</span>"
                 p0p1_href = p0p1_prod_bugs_metric_href(prod_bugs_link_folder)
                 p0p1_extra = ' target="_blank" rel="noopener noreferrer"' if p0p1_href.startswith('https') else ''
+                prod_bugs_label = "🐛 P0/P1 Prod Investigations" if prod_bugs_link_folder == "Core App Efficiency" else "🐛 P0/P1 Prod Bugs"
                 st.markdown(f"""
                 <a href="{p0p1_href}"{p0p1_extra} style="text-decoration: none; color: inherit;">
                     <div class="metric-card metric-card-clickable">
-                        <div class="metric-label">🐛 P0/P1 Prod Bugs</div>
+                        <div class="metric-label">{prod_bugs_label}</div>
                     <div class="metric-value">{critical_prod_bugs_display}</div>
                         <div class="metric-total">of {total_bugs} total</div>
                         <div class="metric-delta {prod_delta_class}">
@@ -4031,7 +4033,8 @@ class QualityReportDashboard:
                         b = int(c[4:6], 16)
                         return f"rgba({r},{g},{b},{alpha})"
 
-                    # Draw all plan areas first (background layer).
+                    # Draw all 6 plan traces first (background layer), even if a stage
+                    # has no explicit timeline window in the selected data.
                     for stage in stage_list:
                         stage_color = stage_colors[stage]
                         if stage in stage_timeline and stage in plan_focus_stages:
@@ -4039,6 +4042,7 @@ class QualityReportDashboard:
                             plan_end = stage_timeline[stage]["end"]
                             plan_vals = []
                             total_days = max((plan_end - plan_start).days, 1)
+                            has_plan_window = True
                             for d in daily_index:
                                 if d < plan_start:
                                     plan_vals.append(None)
@@ -4047,18 +4051,29 @@ class QualityReportDashboard:
                                 else:
                                     elapsed = (d - plan_start).days
                                     plan_vals.append(min(100.0, max(0.0, (elapsed / total_days) * 100.0)))
-                            fig2.add_trace(go.Scatter(
-                                x=daily_index,
-                                y=plan_vals,
-                                name=f"{stage} Plan",
-                                mode='lines',
-                                fill='tozeroy',
-                                fillcolor=_hex_to_rgba(stage_color, 0.09),
-                                line=dict(color=stage_color, width=1.0, dash='dot'),
-                                legendgroup=stage,
-                                showlegend=False,
-                                hovertemplate=f'<b>{stage} Plan</b><br>Date: %{{x|%Y-%m-%d}}<br>Planned %: %{{y:.1f}}<extra></extra>',
-                            ))
+                        else:
+                            # Keep the stage present in the chart even when no plan window
+                            # exists for this version in the selected horizon.
+                            plan_vals = [0.0 for _ in daily_index]
+                            has_plan_window = False
+
+                        hover = (
+                            f'<b>{stage} Plan</b><br>Date: %{{x|%Y-%m-%d}}<br>Planned %: %{{y:.1f}}<extra></extra>'
+                            if has_plan_window
+                            else f'<b>{stage} Plan</b><br>Date: %{{x|%Y-%m-%d}}<br>Planned %: 0.0 (no plan window)<extra></extra>'
+                        )
+                        fig2.add_trace(go.Scatter(
+                            x=daily_index,
+                            y=plan_vals,
+                            name=f"{stage} Plan",
+                            mode='lines',
+                            fill='tozeroy',
+                            fillcolor=_hex_to_rgba(stage_color, 0.09) if has_plan_window else _hex_to_rgba(stage_color, 0.03),
+                            line=dict(color=stage_color, width=1.0, dash='dot'),
+                            legendgroup=stage,
+                            showlegend=False,
+                            hovertemplate=hover,
+                        ))
 
                     # Draw all actual lines after plan areas so they remain fully visible.
                     for stage in stage_list:
@@ -6969,6 +6984,7 @@ P0P1_PROD_BUGS_REPORT_ID_BY_COMPONENT: Dict[str, str] = {
     'Engine': '00OEE0000030kAn2AI',
     'Store': '00OEE0000030lLN2AY',
     'SDD': '00OEE0000030lOb2AI',
+    'Core App Efficiency': '00OEE0000038GfN2AU',  # P0/P1 Prod Investigations for Core Optimizer/SFSQL
 }
 
 # GUS Salesforce report IDs for P0/P1 CI issues (metric card + detail links)
@@ -6976,6 +6992,7 @@ P0P1_CI_ISSUES_REPORT_ID_BY_COMPONENT: Dict[str, str] = {
     'Engine': '00OEE000002WjvJ2AS',
     'Store': '00OEE0000030lWf2AI',
     'SDD': '00OEE0000030lej2AA',
+    'Core App Efficiency': '00OEE0000038NnJ2AU',  # Core Optimizer/SFSQL CI Issues
 }
 
 # GUS Salesforce report IDs for P0/P1 security bugs (metric card + detail links)
@@ -6983,6 +7000,7 @@ P0P1_SECURITY_BUGS_REPORT_ID_BY_COMPONENT: Dict[str, str] = {
     'Engine': '00OB0000002qWjvMAE',
     'Store': '00OEE0000030lwT2AQ',
     'SDD': '00OEE0000030lzh2AA',
+    'Core App Efficiency': '00OEE0000038PM52AM',  # Core Optimizer/SFSQL Security Issues
 }
 
 # GUS Salesforce report IDs for P0/P1 left shift (metric card + detail links)
@@ -6990,6 +7008,7 @@ P0P1_LEFT_SHIFT_REPORT_ID_BY_COMPONENT: Dict[str, str] = {
     'Engine': '00OEE000002Wjld2AC',
     'Store': '00OEE0000030m7l2AA',
     'SDD': '00OEE0000030m9N2AQ',
+    'Core App Efficiency': '00OEE0000038PHF2A2',  # Core Optimizer/SFSQL Left Shift Issues
 }
 
 # GUS Salesforce report IDs for P0/P1 ABS bugs (metric card + detail links)
@@ -6997,6 +7016,7 @@ P0P1_ABS_BUGS_REPORT_ID_BY_COMPONENT: Dict[str, str] = {
     'Engine': '00OEE000002bDht2AE',
     'Store': '00OEE0000030o6L2AQ',
     'SDD': '00OEE0000030o7x2AA',
+    'Core App Efficiency': '00OEE000002bDht2AE',  # Using Engine default (no Core-specific ABS report yet)
 }
 
 # GUS Salesforce report IDs for All-time Bug Backlog (second dev metrics row)
@@ -7004,6 +7024,7 @@ ALL_TIME_BUG_BACKLOG_REPORT_ID_BY_COMPONENT: Dict[str, str] = {
     'Engine': '00OEE000002XRUv2AO',
     'Store': '00OEE0000030oHd2AI',
     'SDD': '00OEE0000030oKr2AI',
+    'Core App Efficiency': '00OEE0000038PIr2AM',  # Core Optimizer/SFSQL All-time Bug Backlog
 }
 
 # GUS Salesforce report IDs for Backlog from PRB (second dev metrics row)
@@ -7011,6 +7032,7 @@ BACKLOG_FROM_PRB_REPORT_ID_BY_COMPONENT: Dict[str, str] = {
     'Engine': '00OEE000002ZnZN2A0',
     'Store': '00OEE0000030oCn2AI',
     'SDD': '00OEE0000030oEP2AY',
+    'Core App Efficiency': '00OEE0000038PKT2A2',  # Core Optimizer/SFSQL PRB Backlog
 }
 
 
@@ -7212,6 +7234,112 @@ def render_component_development_metrics(component: str, display_name: Optional[
             except Exception:
                 engine_data = None
 
+        # Initialize Ask Claude state
+        if f'ask_claude_history_{component}' not in st.session_state:
+            st.session_state[f'ask_claude_history_{component}'] = []
+
+        # Simple, working chat interface using expander
+        st.markdown("""
+        <style>
+        /* Style for Ask Claude section */
+        div[data-testid="stExpander"] details summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            font-size: 18px !important;
+            font-weight: 700 !important;
+            padding: 15px 20px !important;
+            border-radius: 12px !important;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5) !important;
+        }
+
+        div[data-testid="stExpander"] details summary:hover {
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.7) !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+        # Use expander for chat interface
+        with st.expander("💬 Ask Claude AI - Quality Intelligence Assistant", expanded=False):
+            ask_claude = AskClaudePanel()
+
+            st.markdown("**💭 Ask me anything about quality metrics for this component**")
+
+            # Question input
+            question = st.text_area(
+                "Your question:",
+                key=f"ask_claude_input_{component}",
+                placeholder="e.g., What are the top 3 quality risks right now?",
+                height=100,
+                label_visibility="collapsed"
+            )
+
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                send_clicked = st.button("🚀 Send Question", key=f"ask_claude_button_{component}", use_container_width=True, type="primary")
+            with col2:
+                if st.button("🗑️ Clear", key=f"clear_claude_{component}", use_container_width=True):
+                    st.session_state[f'ask_claude_history_{component}'] = []
+                    st.rerun()
+
+            # Process question
+            if send_clicked and question:
+                with st.spinner("🤔 Claude is thinking..."):
+                    context = ask_claude.prepare_context(data, component)
+                    answer = ask_claude.query_claude(question, context, component)
+
+                    # Add to history
+                    st.session_state[f'ask_claude_history_{component}'].append({
+                        'question': question,
+                        'answer': answer,
+                        'timestamp': datetime.now().strftime("%H:%M:%S")
+                    })
+                    st.rerun()
+
+            st.markdown("---")
+
+            # Display conversation history
+            history = st.session_state[f'ask_claude_history_{component}']
+            if history:
+                st.markdown("**📜 Conversation History**")
+
+                # Show messages (most recent first)
+                for idx, item in enumerate(reversed(history)):
+                    # User message
+                    st.markdown(f"""
+                    <div style="margin-bottom: 15px;">
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                    color: white; padding: 12px 16px; border-radius: 18px 18px 4px 18px;
+                                    margin-left: 15%; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);">
+                            <div style="font-size: 11px; opacity: 0.8; margin-bottom: 4px;">You • {item['timestamp']}</div>
+                            <div style="font-size: 14px; line-height: 1.5;">{item['question']}</div>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                    # Claude response
+                    st.markdown(f"""
+                    <div style="margin-bottom: 20px;">
+                        <div style="background: #f7f7f8; color: #1a1a1a; padding: 12px 16px;
+                                    border-radius: 18px 18px 18px 4px; margin-right: 15%;
+                                    border: 1px solid #e5e5e7; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                            <div style="font-size: 11px; opacity: 0.6; margin-bottom: 4px; color: #764ba2; font-weight: 600;">
+                                Claude AI
+                            </div>
+                            <div style="font-size: 14px; line-height: 1.6;">{item['answer']}</div>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+            else:
+                st.info("👋 Start a conversation by asking a question above!")
+                st.markdown("""
+                **Example questions:**
+                - What are the biggest quality risks right now?
+                - Summarize the PRB situation
+                - How is our code coverage trending?
+                - What should I focus on this week?
+                - Are there any P0/P1 bugs I should know about?
+                """)
+
         dashboard.render_production_kpi_row_hybrid(engine_data, data, component, level_label=label)
         dashboard.create_metrics_dashboard(
             data,
@@ -7220,6 +7348,7 @@ def render_component_development_metrics(component: str, display_name: Optional[
             development_heading_suffix=label,
         )
         st.markdown("---")
+
         render_component_weekly_trends(dashboard, component, label)
         st.markdown("---")
 
@@ -7233,12 +7362,14 @@ def render_component_development_metrics(component: str, display_name: Optional[
             dashboard.create_prb_insights(data, key_suffix=f"_{component}")
         
         # Bug Analysis
-        st.markdown('<h3 id="production-bug-analysis">🐛 Production Bug Analysis</h3>', unsafe_allow_html=True)
+        bug_section_title = "🐛 Prod Investigations Analysis" if component == "Core App Efficiency" else "🐛 Production Bug Analysis"
+        bug_link_text = "P0/P1 prod investigations" if component == "Core App Efficiency" else "P0/P1 production bugs"
+        st.markdown(f'<h3 id="production-bug-analysis">{bug_section_title}</h3>', unsafe_allow_html=True)
         p0p1_gus = p0p1_prod_bugs_report_url(component)
         if p0p1_gus:
             st.markdown(
                 f'<p style="margin: -4px 0 10px 0;"><a href="{p0p1_gus}" target="_blank" rel="noopener noreferrer">'
-                f'📋 P0/P1 production bugs — GUS report</a></p>',
+                f'📋 {bug_link_text} — GUS report</a></p>',
                 unsafe_allow_html=True,
             )
         st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
@@ -7589,7 +7720,7 @@ def main():
         for report in component_reports:
             report['component'] = component
             all_reports.append(report)
-    
+
     # Group reports by week (using date as key)
     weeks = {}
     for report in all_reports:
@@ -7601,31 +7732,31 @@ def main():
                 'reports': {}
             }
         weeks[week_key]['reports'][report['component']] = report
-    
+
     # Sort weeks by date (newest first)
     sorted_weeks = sorted(weeks.items(), key=lambda x: x[1]['date'], reverse=True)
-    
+
     if sorted_weeks:
         st.sidebar.markdown("### 📅 Reports by Week")
-        
+
         # Use session state to track selected week
         if 'selected_week' not in st.session_state:
             st.session_state.selected_week = sorted_weeks[0][0] if sorted_weeks else None
-        
+
         # Initialize selected_week_reports if not exists
         if 'selected_week_reports' not in st.session_state:
             st.session_state.selected_week_reports = {}
-        
+
         selected_week_key = None
-        
+
         # Show weeks
         for i, (week_key, week_data) in enumerate(sorted_weeks[:15]):  # Show latest 15
             is_selected = st.session_state.selected_week == week_key
-            
+
             # Create display name with just the date
             display_name = week_data['date'].strftime('%m/%d %H:%M')
             component_count = len(week_data['reports'])
-            
+
             if st.sidebar.button(
                 f"{'🟢' if is_selected else '📄'} {display_name}",
                 key=f"week_{i}",
@@ -7634,7 +7765,7 @@ def main():
             ):
                 st.session_state.selected_week = week_key
                 selected_week_key = week_key
-        
+
         # Always update selected week's reports to ensure consistency
         if st.session_state.selected_week and st.session_state.selected_week in weeks:
             st.session_state.selected_week_reports = weeks[st.session_state.selected_week]['reports']
@@ -7644,9 +7775,9 @@ def main():
         st.sidebar.warning("📭 No reports found")
         st.session_state.selected_week = None
         st.session_state.selected_week_reports = {}
-    
+
     st.sidebar.markdown("---")
-    
+
     # Show report counts (aligned with four dashboard tabs)
     st.sidebar.markdown("### 📊 Available Reports")
     eng = dashboard.get_component_reports('Engine')
@@ -7755,6 +7886,239 @@ def main():
         """,
         unsafe_allow_html=True
     )
+
+
+class AskClaudePanel:
+    """Interactive Ask Claude panel for querying dashboard data"""
+
+    def __init__(self):
+        self.llm_api_key = os.getenv("LLM_GW_EXPRESS_KEY", "")
+        self.openai_user_id = os.getenv("OPENAI_USER_ID", "")
+        self.llm_gateway_url = "https://eng-ai-model-gateway.sfproxy.devx-preprod.aws-esvc1-useast2.aws.sfdc.cl/chat/completions"
+
+    def prepare_context(self, data: Dict[str, Any], component: str) -> str:
+        """Prepare dashboard data as context for Claude"""
+        context_parts = []
+
+        # Component info
+        context_parts.append(f"=== {component} Quality Dashboard Data ===\n")
+
+        # PRBs - with full details
+        prbs = data.get('prbs', [])
+        if prbs:
+            context_parts.append(f"\n## PROBLEM REPORTS (PRBs): {len(prbs)} total")
+            for idx, prb in enumerate(prbs[:10], 1):  # Top 10 PRBs
+                prb_id = prb.get('id', 'Unknown')
+                priority = prb.get('priority', 'Unknown')
+                title = prb.get('title', 'No title')
+                status = prb.get('status', 'Unknown')
+                what_happened = prb.get('what_happened', 'N/A')
+                proximate_cause = prb.get('proximate_cause', 'N/A')
+
+                context_parts.append(f"\n{idx}. {prb_id} - {priority}")
+                context_parts.append(f"   Title: {title}")
+                context_parts.append(f"   Status: {status}")
+                if what_happened != 'N/A':
+                    context_parts.append(f"   What Happened: {what_happened[:200]}")
+                if proximate_cause != 'N/A':
+                    context_parts.append(f"   Cause: {proximate_cause[:200]}")
+        else:
+            context_parts.append("\n## PROBLEM REPORTS (PRBs): None")
+
+        # Production Bugs - with details
+        bugs = data.get('bugs', [])
+        if bugs:
+            p0_bugs = [b for b in bugs if 'P0' in str(b.get('priority',''))]
+            p1_bugs = [b for b in bugs if 'P1' in str(b.get('priority',''))]
+            p2_bugs = [b for b in bugs if 'P2' in str(b.get('priority',''))]
+
+            context_parts.append(f"\n## PRODUCTION BUGS: {len(bugs)} total")
+            context_parts.append(f"   P0 (Critical): {len(p0_bugs)}")
+            context_parts.append(f"   P1 (High): {len(p1_bugs)}")
+            context_parts.append(f"   P2+ (Medium/Low): {len(p2_bugs)}")
+
+            # Show P0/P1 bug details
+            high_priority = p0_bugs + p1_bugs
+            if high_priority:
+                context_parts.append("\n   Critical Bugs (P0/P1):")
+                for idx, bug in enumerate(high_priority[:5], 1):
+                    subject = bug.get('subject', 'No subject')
+                    team = bug.get('team', 'Unknown team')
+                    context_parts.append(f"   {idx}. [{bug.get('priority')}] {subject[:100]} (Team: {team})")
+        else:
+            context_parts.append("\n## PRODUCTION BUGS: None")
+
+        # Code Coverage
+        cov_summary = data.get('coverage_summary', {})
+        if cov_summary:
+            overall = cov_summary.get('overall', {})
+            new_code = cov_summary.get('new_code', {})
+            line_cov = overall.get('line_coverage', 0)
+            branch_cov = overall.get('branch_coverage', 0)
+            new_line_cov = new_code.get('line_coverage', 0)
+
+            context_parts.append(f"\n## CODE COVERAGE:")
+            context_parts.append(f"   Overall Line Coverage: {line_cov:.1f}%")
+            context_parts.append(f"   Overall Branch Coverage: {branch_cov:.1f}%")
+            context_parts.append(f"   New Code Line Coverage: {new_line_cov:.1f}%")
+
+            # Coverage status
+            if line_cov < 70:
+                context_parts.append(f"   ⚠️ Coverage is below 70% threshold - HIGH RISK")
+            elif line_cov < 80:
+                context_parts.append(f"   ⚠️ Coverage is below 80% target - MODERATE RISK")
+            else:
+                context_parts.append(f"   ✓ Coverage meets target")
+        else:
+            context_parts.append("\n## CODE COVERAGE: No data available")
+
+        # CI Issues
+        ci = data.get('ci_issues', [])
+        if ci:
+            p0_ci = [c for c in ci if 'P0' in str(c.get('priority',''))]
+            p1_ci = [c for c in ci if 'P1' in str(c.get('priority',''))]
+            context_parts.append(f"\n## CI ISSUES: {len(ci)} total")
+            context_parts.append(f"   P0 (Blocking): {len(p0_ci)}")
+            context_parts.append(f"   P1 (High): {len(p1_ci)}")
+            if p0_ci:
+                context_parts.append("   ⚠️ P0 CI issues are blocking releases - CRITICAL")
+
+        # Left Shift Issues
+        leftshift = data.get('leftshift_issues', [])
+        if leftshift:
+            context_parts.append(f"\n## LEFT SHIFT ISSUES: {len(leftshift)} total")
+            context_parts.append(f"   (Bugs found late in development cycle)")
+
+        # ABS (After Build Starts) Issues
+        abs_issues = data.get('abs_issues', [])
+        if abs_issues:
+            p0_abs = [a for a in abs_issues if 'P0' in str(a.get('priority',''))]
+            p1_abs = [a for a in abs_issues if 'P1' in str(a.get('priority',''))]
+            context_parts.append(f"\n## ABS ISSUES: {len(abs_issues)} total")
+            context_parts.append(f"   P0: {len(p0_abs)}, P1: {len(p1_abs)}")
+
+        # Security Issues
+        security = data.get('security_issues', [])
+        if security:
+            p0_sec = [s for s in security if 'P0' in str(s.get('priority',''))]
+            p1_sec = [s for s in security if 'P1' in str(s.get('priority',''))]
+            context_parts.append(f"\n## SECURITY ISSUES: {len(security)} total")
+            context_parts.append(f"   P0: {len(p0_sec)}, P1: {len(p1_sec)}")
+            if p0_sec or p1_sec:
+                context_parts.append("   ⚠️ High priority security issues require immediate attention")
+
+        # Risks/Features
+        risks = data.get('risks', [])
+        if risks:
+            at_risk = [r for r in risks if 'red' in str(r.get('status','')).lower() or 'at risk' in str(r.get('status','')).lower()]
+            on_track = [r for r in risks if 'green' in str(r.get('status','')).lower() or 'on track' in str(r.get('status','')).lower()]
+
+            context_parts.append(f"\n## FEATURES/RISKS: {len(risks)} tracked")
+            context_parts.append(f"   At Risk: {len(at_risk)}")
+            context_parts.append(f"   On Track: {len(on_track)}")
+
+            if at_risk:
+                context_parts.append("\n   Features at Risk:")
+                for idx, risk in enumerate(at_risk[:5], 1):
+                    feature = risk.get('feature', 'Unknown')
+                    status = risk.get('status', 'Unknown')
+                    context_parts.append(f"   {idx}. {feature} - Status: {status}")
+
+        # Backlog
+        alltime_backlog = data.get('alltime_backlog', [])
+        prb_backlog = data.get('prb_backlog', [])
+        if alltime_backlog:
+            context_parts.append(f"\n## ALL-TIME BACKLOG: {len(alltime_backlog)} items")
+        if prb_backlog:
+            context_parts.append(f"## PRB BACKLOG: {len(prb_backlog)} items")
+
+        # Code Changes
+        code_changes = data.get('code_changes', {})
+        if code_changes:
+            files_changed = code_changes.get('files_changed', 0)
+            lines_added = code_changes.get('lines_added', 0)
+            lines_deleted = code_changes.get('lines_deleted', 0)
+            commits = code_changes.get('commits', 0)
+
+            context_parts.append(f"\n## CODE CHANGES (Recent):")
+            context_parts.append(f"   Files Changed: {files_changed}")
+            context_parts.append(f"   Lines Added: {lines_added}")
+            context_parts.append(f"   Lines Deleted: {lines_deleted}")
+            context_parts.append(f"   Commits: {commits}")
+
+        return "\n".join(context_parts)
+
+    def query_claude(self, question: str, context: str, component: str) -> str:
+        """Query Claude with the dashboard context"""
+        import requests
+        import socket
+        import urllib3
+
+        # Suppress SSL warnings for internal Salesforce endpoint
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+        if not self.llm_api_key:
+            return "❌ LLM Gateway API key not configured. Please set LLM_GW_EXPRESS_KEY environment variable."
+
+        # Check if LLM Gateway is reachable (VPN connectivity)
+        try:
+            socket.gethostbyname("eng-ai-model-gateway.sfproxy.devx-preprod.aws-esvc1-useast2.aws.sfdc.cl")
+        except socket.gaierror:
+            return """❌ Cannot reach LLM Gateway (eng-ai-model-gateway.sfproxy.devx-preprod.aws-esvc1-useast2.aws.sfdc.cl)
+
+This is an internal Salesforce endpoint that requires VPN connection.
+
+**To fix:**
+1. Connect to Salesforce VPN
+2. Verify connection: `ping eng-ai-model-gateway.sfproxy.devx-preprod.aws-esvc1-useast2.aws.sfdc.cl`
+3. Refresh this page and try again"""
+
+        try:
+            headers = {
+                "Authorization": f"Bearer {self.llm_api_key}",
+                "Content-Type": "application/json"
+            }
+
+            messages = [
+                {"role": "system", "content": f"You are a senior quality engineer analyzing SDB dashboard data for {component}. Provide concise, actionable answers."},
+                {"role": "user", "content": f"Dashboard Context:\n{context}\n\nQuestion: {question}"}
+            ]
+
+            payload = {
+                "model": "claude-sonnet-4-20250514",
+                "messages": messages,
+                "max_tokens": 1000,
+                "temperature": 0.3
+            }
+
+            if self.openai_user_id:
+                payload["user"] = self.openai_user_id
+
+            response = requests.post(
+                self.llm_gateway_url,
+                headers=headers,
+                json=payload,
+                timeout=120,
+                verify=False  # Disable SSL verification for internal Salesforce endpoint
+            )
+
+            if response.status_code == 200:
+                result = response.json()
+                if "choices" in result and len(result["choices"]) > 0:
+                    return result["choices"][0]["message"]["content"].strip()
+                else:
+                    return f"❌ LLM Gateway returned 200 but no choices. Response: {str(result)[:200]}"
+            else:
+                return f"❌ Error: {response.status_code} - {response.text[:200]}"
+
+        except requests.exceptions.Timeout:
+            return "❌ Request timed out. The LLM Gateway may be slow or unresponsive."
+        except requests.exceptions.ConnectionError as e:
+            return f"❌ Connection error: {str(e)}\n\nMake sure you're connected to Salesforce VPN."
+        except Exception as e:
+            return f"❌ Error querying Claude: {str(e)}"
+
+
 
 if __name__ == "__main__":
     main()
