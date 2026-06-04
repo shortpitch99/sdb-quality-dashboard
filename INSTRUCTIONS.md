@@ -2,6 +2,9 @@
 
 **⚠️ IMPORTANT**: The following data files must be prepared before running the quality report generator:
 
+### Authentication for GUS is done the following way
+- ** sf org login web --set-default --alias gus
+
 ## Required Data Files
 
 ### 1. Risk Assessment Data (`risks.txt`)
