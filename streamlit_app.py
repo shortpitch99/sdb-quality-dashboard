@@ -1973,9 +1973,65 @@ class QualityReportDashboard:
             # Show most changed files if available
             most_changed = git_stats.get('most_changed_files', [])
             if most_changed:
-                st.markdown("#### 📁 Most Changed Files")
-                for i, file_info in enumerate(most_changed[:5]):
-                    st.write(f"{i+1}. **{file_info.get('file', 'Unknown')}** - {file_info.get('total_changes', 0)} changes")
+                st.markdown("#### 📁 Most Changed Files (Top 10)")
+                for i, file_info in enumerate(most_changed[:10]):
+                    total = file_info.get('total_changes', 0)
+                    file_path = file_info.get('file', 'Unknown')
+                    st.write(f"{i+1}. `{file_path}` - **{total:,} changes**")
+
+                if len(most_changed) > 10:
+                    st.caption(f"... and {len(most_changed) - 10} more files changed")
+
+            # Check if we can get detailed category breakdown from live git
+            # (Only if repo is accessible and we want more details)
+            st.markdown("---")
+            st.info("💡 **Note:** Detailed file breakdown by category requires regenerating the report with `./run_report.sh`")
+
+            # Try to show category breakdown if git repo is accessible
+            try:
+                # Get dates from git_stats if available
+                report_start = git_stats.get('reporting_period_start')
+                report_end = git_stats.get('reporting_period_end')
+
+                if report_start and report_end:
+                    changes_data, _ = get_git_changes_by_path(
+                        report_start, report_end, repo_path, is_sdb_repo
+                    )
+
+                    if changes_data:
+                        st.markdown("#### 📋 Detailed File Changes by Category")
+                        st.caption("(Live data from git repository)")
+
+                        # Calculate total changes for percentages
+                        categories = list(changes_data.keys())
+                        total_changes = [changes_data[d]['added'] + changes_data[d]['deleted'] for d in categories]
+
+                        # Sort by total changes
+                        sorted_data = sorted(zip(categories, total_changes), key=lambda x: x[1], reverse=True)
+
+                        # Show file details for each category in an expander
+                        for category, total_cat_changes in sorted_data:
+                            file_details = changes_data[category]['file_details']
+                            percentage = (total_cat_changes / sum(total_changes) * 100) if sum(total_changes) > 0 else 0
+
+                            # Create expander for each category
+                            with st.expander(f"📁 {category}: {total_cat_changes:,} lines ({percentage:.1f}%) - {len(file_details)} files"):
+                                for detail in sorted(file_details, key=lambda x: x['added'] + x['deleted'], reverse=True):
+                                    total_file_changes = detail['added'] + detail['deleted']
+                                    st.markdown(f"• `{detail['path']}`: +{detail['added']} -{detail['deleted']} ({total_file_changes} total)")
+
+                                # Summary for this category
+                                total_added = changes_data[category]['added']
+                                total_deleted = changes_data[category]['deleted']
+                                st.markdown(f"**Category Summary:** +{total_added:,} lines added, -{total_deleted:,} lines deleted")
+                else:
+                    st.warning("⚠️ Could not determine reporting period from git_stats")
+            except Exception as e:
+                # Git repo not accessible, which is expected on Streamlit Cloud
+                st.error(f"⚠️ Error fetching detailed git data: {str(e)}")
+                import traceback
+                st.code(traceback.format_exc())
+
             return
         
         # Fallback: Try to get changes from git (won't work on Streamlit Cloud)
@@ -2043,20 +2099,27 @@ class QualityReportDashboard:
             )
             
             st.plotly_chart(fig, use_container_width=True)
-            
-            # Add detailed file breakdown for top categories
+
+            # Add detailed file breakdown for ALL categories (expandable)
             if categories:
-                st.markdown("#### 📋 Detailed File Changes")
-                top_category = categories[0]
-                file_details = changes_data[top_category]['file_details']
-                
-                st.markdown(f"**Top Changed Category: {top_category}**")
-                for detail in sorted(file_details, key=lambda x: x['added'] + x['deleted'], reverse=True)[:5]:
-                    total_file_changes = detail['added'] + detail['deleted']
-                    st.markdown(f"• `{detail['path']}`: +{detail['added']} -{detail['deleted']} ({total_file_changes} total)")
-                
-                if len(file_details) > 5:
-                    st.markdown(f"... and {len(file_details) - 5} more files")
+                st.markdown("#### 📋 Detailed File Changes by Category")
+
+                # Show file details for each category in an expander
+                for i, category in enumerate(categories):
+                    file_details = changes_data[category]['file_details']
+                    total_cat_changes = total_changes[i]
+                    percentage = (total_cat_changes / sum(total_changes) * 100) if sum(total_changes) > 0 else 0
+
+                    # Create expander for each category
+                    with st.expander(f"📁 {category}: {total_cat_changes:,} lines ({percentage:.1f}%) - {len(file_details)} files"):
+                        for detail in sorted(file_details, key=lambda x: x['added'] + x['deleted'], reverse=True):
+                            total_file_changes = detail['added'] + detail['deleted']
+                            st.markdown(f"• `{detail['path']}`: +{detail['added']} -{detail['deleted']} ({total_file_changes} total)")
+
+                        # Summary for this category
+                        total_added = changes_data[category]['added']
+                        total_deleted = changes_data[category]['deleted']
+                        st.markdown(f"**Category Summary:** +{total_added:,} lines added, -{total_deleted:,} lines deleted")
         
         with col2:
             st.markdown("#### 🎯 Risk Assessment")
@@ -2342,7 +2405,7 @@ class QualityReportDashboard:
         
         st.plotly_chart(fig, use_container_width=True, key="deployment_stacked_bar")
     
-    def create_version_pie_chart(self, data: Dict[str, Any]):
+    def create_version_pie_chart(self, data: Dict[str, Any], key_suffix: str = ""):
         """Create pie chart of SDB versions from deployment.csv data."""
         deployments = self.get_deployment_data(data)
         if not deployments:
@@ -2414,7 +2477,7 @@ class QualityReportDashboard:
                 plot_bgcolor='rgba(0,0,0,0)',
                 margin=dict(l=20, r=150, t=80, b=20)
             )
-            st.plotly_chart(fig, use_container_width=True, key="version_pie_chart")
+            st.plotly_chart(fig, use_container_width=True, key=f"version_pie_chart{key_suffix}")
         else:
             st.warning(f"📊 No valid version data for pie chart (found {total_cells} total cells)")
 
@@ -5744,7 +5807,7 @@ class QualityReportDashboard:
             fig.update_layout(xaxis_tickangle=45)
             st.plotly_chart(fig, use_container_width=True, key="deployment_timeline_chart")
     
-    def create_bug_severity_chart(self, data: Dict[str, Any]):
+    def create_bug_severity_chart(self, data: Dict[str, Any], key_suffix: str = ""):
         """Create production bug priority breakdown chart with scoring visualization."""
         bugs = data.get('bugs', [])
         
@@ -5796,9 +5859,9 @@ class QualityReportDashboard:
             ]
         )
         
-        st.plotly_chart(fig, use_container_width=True, key="bug_severity_chart")
+        st.plotly_chart(fig, use_container_width=True, key=f"bug_severity_chart{key_suffix}")
     
-    def create_ci_issues_chart(self, data: Dict[str, Any]):
+    def create_ci_issues_chart(self, data: Dict[str, Any], key_suffix: str = ""):
         """Create CI issues stacked bar chart by team and priority."""
         ci_data = data.get('ci_issues', [])
         
@@ -5856,9 +5919,9 @@ class QualityReportDashboard:
             legend_title="Priority"
         )
         
-        st.plotly_chart(fig, use_container_width=True, key="ci_issues_chart")
+        st.plotly_chart(fig, use_container_width=True, key=f"ci_issues_chart{key_suffix}")
     
-    def create_security_bugs_chart(self, data: Dict[str, Any]):
+    def create_security_bugs_chart(self, data: Dict[str, Any], key_suffix: str = ""):
         """Create security bugs stacked bar chart by team and priority."""
         security_data = data.get('security_issues', [])
         
@@ -5917,9 +5980,9 @@ class QualityReportDashboard:
             legend_title="Priority"
         )
         
-        st.plotly_chart(fig, use_container_width=True, key="security_bugs_chart")
+        st.plotly_chart(fig, use_container_width=True, key=f"security_bugs_chart{key_suffix}")
     
-    def create_leftshift_bugs_chart(self, data: Dict[str, Any]):
+    def create_leftshift_bugs_chart(self, data: Dict[str, Any], key_suffix: str = ""):
         """Create left shift bugs stacked bar chart by team and priority."""
         leftshift_data = data.get('leftshift_issues', [])
         
@@ -5975,9 +6038,9 @@ class QualityReportDashboard:
             legend_title="Priority"
         )
         
-        st.plotly_chart(fig, use_container_width=True, key="leftshift_bugs_chart")
+        st.plotly_chart(fig, use_container_width=True, key=f"leftshift_bugs_chart{key_suffix}")
     
-    def create_abs_bugs_chart(self, data: Dict[str, Any]):
+    def create_abs_bugs_chart(self, data: Dict[str, Any], key_suffix: str = ""):
         """Create ABS bugs stacked bar chart by team and priority."""
         abs_data = data.get('abs_issues', [])
         
@@ -6030,7 +6093,7 @@ class QualityReportDashboard:
             legend_title="Priority"
         )
         
-        st.plotly_chart(fig, use_container_width=True, key="abs_bugs_chart")
+        st.plotly_chart(fig, use_container_width=True, key=f"abs_bugs_chart{key_suffix}")
     
     def create_trend_analysis(self, data: Dict[str, Any]):
         """Get pre-generated trend analysis from LLM content or show unavailable message."""
@@ -7375,7 +7438,7 @@ def render_component_development_metrics(component: str, display_name: Optional[
         st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         col1, col2 = st.columns([1, 1])
         with col1:
-            dashboard.create_bug_severity_chart(data)
+            dashboard.create_bug_severity_chart(data, key_suffix=f"_{component}")
         with col2:
             dashboard.create_bug_insights(data)
         
@@ -7384,7 +7447,7 @@ def render_component_development_metrics(component: str, display_name: Optional[
         st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         col1, col2 = st.columns([1, 1])
         with col1:
-            dashboard.create_coverage_comparison_chart(data)
+            dashboard.create_coverage_comparison_chart(data, key_suffix=f"_{component}")
         with col2:
             dashboard.create_coverage_insights(data)
         
@@ -7400,7 +7463,7 @@ def render_component_development_metrics(component: str, display_name: Optional[
         st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         col1, col2 = st.columns([1, 1])
         with col1:
-            dashboard.create_ci_issues_chart(data)
+            dashboard.create_ci_issues_chart(data, key_suffix=f"_{component}")
         with col2:
             if ci_issues_gus:
                 st.markdown(f"#### 📊 [CI Issues Insights]({ci_issues_gus})")
@@ -7445,7 +7508,7 @@ def render_component_development_metrics(component: str, display_name: Optional[
         st.markdown("*Source: Coverity and 3PP Scan*")
         col1, col2 = st.columns([1, 1])
         with col1:
-            dashboard.create_security_bugs_chart(data)
+            dashboard.create_security_bugs_chart(data, key_suffix=f"_{component}")
         with col2:
             st.markdown("#### 🛡️ Security Analysis")
             security_data = data.get('security_issues', [])
@@ -7493,7 +7556,7 @@ def render_component_development_metrics(component: str, display_name: Optional[
         st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         col1, col2 = st.columns([1, 1])
         with col1:
-            dashboard.create_leftshift_bugs_chart(data)
+            dashboard.create_leftshift_bugs_chart(data, key_suffix=f"_{component}")
         with col2:
             if left_shift_gus:
                 st.markdown(f"#### 📈 [Left Shift Insights]({left_shift_gus})")
@@ -7535,7 +7598,7 @@ def render_component_development_metrics(component: str, display_name: Optional[
         st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         col1, col2 = st.columns([1, 1])
         with col1:
-            dashboard.create_abs_bugs_chart(data)
+            dashboard.create_abs_bugs_chart(data, key_suffix=f"_{component}")
         with col2:
             if abs_gus:
                 st.markdown(f"#### 📈 [ABS Insights]({abs_gus})")
@@ -7564,7 +7627,7 @@ def render_component_development_metrics(component: str, display_name: Optional[
         st.markdown("---")
         st.markdown('<h3 id="deployment-analysis">🚀 <a href="https://bdmpresto-superset-server.sfproxy.uip.aws-esvc1-useast2.aws.sfdc.cl/superset/sqllab?savedQueryId=25468" target="_blank">Deployment Analysis</a></h3>', unsafe_allow_html=True)
         st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
-        dashboard.create_version_pie_chart(data)
+        dashboard.create_version_pie_chart(data, key_suffix=f"_{component}")
 
         st.markdown("#### 1. Release Deployment Timeline - Plan vs Actual")
         st.markdown("""
@@ -7598,7 +7661,21 @@ def render_component_development_metrics(component: str, display_name: Optional[
 
         # Code Changes Analysis
         st.markdown("---")
-        st.markdown('<h3 id="code-changes-analysis">📊 Code Changes Analysis</h3>', unsafe_allow_html=True)
+        st.markdown("""
+        <h3 id="code-changes-analysis">📊 Code Changes Analysis</h3>
+        <script>
+        // Enable smooth scrolling to anchors
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A' && e.target.getAttribute('href').startsWith('#')) {
+                e.preventDefault();
+                const target = document.querySelector(e.target.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        });
+        </script>
+        """, unsafe_allow_html=True)
         st.markdown('<p style="text-align: right; margin-top: -10px;"><a href="#production-metrics" style="font-size: 0.8rem; color: #666;">↑ Back to top</a></p>', unsafe_allow_html=True)
         dashboard.create_code_changes_analysis(data, component=component)
 
@@ -7617,7 +7694,22 @@ def render_component_development_metrics(component: str, display_name: Optional[
 
 def main():
     """Main Streamlit application."""
-    
+
+    # Authentication check
+    from auth_config import check_authentication, login_page, logout
+
+    if not check_authentication():
+        login_page()
+        st.stop()
+
+    # Show logout button in sidebar
+    if st.session_state.get("authenticated"):
+        st.sidebar.markdown("---")
+        st.sidebar.markdown(f"**👤 Logged in as:** {st.session_state.username}")
+        st.sidebar.markdown(f"**🔑 Role:** {st.session_state.user_role}")
+        if st.sidebar.button("🚪 Logout", key="logout_button"):
+            logout()
+
     # Display professional title banner - stretchable across full width
     st.markdown("""
     <style>

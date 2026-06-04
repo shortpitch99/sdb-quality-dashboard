@@ -66,3 +66,8 @@ tmp/
 # Uncomment if you want to ignore data files:
 # *.txt
 # *.csv
+
+# Security files
+.encryption_key
+.env.production
+# Note: auth_config.py is committed (contains only hashed passwords, safe to commit)
