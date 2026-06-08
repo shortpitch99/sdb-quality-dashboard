@@ -434,34 +434,54 @@ class QualityReportDashboard:
 
     def _resolve_week_folder_key(self, selected_week: Optional[str], data: Optional[Dict[str, Any]] = None) -> Optional[str]:
         """
-        Convert UI week selector key (often YYYY-MM-DD timestamp key) into weeks/cwNN folder key.
+        Convert UI week selector key into weeks/YYYY-cwNN folder key.
         Priority:
-          1) explicit cwNN in selected_week
-          2) metadata.week_label
-          3) metadata.report_period_start
-          4) selected_week parsed as date
+          1) explicit YYYY-cwNN in selected_week
+          2) bare cwNN — scan weeks/ to find matching folder
+          3) metadata.week_label
+          4) metadata.report_period_start (date → YYYY-cwNN)
+          5) selected_week parsed as date
         """
         def cw_from_date_str(s: str) -> Optional[str]:
             try:
                 d = datetime.strptime(str(s).strip(), "%Y-%m-%d")
-                return f"cw{d.isocalendar().week:02d}"
+                return f"{d.year}-cw{d.isocalendar().week:02d}"
             except ValueError:
                 return None
 
-        if selected_week and re.match(r"^cw\d{2}$", str(selected_week).strip(), re.IGNORECASE):
-            return str(selected_week).strip().lower()
+        def find_week_folder(cw_bare: str) -> Optional[str]:
+            """Find YYYY-cwNN folder matching bare cwNN key."""
+            weeks_dir = os.path.join(APP_ROOT, "weeks")
+            if not os.path.exists(weeks_dir):
+                return None
+            for entry in sorted(os.listdir(weeks_dir), reverse=True):
+                if re.match(r"^\d{4}-" + re.escape(cw_bare) + r"$", entry, re.IGNORECASE):
+                    return entry
+            return None
+
+        sw = str(selected_week or "").strip()
+
+        # Already in YYYY-cwNN format
+        if re.match(r"^\d{4}-cw\d{2}$", sw, re.IGNORECASE):
+            return sw.lower()
+
+        # Bare cwNN — find matching year folder
+        if re.match(r"^cw\d{2}$", sw, re.IGNORECASE):
+            return find_week_folder(sw.lower())
 
         md = (data or {}).get("metadata", {}) if isinstance(data, dict) else {}
-        wl = str(md.get("week_label", "")).strip().lower()
-        if re.match(r"^cw\d{2}$", wl):
-            return wl
+        wl = str(md.get("week_label", "")).strip()
+        if re.match(r"^\d{4}-cw\d{2}$", wl, re.IGNORECASE):
+            return wl.lower()
+        if re.match(r"^cw\d{2}$", wl, re.IGNORECASE):
+            return find_week_folder(wl.lower())
 
         rps = str(md.get("report_period_start", "")).strip()
         cw = cw_from_date_str(rps)
         if cw:
             return cw
 
-        cw = cw_from_date_str(str(selected_week or ""))
+        cw = cw_from_date_str(sw)
         if cw:
             return cw
         return None
