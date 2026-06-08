@@ -78,13 +78,25 @@ if [ -z "$WEEK" ] || [ -z "$COMPONENT_INPUT" ]; then
     exit 1
 fi
 
-# Week data folder may be lowercase (e.g. weeks/cw15/sdd); prefer existing path
-if [ -d "weeks/$WEEK/$COMPONENT_INPUT" ]; then
-  DATA_DIR="weeks/$WEEK/$COMPONENT_INPUT"
-elif [ -d "weeks/$WEEK/$COMPONENT" ]; then
-  DATA_DIR="weeks/$WEEK/$COMPONENT"
+# Normalise week: accept both "cw22" and "2026-cw22" — always store as YYYY-cwNN
+if [[ "$WEEK" =~ ^[0-9]{4}-cw[0-9]{2}$ ]]; then
+  WEEK_FOLDER="$WEEK"                         # already YYYY-cwNN
+  WEEK_SHORT="${WEEK:5}"                       # "cw22" (passed to quality_report_generator)
 else
-  DATA_DIR="weeks/$WEEK/$COMPONENT"
+  # bare cwNN — derive year from current date
+  YEAR=$(date +%Y)
+  WEEK_FOLDER="${YEAR}-${WEEK}"               # "2026-cw22"
+  WEEK_SHORT="$WEEK"                          # "cw22"
+fi
+WEEK="$WEEK_SHORT"   # keep $WEEK as the bare form that quality_report_generator expects
+
+# Week data folder may be lowercase (e.g. weeks/2026-cw15/sdd); prefer existing path
+if [ -d "weeks/$WEEK_FOLDER/$COMPONENT_INPUT" ]; then
+  DATA_DIR="weeks/$WEEK_FOLDER/$COMPONENT_INPUT"
+elif [ -d "weeks/$WEEK_FOLDER/$COMPONENT" ]; then
+  DATA_DIR="weeks/$WEEK_FOLDER/$COMPONENT"
+else
+  DATA_DIR="weeks/$WEEK_FOLDER/$COMPONENT"
 fi
 
 # Git clone used for code-churn in the report (must match quality_report_generator.resolve_git_repo_path)
@@ -131,7 +143,7 @@ missing_files=()
 
 # Data directory (resolved above for lowercase folder names)
 data_dir="$DATA_DIR"
-shared_dir="weeks/$WEEK/Shared"
+shared_dir="weeks/$WEEK_FOLDER/Shared"
 echo "📂 Looking for data files in: $data_dir/"
 
 # Prefer shared deployment sources (actuals), then component-local fallback.
@@ -272,6 +284,21 @@ if [ $exit_code -eq 0 ]; then
     if [ -n "$latest_report" ]; then
         echo "📄 Latest report: $latest_report"
         echo "📏 Report size: $(wc -c < "$latest_report") bytes"
+    fi
+
+    # ── Auto-update static dashboard (QC2) ───────────────────────────────────
+    QC2_DIR="$(dirname "$SCRIPT_DIR")/QC2"
+    if [ -d "$QC2_DIR" ] && [ -f "$QC2_DIR/generate_static_site.py" ]; then
+        echo ""
+        echo "🔄 Regenerating static dashboard (QC2)..."
+        python3 "$QC2_DIR/generate_static_site.py"
+        echo "⬆️  Pushing static dashboard to git.soma..."
+        (cd "$QC2_DIR" && \
+          git add -A && \
+          git commit -m "Update $COMPONENT $WEEK_FOLDER report" 2>/dev/null && \
+          git push origin main && \
+          echo "✅ Static dashboard live at: https://git.soma.salesforce.com/pages/rchowdhuri/sdb-quality-dashboard/"
+        ) || echo "ℹ️  No changes to push to QC2"
     fi
 elif [ $exit_code -eq 1 ] && [ "$USE_SF_REPORTS" = "1" ]; then
     echo ""
